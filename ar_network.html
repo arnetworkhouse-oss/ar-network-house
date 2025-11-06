@@ -186,11 +186,38 @@
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
             text-align: center;
-            transition: 0.3s;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.3, 1);
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .service-card p {
+            color: var(--gray);
+        }
+
+        .service-card ul {
+            list-style: disc;
+            text-align: left;
+            margin-top: 15px;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.3, 1);
+            color: var(--gray);
+            padding-left: 25px;
         }
 
         .service-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .service-card:hover ul {
+            opacity: 1;
+            max-height: 250px;
+            transform: translateY(0);
         }
 
         /* Projects Section */
@@ -227,12 +254,6 @@
             transition: 0.3s;
         }
 
-        .contact form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
         .contact input,
         .contact textarea {
             padding: 10px;
@@ -252,7 +273,7 @@
             transition: 0.3s;
         }
 
-        button.contact :hover {
+        button.contact:hover {
             opacity: 0.9;
         }
 
@@ -304,7 +325,6 @@
                     <a href="#services">Services</a>
                     <a href="#projects">Projects</a>
                     <a href="#work-form">Work Form</a>
-
                     <a href="#contact">Contact</a>
                 </div>
             </nav>
@@ -322,9 +342,9 @@
     <section id="about" class="about">
         <div class="container">
             <h2>About Us</h2>
-            <p>AR Network House is an educational organization dedicated to providing high-quality study materials.
-                for students and teachers. We offer structured notes, personalized website design, and innovative
-                projects to help you grow.</p>
+            <p>AR Network House is an educational organization dedicated to providing high-quality study materials for
+                students and teachers. We offer structured notes, personalized website design, and innovative projects
+                to help you grow.</p>
         </div>
     </section>
 
@@ -333,17 +353,47 @@
             <h2>Our Services</h2>
             <div class="grid">
                 <div class="service-card">
-                    <h3>Projects & posters</h3>
-                    <p>All kind of school projects & content posters are done here</p>
+                    <h3>Projects & Posters</h3>
+                    <p>All kinds of school projects & content posters</p>
+                    <ul>
+                        <li>Academic projects & Project related pictures</li>
+                        <li>Cover page Design</li>
+                        <li>Poster design & layout</li>
+                        <li>Custom content formatting</li>
+                    </ul>
                 </div>
                 <div class="service-card">
-                    <h3>Website create & design</h3>
-                    <p>Personalized website design with future updates & maintanance</p>
+                    <h3>Website Create & Design</h3>
+                    <p>Personalized website design with ongoing support</p>
+                    <ul>
+                        <li>Modern responsive layouts</li>
+                        <li>Update & maintenance package</li>
+                        <li>School-College Html,Css,Script projects</li>
+
+                    </ul>
                 </div>
                 <div class="service-card">
-                    <h3>CV</h3>
-                    <p>creating & updating CV with custom lines and prompt </p>
+                    <h3>Official Documents</h3>
+                    <p>Support for PAN, voter ID, etc. like documents</p>
+                    <ul>
+                        <li>PAN Card</li>
+                        <li>Voter Card</li>
+                        <li>Birth Cirtificate Renewal</li>
+                        <li>CU registration</li>
+                        <li>ABC Id / Apaar no</li>
+                        <li>E-Shram card / UAN no</li>
+                    </ul>
                 </div>
+                <div class="service-card">
+                    <h3>CV Creation</h3>
+                    <p>Customized resumes that stand out</p>
+                    <ul>
+                        <li>Content structuring</li>
+                        <li>Professional formatting</li>
+                        <li>Prompt-driven enhancements</li>
+                    </ul>
+                </div>
+
             </div>
         </div>
     </section>
@@ -358,25 +408,16 @@
                     </h3>
                     <p><a href="https://duyare-physics.github.io/turbo/home.html">Tap to see !</a></p>
                 </div>
-                <!-- <div class="project-card">
-          <h3>Photography Basics</h3>
-          <p>Hands-on course for aspiring photographers.</p>
-        </div> -->
-                <!-- <div class="project-card">
-          <h3>Exam Prep Series</h3>
-          <p>Intensive short courses for exam revision and practice.</p>
-        </div> -->
             </div>
         </div>
     </section>
+
     <section class="notice" id="work-form">
         <div class="notice" id="work-form">
             <h2 style="text-align:center; color:#3a3af5; font-size: 28px; margin-bottom: 20px;"><i> Work Submission
                     Form</i>
             </h2>
-            <p></p>
-            <center>Tap the button to give your work to us !
-                </p>
+            <center>Tap the button to give your work to us!
                 <a href="https://docs.google.com/forms/d/e/1FAIpQLSc823X7If-DehxrBNTZwGcRIXyhcVKIHD8YVGCnO7Ts63ysTw/viewform"
                     class="btn">Click Here</a>
             </center>
@@ -388,26 +429,18 @@
             style="max-width: 600px; margin: auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); padding: 30px;">
             <h2 style="text-align:center; color:#3a3af5; font-size: 28px; margin-bottom: 20px;">Contact Us</h2>
 
-            <form method="POST" enctype="text/plain">
-
-
-            </form>
-
             <p style="text-align:center; margin-top:20px; color:#555;">
                 email us for projects or website design <strong>[arnetworkhouse@gmail.com]</strong><br>
                 <a href="mailto:arnetworkhouse@gmail.com"><button class="contact">Email Us</button></a> <br>
                 or, whatsapp: <strong>[+91 95648 69046]</strong><br>
-                <center> <a href=" https://wa.me/919564869046 "><button class="contact">Chat With Us</button></a>
+                <center> <a href="https://wa.me/919564869046"><button class="contact">Chat With Us</button></a>
                 </center><br>
                 or, DM us on facebook <strong><a
-                        href="https://www.facebook.com/people/AR-Network-House/61582122682177/?rdid=OEDi5i8z02rliaV9&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1A9nJxyZVS%2F">AR
-                        Network House</a></strong>
+                        href="https://www.facebook.com/people/AR-Network-House/61582122682177/">AR Network
+                        House</a></strong>
             </p>
-
         </div>
     </section>
-
-
 
     <footer>
         © <span id="year"></span> AR Network House | All rights reserved. | <a
