@@ -262,19 +262,62 @@
             font-size: 1rem;
         }
 
-        button.contact {
-            padding: 12px;
-            border: none;
-            background: var(--primary);
-            color: white;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
+        .contact-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
         }
 
-        button.contact:hover {
-            opacity: 0.9;
+        .btn-contact {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-contact img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .btn-contact.mail {
+            background: #e63946;
+        }
+
+        .btn-contact.whatsapp {
+            background: #25d366;
+        }
+
+        .btn-contact.linkedin {
+            background: #0a66c2;
+        }
+
+        .btn-contact.facebook {
+            background: #1877f2;
+        }
+
+        .btn-contact.instagram {
+            background: linear-gradient(45deg, #fd1d1d, #e1306c, #c13584, #833ab4);
+        }
+
+        .btn-contact:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 600px) {
+            .btn-contact {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         footer {
@@ -342,9 +385,12 @@
     <section id="about" class="about">
         <div class="container">
             <h2>About Us</h2>
-            <p><strong>AR Network House</strong>  delivers end-to-end creative and digital solutions including <strong>project development, poster
-                design, professional web design, and official document services</strong>. We combine innovation with precision to
-                ensure every deliverable reflects quality, professionalism, and measurable impact.</p>
+            <p><strong>AR Network House</strong> delivers end-to-end creative and digital solutions including
+                <strong>project development, poster
+                    design, professional web design, and official document services</strong>. We combine innovation with
+                precision to
+                ensure every deliverable reflects quality, professionalism, and measurable impact.
+            </p>
         </div>
     </section>
 
@@ -429,20 +475,59 @@
             style="max-width: 600px; margin: auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); padding: 30px;">
             <h2 style="text-align:center; color:#3a3af5; font-size: 28px; margin-bottom: 20px;">Contact Us</h2>
 
-            <p style="text-align:center; margin-top:20px; color:#555;">
-                email us for projects or website design <strong>[arnetworkhouse@gmail.com]</strong><br>
-                <a href="mailto:arnetworkhouse@gmail.com"><button class="contact">Email Us</button></a> <br><br>
-                or, whatsapp: <strong>[+91 94774 40204]</strong><br>
-                <center> <a href="https://wa.me/message/BYBAW3B7HISBI1"><button class="contact">Chat With
-                            Us</button></a>
-                    <br><br>
-                    or, DM us on facebook <strong><a
-                            href="https://www.facebook.com/people/AR-Network-House/61582122682177/">AR Network
-                            House</a></strong>
-                </center>
+            <p style="text-align:center; margin-top:10px; color:#555;">
+                Get in touch with us for project work, web design, or official document services.
             </p>
+
+            <div class="contact-buttons">
+                <!-- Mail Button -->
+                <a href="mailto:arnetworkhouse@gmail.com" class="btn-contact mail">
+                    <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" alt="Mail">
+                    Email Us
+                </a>
+
+                <!-- WhatsApp Button -->
+                <a href=" https://wa.me/919477440204 " class="btn-contact whatsapp">
+                    <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
+                    WhatsApp
+                </a>
+
+                <!-- LinkedIn Button -->
+                <a href="https://www.linkedin.com/in/ar-network-house-635784395/" class="btn-contact linkedin">
+                    <img src="https://cdn-icons-png.flaticon.com/512/733/733561.png" alt="LinkedIn">
+                    LinkedIn
+                </a>
+            </div>
         </div>
     </section>
+
+    <!-- New Social Section -->
+    <section id="social" style="background-color: #ffffff; padding: 50px 0;">
+        <div
+            style="max-width: 600px; margin: auto; background: #fefefe; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); padding: 30px;">
+            <h2 style="text-align:center; color:#3a3af5; font-size: 26px; margin-bottom: 15px;">Follow Us</h2>
+
+            <p style="text-align:center; color:#555; margin-bottom:25px;">
+                Stay connected with AR Network House on our social media platforms.
+            </p>
+
+            <div class="contact-buttons">
+                <!-- Facebook Button -->
+                <a href="https://www.facebook.com/share/17om73cZ5X/" class="btn-contact facebook">
+                    <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook">
+                    Facebook
+                </a>
+
+                <!-- Instagram Button -->
+                <a href="https://www.instagram.com/ar_network_house?igsh=MWY0bDdiaXI2bjRvMQ=="
+                    class="btn-contact instagram">
+                    <img src="https://cdn-icons-png.flaticon.com/512/733/733558.png" alt="Instagram">
+                    Instagram
+                </a>
+            </div>
+        </div>
+    </section>
+
 
     <footer>
         © <span id="year"></span> AR Network House | All rights reserved. | <a
