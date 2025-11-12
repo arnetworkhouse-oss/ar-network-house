@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AR NETWORK HOUSE - Invoice</title>
+
+    <!-- html2canvas + jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            --cream: #fffaf0;
+            --panel: #fff;
+            --accent: #ff8a00;
+            --green: #28a745;
+            --red: #dc3545;
+            --text: #222;
+            --muted: #666;
+            --card-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+        }
+
+        .dark {
+            --panel: #232527;
+            --text: #e9eef2;
+            --muted: #bfc4c8;
+            --card-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
+            background: #1f1f22;
+        }
+
+        /* --- Fix for dark mode dropdowns (Billing System + Item selects) --- */
+        .dark select,
+        .dark option {
+            background-color: #2e3136 !important;
+            color: #f1f1f1 !important;
+            border-color: #444 !important;
+        }
+
+        .dark select:focus {
+            outline: 1px solid #ff8a00;
+        }
+
+
+        * {
+            box-sizing: border-box;
+            font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial
+        }
+
+        body {
+            margin: 12px;
+            background: var(--cream);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased
+        }
+
+        .wrap {
+            max-width: 980px;
+            margin: 0 auto;
+            display: flex;
+            gap: 18px;
+            flex-direction: column
+        }
+
+        .card {
+            background: var(--panel);
+            border-radius: 10px;
+            padding: 16px;
+            box-shadow: var(--card-shadow)
+        }
+
+        header {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .brand {
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .logo {
+            width: 84px;
+            height: 84px;
+            border-radius: 8px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 20px
+        }
+
+        .meta {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        .top-extra {
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        /* location & billing fields */
+        .fields {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px
+        }
+
+        .fields label {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        .fields input[type="text"],
+        .fields select {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            width: 100%;
+            background: transparent;
+            color: var(--text)
+        }
+
+        /* invoice table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            vertical-align: middle
+        }
+
+        thead th {
+            background: transparent;
+            text-align: left;
+            color: var(--muted)
+        }
+
+        .col-item {
+            width: 54%
+        }
+
+        .col-qty {
+            width: 12%
+        }
+
+        .col-price {
+            width: 16%
+        }
+
+        .col-total {
+            width: 14%
+        }
+
+        .col-act {
+            width: 60px;
+            text-align: center
+        }
+
+        select.item-select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: transparent;
+            color: var(--text)
+        }
+
+        input.qty,
+        input.price,
+        input.line-total {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: transparent;
+            color: var(--text)
+        }
+
+        .remove-btn {
+            background: var(--red);
+            color: white;
+            border: 0;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer
+        }
+
+        .add-btn {
+            background: var(--green);
+            color: white;
+            border: 0;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer
+        }
+
+        .summary {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end
+        }
+
+        .summary .row {
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .big {
+            font-weight: 700;
+            font-size: 18px
+        }
+
+        /* controls sticky bottom (mobile friendly) */
+        .controls {
+            position: sticky;
+            bottom: 8px;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            padding: 10px;
+            background: transparent;
+            z-index: 40
+        }
+
+        .controls .btn {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 0;
+            cursor: pointer
+        }
+
+        /* price list panel */
+        .price-panel {
+            background: linear-gradient(180deg, var(--accent), #ffb25a);
+            color: white;
+            padding: 12px;
+            border-radius: 8px
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06)
+        }
+
+        /* hide on print */
+        @media print {
+
+            .controls,
+            .no-print {
+                display: none !important;
+            }
+
+            body.for-pdf select.item-select {
+                display: none !important;
+            }
+
+            /* ensure selects hidden when generating pdf */
+            .print-name {
+                display: inline-block !important;
+            }
+
+            /* show plain text names for print */
+        }
+
+        /* hidden print-name (text that mirrors select) */
+        .print-name {
+            display: none;
+            font-weight: 600;
+        }
+
+        /* ensure select shows full text */
+        select.item-select {
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        /* responsive */
+        @media(max-width:860px) {
+            .wrap {
+                padding: 8px
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px
+            }
+
+            .brand {
+                align-items: flex-start
+            }
+
+            .logo {
+                width: 68px;
+                height: 68px
+            }
+
+            .col-item {
+                width: 56%
+            }
+
+            .col-qty {
+                width: 12%
+            }
+
+            .col-price {
+                width: 16%
+            }
+
+            .col-total {
+                width: 14%
+            }
+
+            .controls {
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: var(--panel);
+                padding: 10px;
+                border-top: 1px solid rgba(0, 0, 0, 0.06)
+            }
+
+            .card {
+                padding-bottom: 72px
+            }
+
+            /* space for sticky controls */
+        }
+
+        /* dark mode styles */
+        .dark .card {
+            background: #2b2f33;
+            color: var(--text)
+        }
+
+        .dark select.item-select,
+        .dark input {
+            background: #333;
+            color: var(--text)
+        }
+
+        .dark table th,
+        .dark table td {
+            border-color: rgba(255, 255, 255, 0.06)
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="card" id="invoiceCard">
+            <header>
+                <div class="brand">
+                    <div class="logo" id="logoHolder">
+                        <img
+                            src="https://raw.githubusercontent.com/arnetworkhouse-oss/ar-network-house/main/ar%20logo.jpg">
+
+                    </div>
+                    <div>
+                        <h1>AR NETWORK HOUSE</h1>
+                        <div class="meta">WhatsApp: +91 94774 40204 | Email: arnetworkhouse@gmail.com</div>
+                    </div>
+                </div>
+
+                <div style="text-align:right">
+
+                    <div class="meta">Date: <strong id="invDate"></strong></div>
+                </div>
+            </header>
+
+            <div class="top-extra">
+                <div class="fields">
+                    <table border="0">
+                        <tr>
+                            <td><label>Invoice</label>
+                                <input type="text" id="invoice" placeholder="enter invoice " value="2k25_">
+                            </td>
+                            <td>
+                                <label>Project Id</label>
+                                <input type="text" id="projectId" placeholder="Projest Id " value="AR2k25_">
+                            </td>
+                        </tr>
+                    </table>
+
+
+
+
+
+                    <label>Bill to</label>
+                    <input type="text" id="bill to" placeholder="name ">
+
+                    <label>Phone</label>
+                    <input type="number" id="phone" placeholder="Ph number">
+
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder=".....@gmail.com">
+
+                    <label>Location Code</label>
+                    <select id="locationCode">
+                        <option value="1">HWH</option>
+                        <option value="2">BIR</option>
+                        <option value="3">Other</option>
+                    </select>
+
+                    <label>Billing System</label>
+                    <select id="billingSystem">
+                        <option value="1">AD_1</option>
+                        <option value="2">RSR_2</option>
+                        <!-- Add your billing system options here (edit this in the file) -->
+                    </select>
+                </div>
+            </div>
+
+            <table id="itemsTable" aria-label="Invoice items">
+                <thead>
+                    <tr>
+                        <th class="col-item">Item</th>
+                        <th class="col-qty">Qty</th>
+                        <th class="col-price">Price</th>
+                        <th class="col-total">Total</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- initial row inserted by JS -->
+                </tbody>
+            </table>
+
+            <div
+                style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:10px;flex-wrap:wrap">
+                <div style="max-width:65%">
+                    <button id="addRow" class="add-btn no-print">+ Add Item</button>
+                    <button id="togglePrice" class="no-print"
+                        style="background:var(--accent);color:white;border:0;padding:8px 12px;border-radius:8px;cursor:pointer">Show/Hide
+                        Price List</button>
+                </div>
+
+                <div style="min-width:220px">
+                    <div class="summary">
+                        <div class="row">
+                            <div class="meta">Subtotal</div>
+                            <div id="subtotal" class="big">₹0.00</div>
+                        </div>
+                        <div class="row" style="align-items:center;gap:8px">
+                            <div class="meta">Discount (%)</div>
+                            <input id="discount" type="number" value="0" min="0" max="100"
+                                style="width:90px;padding:6px;border-radius:6px;border:1px solid rgba(0,0,0,0.06);background:transparent">
+                            <div id="discountAmount" class="meta">-₹0.00</div>
+                        </div>
+                        <div class="row">
+                            <div class="meta">Net Total</div>
+                            <div id="netTotal" class="big">₹0.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:14px;font-size:13px;color:var(--muted)"></div>
+
+            <footer style="margin-top:18px">
+                <div style="text-align:center">
+                    <p>Thanks for connecting with us !</p>
+
+                </div>
+            </footer>
+        </div>
+
+        <!-- Price list panel -->
+        <div class="price-panel card" id="pricePanel" style="display:none">
+            <h3 style="margin:0 0 8px 0">ITEMS & PRICES</h3>
+            <div id="priceList"></div>
+        </div>
+
+    </div>
+
+    <!-- Sticky controls (hidden when printing) -->
+    <div class="controls no-print" aria-hidden="true"
+        style="position:fixed;left:0;right:0;bottom:10px;justify-content:center">
+        <button id="downloadPDF" class="btn"
+            style="background:var(--accent);color:white;padding:10px 14px;border-radius:8px;border:0;margin-right:8px">Download
+            PDF</button>
+        <button id="printBtn" class="btn"
+            style="background:#666;color:white;padding:10px 14px;border-radius:8px;border:0;margin-right:8px"
+            title="Ctrl + P">Print</button>
+        <button id="themeToggle" class="btn"
+            style="background:#444;color:white;padding:10px 14px;border-radius:8px;border:0" title="Ctrl + D">Light /
+            Dark</button>
+    </div>
+
+    <script>
+        /* ------------------ ITEM LIST ------------------
+           Edit this block to change item names & prices.
+           Format: items['Item full name'] = price;
+           ------------------------------------------------ */
+        const items = {
+            "Cover Page": 5,
+            "Cover Page Design with Print": 7,
+            "Mergin Paper": 5,
+            "Content making": 7,
+            "Website making (html, css project)": 150,
+            "Website making (Single Page)": 250,
+            "CV": 50,
+            "Bussiness / Personal card Design": 80,
+            " Digital Wedding Card": 90,
+            "Poster": 50,
+            "PAN Card": 175,
+            "Voter Card": 80,
+            "Birth Cirtificate Renewal": 150,
+            "CU registration": 100,
+            "ABC Id / Apaar no": 50,
+            "E-Shram card / UAN no": 50,
+            "Old File/photos Recovery": 300,
+            "Passport/stamp size Photo": 55,
+
+        };
+        /* ------------------------------------------------ */
+
+        const tbody = document.querySelector('#itemsTable tbody');
+        const subtotalEl = document.getElementById('subtotal');
+        const discountInput = document.getElementById('discount');
+        const discountAmountEl = document.getElementById('discountAmount');
+        const netEl = document.getElementById('netTotal');
+        const pricePanel = document.getElementById('pricePanel');
+        const priceList = document.getElementById('priceList');
+        const invoiceCard = document.getElementById('invoiceCard');
+        const invDate = document.getElementById('invDate');
+
+        invDate.innerText = new Date().toLocaleDateString('en-IN');
+
+        // Helper: format INR
+        function fmt(n) {
+            return '₹' + Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // Render price panel
+        function renderPricePanel() {
+            priceList.innerHTML = '';
+            for (const k of Object.keys(items)) {
+                const d = document.createElement('div');
+                d.className = 'price-item';
+                d.innerHTML = `<div style="max-width:78%">${k}</div><div style="font-weight:700">${fmt(items[k])}</div>`;
+                priceList.appendChild(d);
+            }
+        }
+
+        // Create a table row (with select + mirrored print-name span + remove button)
+        function createRow(selected) {
+            const tr = document.createElement('tr');
+
+            // build item select
+            const optsHtml = Object.keys(items).map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join('');
+            tr.innerHTML = `
+    <td class="col-item">
+      <select class="item-select" aria-label="Item">${optsHtml}</select>
+      <div class="print-name" style="margin-top:6px"></div>
+    </td>
+    <td class="col-qty"><input type="number" class="qty" min="1" value="1"></td>
+   <td class="col-price"><input type="number" class="price"></td>
+    <td class="col-total"><input type="number" class="line-total" readonly></td>
+    <td class="col-act" style="text-align:center"><button class="remove-btn">Remove</button></td>
+  `;
+
+            tbody.appendChild(tr);
+
+            const select = tr.querySelector('.item-select');
+            const printName = tr.querySelector('.print-name');
+            const qty = tr.querySelector('.qty');
+            const price = tr.querySelector('.price');
+            const lineTotal = tr.querySelector('.line-total');
+            const removeBtn = tr.querySelector('.remove-btn');
+
+            // set selected
+            if (selected && items[selected] !== undefined) select.value = selected;
+
+            function updateFromSelect() {
+                const key = select.value || '';
+                const p = items[key] || 0;
+                price.value = p;
+                const total = (Number(qty.value) || 0) * p;
+                lineTotal.value = total;
+                printName.innerText = key;
+                recalc();
+            }
+
+            // events
+            select.addEventListener('change', updateFromSelect);
+            price.addEventListener('input', () => {
+                const t = (Number(qty.value) || 0) * (Number(price.value) || 0);
+                lineTotal.value = t;
+                recalc();
+            });
+
+
+            removeBtn.addEventListener('click', () => { tr.remove(); recalc(); });
+
+            // initialize
+            updateFromSelect();
+
+            return tr;
+        }
+
+        // helper escape for option values
+        function escapeHtml(str) {
+            return String(str).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+        }
+
+        // recalc totals
+        function recalc() {
+            let sum = 0;
+            Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+                const p = Number(tr.querySelector('.price').value || 0);
+                const q = Number(tr.querySelector('.qty').value || 0);
+                sum += p * q;
+            });
+            subtotalEl.innerText = fmt(sum);
+            const disc = Number(discountInput.value || 0);
+            const discAmt = sum * (disc / 100);
+            discountAmountEl.innerText = '-' + fmt(discAmt);
+            const net = Math.max(0, sum - discAmt);
+            netEl.innerText = fmt(net);
+        }
+
+        // add initial single row
+        createRow();
+
+        // Add row button
+        document.getElementById('addRow').addEventListener('click', () => createRow());
+
+        // discount change
+        discountInput.addEventListener('input', recalc);
+
+        // price panel toggle
+        document.getElementById('togglePrice').addEventListener('click', () => {
+            if (pricePanel.style.display === 'none' || pricePanel.style.display === '') { renderPricePanel(); pricePanel.style.display = 'block'; }
+            else pricePanel.style.display = 'none';
+        });
+
+        // theme toggle
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+
+        // prevent controls from appearing in print/PDF: all controls are inside .no-print or .controls
+
+        // PDF download: capture invoiceCard only; temporarily switch to 'for-pdf' so selects are hidden & mirrored text shows
+        document.getElementById('downloadPDF').addEventListener('click', async () => {
+            try {
+                document.body.classList.add('for-pdf');
+
+                // Small delay to ensure all DOM (especially logo) is fully visible
+                await new Promise(r => setTimeout(r, 200));
+
+                const elem = document.getElementById('invoiceCard');
+                const bgColor = getComputedStyle(document.body).backgroundColor || '#ffffff';
+
+                // Capture invoice section
+                const canvas = await html2canvas(elem, {
+                    scale: 2,
+                    backgroundColor: bgColor,
+                    useCORS: true,        // ensures logo is included (even local)
+                    allowTaint: true,     // helps with cross-origin images
+                    imageTimeout: 0       // prevents timeout for slow logo load
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'pt', 'a4');
+
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+                // unique file name with timestamp
+                const fileName = 'ar_invoice_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.pdf';
+
+                // Save triggers "Save As" dialog on all browsers (desktop + mobile)
+                pdf.save(fileName);
+
+            } catch (err) {
+                alert('⚠️ PDF generation failed. Try again.');
+                console.error(err);
+            } finally {
+                document.body.classList.remove('for-pdf');
+            }
+        });
+
+
+        // Print button: hide controls automatically by print CSS
+        document.getElementById('printBtn').addEventListener('click', () => {
+            // ensure print-name visible by toggling for-pdf briefly
+            document.body.classList.add('for-pdf');
+            setTimeout(() => { window.print(); setTimeout(() => document.body.classList.remove('for-pdf'), 500); }, 80);
+        });
+
+        // re-calc on mutation (when rows added/removed)
+        const mo = new MutationObserver(() => recalc());
+        mo.observe(tbody, { childList: true, subtree: true });
+
+        // initial render of price panel off
+        pricePanel.style.display = 'none';
+
+        // expose where to edit items for the user (console helper)
+        console.log('Item list is at top of file in the JS block under // --- ITEM LIST --- . Edit names and prices there.');
+
+        // ensure long option names visible: when printing we hide select and show print-name via CSS (class for-pdf added above)
+        // --- Ctrl + D shortcut to toggle dark mode (no popup) ---
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey && e.key.toLowerCase() === 'd') {
+                e.preventDefault(); // stop browser default bookmark shortcut
+                document.documentElement.classList.toggle('dark');
+            }
+        });
+
+    </script>
+</body>
+
+</html>
