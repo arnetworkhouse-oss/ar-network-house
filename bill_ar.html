@@ -374,6 +374,28 @@
         .dark table td {
             border-color: rgba(255, 255, 255, 0.06)
         }
+
+
+        .sync-btn {
+            padding: 10px 18px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .sync-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .sync-msg {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #16a34a;
+            font-weight: 600;
+        }
     </style>
 </head>
 
@@ -414,29 +436,26 @@
                     </table>
 
 
-
-
-
                     <label>Bill to</label>
-                    <input type="text" id="bill to" placeholder="name ">
+                    <input type="text" id="bill_to" placeholder="name ">
 
                     <label>Phone</label>
-                    <input type="number" id="phone" placeholder="Ph number">
+                    <input type="number" id="phone" placeholder="Ph no.">
 
                     <label>Email</label>
                     <input type="email" id="email" placeholder=".....@gmail.com">
 
                     <label>Location Code</label>
                     <select id="locationCode">
-                        <option value="1">HWH</option>
-                        <option value="2">BIR</option>
-                        <option value="3">Other</option>
+                        <option value="HWH">HWH</option>
+                        <option value="BIR">BIR</option>
+                        <option value="Other">Other</option>
                     </select>
 
                     <label>Billing System</label>
                     <select id="billingSystem">
-                        <option value="1">AD_1</option>
-                        <option value="2">RSR_2</option>
+                        <option value="AD_1">AD_1</option>
+                        <option value="RSR_2">RSR_2</option>
                         <!-- Add your billing system options here (edit this in the file) -->
                     </select>
                 </div>
@@ -516,13 +535,15 @@
         <button id="themeToggle" class="btn"
             style="background:#444;color:white;padding:10px 14px;border-radius:8px;border:0" title="Ctrl + D">Light /
             Dark</button>
+
+        <button id="syncBtn" class="sync-btn">Sync to Sheet </button>
+        <div id="syncMsg" class="sync-msg" style="display:none;"></div>
+
     </div>
 
     <script>
-        /* ------------------ ITEM LIST ------------------
-           Edit this block to change item names & prices.
-           Format: items['Item full name'] = price;
-           ------------------------------------------------ */
+
+        /* ------------------ ITEM LIST ------------------ */
         const items = {
             "Cover Page": 5,
             "Cover Page Design with Print": 7,
@@ -532,17 +553,16 @@
             "Website making (Single Page)": 250,
             "CV": 50,
             "Bussiness / Personal card Design": 80,
-            " Digital Wedding Card": 90,
+            "Digital Wedding Card": 90,
             "Poster": 50,
-            "PAN Card": 175,
-            "Voter Card": 80,
+            "PAN Card": 170,
+            "Voter Card": 50,
             "Birth Cirtificate Renewal": 150,
             "CU registration": 100,
             "ABC Id / Apaar no": 50,
             "E-Shram card / UAN no": 50,
             "Old File/photos Recovery": 300,
-            "Passport/stamp size Photo": 55,
-
+            "Passport/stamp size Photo": 50,
         };
         /* ------------------------------------------------ */
 
@@ -553,197 +573,268 @@
         const netEl = document.getElementById('netTotal');
         const pricePanel = document.getElementById('pricePanel');
         const priceList = document.getElementById('priceList');
-        const invoiceCard = document.getElementById('invoiceCard');
         const invDate = document.getElementById('invDate');
-
         invDate.innerText = new Date().toLocaleDateString('en-IN');
 
-        // Helper: format INR
+        /* ------------------ Helper ------------------ */
         function fmt(n) {
-            return '₹' + Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return '₹' + Number(n || 0).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
         }
 
-        // Render price panel
-        function renderPricePanel() {
-            priceList.innerHTML = '';
-            for (const k of Object.keys(items)) {
-                const d = document.createElement('div');
-                d.className = 'price-item';
-                d.innerHTML = `<div style="max-width:78%">${k}</div><div style="font-weight:700">${fmt(items[k])}</div>`;
-                priceList.appendChild(d);
-            }
+        function escapeHtml(str) {
+            return String(str)
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;');
         }
 
-        // Create a table row (with select + mirrored print-name span + remove button)
+        /* ------------------ Create Row ------------------ */
         function createRow(selected) {
             const tr = document.createElement('tr');
+            const options = Object.keys(items)
+                .map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`)
+                .join('');
 
-            // build item select
-            const optsHtml = Object.keys(items).map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join('');
             tr.innerHTML = `
-    <td class="col-item">
-      <select class="item-select" aria-label="Item">${optsHtml}</select>
-      <div class="print-name" style="margin-top:6px"></div>
-    </td>
-    <td class="col-qty"><input type="number" class="qty" min="1" value="1"></td>
-   <td class="col-price"><input type="number" class="price"></td>
-    <td class="col-total"><input type="number" class="line-total" readonly></td>
-    <td class="col-act" style="text-align:center"><button class="remove-btn">Remove</button></td>
-  `;
+        <td class="col-item">
+            <select class="item-select">${options}</select>
+            <div class="print-name" style="margin-top:6px"></div>
+        </td>
+        <td class="col-qty"><input type="number" class="qty" min="1" value="1"></td>
+        <td class="col-price"><input type="number" class="price"></td>
+        <td class="col-total"><input type="number" class="line-total" readonly></td>
+        <td class="col-act" style="text-align:center"><button class="remove-btn">Remove</button></td>
+    `;
 
             tbody.appendChild(tr);
 
             const select = tr.querySelector('.item-select');
-            const printName = tr.querySelector('.print-name');
             const qty = tr.querySelector('.qty');
             const price = tr.querySelector('.price');
             const lineTotal = tr.querySelector('.line-total');
+            const printName = tr.querySelector('.print-name');
             const removeBtn = tr.querySelector('.remove-btn');
 
-            // set selected
-            if (selected && items[selected] !== undefined) select.value = selected;
+            if (selected && items[selected]) select.value = selected;
 
-            function updateFromSelect() {
-                const key = select.value || '';
+            function updateItem() {
+                const key = select.value;
                 const p = items[key] || 0;
                 price.value = p;
-                const total = (Number(qty.value) || 0) * p;
-                lineTotal.value = total;
+                lineTotal.value = (Number(qty.value) || 0) * p;
                 printName.innerText = key;
                 recalc();
             }
 
-            // events
-            select.addEventListener('change', updateFromSelect);
-            price.addEventListener('input', () => {
-                const t = (Number(qty.value) || 0) * (Number(price.value) || 0);
-                lineTotal.value = t;
+            select.addEventListener('change', updateItem);
+            qty.addEventListener('input', updateItem);
+            price.addEventListener('input', updateItem);
+
+            removeBtn.addEventListener('click', () => {
+                tr.remove();
                 recalc();
             });
 
-
-            removeBtn.addEventListener('click', () => { tr.remove(); recalc(); });
-
-            // initialize
-            updateFromSelect();
-
-            return tr;
+            updateItem();
         }
 
-        // helper escape for option values
-        function escapeHtml(str) {
-            return String(str).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+
+        let syncTimer = null;
+
+        async function syncNow() {
+            const url = "https://script.google.com/macros/s/AKfycbzaq_FQpNRCI8g_JUkU-vfQQ5BVJj4QObRNG0ZRIA8q33O1feFOCODpzglmSy225EHlfw/exec";   // <-- replace this
+
+            const rows = Array.from(document.querySelectorAll("#itemsTable tbody tr")).map(tr => ({
+                itemName: tr.querySelector(".item-select").value,
+                qty: tr.querySelector(".qty").value,
+                price: tr.querySelector(".price").value,
+                lineTotal: tr.querySelector(".line-total").value
+            }));
+
+            const payload = {
+                invoice: document.getElementById('invoice').value,
+                projectId: document.getElementById('projectId').value,
+                billto: document.getElementById('bill_to').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                locationCode: document.getElementById('locationCode').value,
+                billingSystem: document.getElementById('billingSystem').value,
+                items: rows,
+                subtotal: document.getElementById('subtotal').innerText,
+                discount: document.getElementById('discount').value,
+                discountAmount: document.getElementById('discountAmount').innerText,
+                netTotal: document.getElementById('netTotal').innerText,
+                invoiceDate: new Date().toLocaleString("en-IN")
+            };
+
+            // Send to Google Apps Script
+            fetch(url, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            // Toast message
+            const msg = document.getElementById("syncMsg");
+            msg.innerText = "✔ Saved to Google Sheet";
+            msg.style.display = "block";
+
+            setTimeout(() => {
+                msg.style.display = "none";
+            }, 2000);
         }
 
-        // recalc totals
+        /* ------------------ Recalc (Debounced Sync) ------------------ */
+
         function recalc() {
             let sum = 0;
+
             Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
                 const p = Number(tr.querySelector('.price').value || 0);
                 const q = Number(tr.querySelector('.qty').value || 0);
                 sum += p * q;
             });
+
             subtotalEl.innerText = fmt(sum);
+
             const disc = Number(discountInput.value || 0);
             const discAmt = sum * (disc / 100);
-            discountAmountEl.innerText = '-' + fmt(discAmt);
+            discountAmountEl.innerText = "-" + fmt(discAmt);
+
             const net = Math.max(0, sum - discAmt);
             netEl.innerText = fmt(net);
+
+            // debounce sync
+            if (syncTimer) clearTimeout(syncTimer);
+            syncTimer = setTimeout(() => autoSyncToSheet(), 400);
         }
 
-        // add initial single row
-        createRow();
+        /* ------------------ Mutation Observer (clean) ------------------ */
 
-        // Add row button
-        document.getElementById('addRow').addEventListener('click', () => createRow());
+        const mo = new MutationObserver(m => {
+            if (m.some(x => x.type === "childList")) recalc();
+        });
+        mo.observe(tbody, { childList: true });
 
-        // discount change
-        discountInput.addEventListener('input', recalc);
-
-        // price panel toggle
-        document.getElementById('togglePrice').addEventListener('click', () => {
-            if (pricePanel.style.display === 'none' || pricePanel.style.display === '') { renderPricePanel(); pricePanel.style.display = 'block'; }
-            else pricePanel.style.display = 'none';
+        // Button click
+        document.getElementById("syncBtn").addEventListener("click", () => {
+            syncNow();
         });
 
-        // theme toggle
-        document.getElementById('themeToggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-        });
-
-        // prevent controls from appearing in print/PDF: all controls are inside .no-print or .controls
-
-        // PDF download: capture invoiceCard only; temporarily switch to 'for-pdf' so selects are hidden & mirrored text shows
-        document.getElementById('downloadPDF').addEventListener('click', async () => {
-            try {
-                document.body.classList.add('for-pdf');
-
-                // Small delay to ensure all DOM (especially logo) is fully visible
-                await new Promise(r => setTimeout(r, 200));
-
-                const elem = document.getElementById('invoiceCard');
-                const bgColor = getComputedStyle(document.body).backgroundColor || '#ffffff';
-
-                // Capture invoice section
-                const canvas = await html2canvas(elem, {
-                    scale: 2,
-                    backgroundColor: bgColor,
-                    useCORS: true,        // ensures logo is included (even local)
-                    allowTaint: true,     // helps with cross-origin images
-                    imageTimeout: 0       // prevents timeout for slow logo load
-                });
-
-                const imgData = canvas.toDataURL('image/png');
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'pt', 'a4');
-
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-                // unique file name with timestamp
-                const fileName = 'ar_invoice_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.pdf';
-
-                // Save triggers "Save As" dialog on all browsers (desktop + mobile)
-                pdf.save(fileName);
-
-            } catch (err) {
-                alert('⚠️ PDF generation failed. Try again.');
-                console.error(err);
-            } finally {
-                document.body.classList.remove('for-pdf');
+        // CTRL + S → Sync
+        document.addEventListener("keydown", function (e) {
+            if (e.ctrlKey && e.key.toLowerCase() === "s") {
+                e.preventDefault();  // stop browser default Save dialog
+                syncNow();
             }
         });
 
 
-        // Print button: hide controls automatically by print CSS
-        document.getElementById('printBtn').addEventListener('click', () => {
-            // ensure print-name visible by toggling for-pdf briefly
-            document.body.classList.add('for-pdf');
-            setTimeout(() => { window.print(); setTimeout(() => document.body.classList.remove('for-pdf'), 500); }, 80);
+        /* ------------------ UI Buttons ------------------ */
+        document.getElementById('addRow').addEventListener('click', () => createRow());
+        discountInput.addEventListener('input', recalc);
+
+        document.getElementById('togglePrice').addEventListener('click', () => {
+            if (pricePanel.style.display === "none" || pricePanel.style.display === "") {
+                renderPricePanel();
+                pricePanel.style.display = "block";
+            } else pricePanel.style.display = "none";
         });
 
-        // re-calc on mutation (when rows added/removed)
-        const mo = new MutationObserver(() => recalc());
-        mo.observe(tbody, { childList: true, subtree: true });
+        function renderPricePanel() {
+            priceList.innerHTML = "";
+            for (let name in items) {
+                const div = document.createElement("div");
+                div.className = "price-item";
+                div.innerHTML = `<div style="max-width:78%">${name}</div><div style="font-weight:700">${fmt(items[name])}</div>`;
+                priceList.appendChild(div);
+            }
+        }
 
-        // initial render of price panel off
-        pricePanel.style.display = 'none';
+        /* ------------------ INIT ------------------ */
+        createRow();
+        pricePanel.style.display = "none";
 
-        // expose where to edit items for the user (console helper)
-        console.log('Item list is at top of file in the JS block under // --- ITEM LIST --- . Edit names and prices there.');
+        /* ------------------ UI: Theme Toggle & PDF Download ------------------ */
 
-        // ensure long option names visible: when printing we hide select and show print-name via CSS (class for-pdf added above)
-        // --- Ctrl + D shortcut to toggle dark mode (no popup) ---
+        // Theme toggle button (also adds Ctrl+D keyboard shortcut)
+        const themeToggleBtn = document.getElementById('themeToggle');
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+            });
+        }
+
+        // Keyboard shortcut: Ctrl + D
         document.addEventListener('keydown', function (e) {
             if (e.ctrlKey && e.key.toLowerCase() === 'd') {
-                e.preventDefault(); // stop browser default bookmark shortcut
+                e.preventDefault();
                 document.documentElement.classList.toggle('dark');
             }
         });
 
+        /*
+         * PDF download: captures #invoiceCard using html2canvas and jsPDF
+         * - Requires html2canvas and jspdf to be included in the page (CDN already present in your HTML head)
+         * - Temporarily adds 'for-pdf' class so .print-name is visible and selects hidden
+         */
+        const downloadBtn = document.getElementById('downloadPDF');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', async () => {
+                try {
+                    // Prevent double-click
+                    downloadBtn.disabled = true;
+                    downloadBtn.innerText = "Preparing PDF...";
+
+                    // Ensure print-friendly view
+                    document.body.classList.add('for-pdf');
+
+                    // give browser a tiny moment to reflow DOM (show print-name etc.)
+                    await new Promise(r => setTimeout(r, 150));
+
+                    const elem = document.getElementById('invoiceCard');
+                    const bgColor = getComputedStyle(document.body).backgroundColor || '#ffffff';
+
+                    // html2canvas capture
+                    const canvas = await html2canvas(elem, {
+                        scale: 2,
+                        backgroundColor: bgColor,
+                        useCORS: true,
+                        allowTaint: true,
+                        imageTimeout: 0
+                    });
+
+                    const imgData = canvas.toDataURL('image/png');
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'pt', 'a4');
+
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+                    const fileName = 'ar_invoice_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.pdf';
+                    pdf.save(fileName);
+                } catch (err) {
+                    console.error("PDF generation failed:", err);
+                    alert("⚠️ PDF generation failed. Open console to debug.");
+                } finally {
+                    // restore page and button
+                    document.body.classList.remove('for-pdf');
+                    downloadBtn.disabled = false;
+                    downloadBtn.innerText = "Download PDF";
+                }
+            });
+        }
+
+
     </script>
+
 </body>
 
 </html>
