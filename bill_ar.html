@@ -520,19 +520,19 @@
                                 </select>
                             </td>
                             <td>
-                                 <div class="form-row">
-                        <label for="sellerName">Seller Name</label>
-                        <select id="sellerName" class="seller-select">
-                            <option value="RSR">RSR</option>
-                            <option value="AD">AD</option>
-                            <option value="AR">AR</option>
-                            <option value="PJ">PJ</option>
-                        </select>
-                    </div>
+                                <div class="form-row">
+                                    <label for="sellerName">Seller Name</label>
+                                    <select id="sellerName" class="seller-select">
+                                        <option value="RSR">RSR</option>
+                                        <option value="AD">AD</option>
+                                        <option value="AR">AR</option>
+                                        <option value="PJ">PJ</option>
+                                    </select>
+                                </div>
                             </td>
                         </tr>
                     </table>
-                   
+
 
 
 
@@ -739,6 +739,9 @@
             }));
 
             const payload = {
+                invoice: document.getElementById('invoice').value,
+                projectId: document.getElementById('projectId').value,
+
                 billto: document.getElementById('bill_to').value,
                 phone: document.getElementById('phone').value,
                 email: document.getElementById('email').value,
