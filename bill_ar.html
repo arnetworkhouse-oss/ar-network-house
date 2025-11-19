@@ -425,6 +425,33 @@
             color: #16a34a;
             font-weight: 600;
         }
+
+        .seller-select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 15px;
+            background: #fff;
+            outline: none;
+            transition: 0.2s ease;
+        }
+
+        .seller-select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+        }
+
+        .dark .seller-select {
+            background: #1e1e1e;
+            border-color: #555;
+            color: #fff;
+        }
+
+        .dark .seller-select:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+        }
     </style>
 </head>
 
@@ -492,8 +519,20 @@
 
                                 </select>
                             </td>
+                            <td>
+                                 <div class="form-row">
+                        <label for="sellerName">Seller Name</label>
+                        <select id="sellerName" class="seller-select">
+                            <option value="RSR">RSR</option>
+                            <option value="AD">AD</option>
+                            <option value="AR">AR</option>
+                            <option value="PJ">PJ</option>
+                        </select>
+                    </div>
+                            </td>
                         </tr>
                     </table>
+                   
 
 
 
@@ -648,10 +687,16 @@
 
             function update() {
                 const name = itemName.value.trim();
-                if (items[name] !== undefined) price.value = items[name];
+
+                // Auto-fill price ONLY if price is empty
+                if (items[name] !== undefined && price.value.trim() === "") {
+                    price.value = items[name];
+                }
+
                 lineTotal.value = (Number(qty.value) || 0) * (Number(price.value) || 0);
                 recalc();
             }
+
 
             itemName.addEventListener("input", update);
             qty.addEventListener("input", update);
@@ -684,7 +729,7 @@
 
         /* ---------- MANUAL SYNC ---------- */
         async function syncNow() {
-            const url = "https://script.google.com/macros/s/AKfycbypisULLEiyGHBHgmwqv3KGH78LF7EuTQw8eF6WHBKq77e4gdr-UQBmCVUJsrelwYcuNA/exec";  // ← UPDATE THIS
+            const url = "https://script.google.com/macros/s/AKfycbwzIGnZ-827RUjSuhBu42779IbC0FUjcisTQDJRaL1wePTNqi1Ghvbb79I2DR1z5UcZ5g/exec";  // ← UPDATE THIS
 
             const rows = Array.from(tbody.querySelectorAll("tr")).map(tr => ({
                 itemName: tr.querySelector(".item-name").value,
@@ -694,20 +739,21 @@
             }));
 
             const payload = {
-                invoice: invoice.value,
-                projectId: projectId.value,
-                billto: bill_to.value,
-                phone: phone.value,
-                email: email.value,
-                locationCode: locationCode.value,
-                billingSystem: billingSystem.value,
+                billto: document.getElementById('bill_to').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                locationCode: document.getElementById('locationCode').value,
+                billingSystem: document.getElementById('billingSystem').value,
+                sellerName: document.getElementById('sellerName').value,   // ✔ NEW
                 items: rows,
-                subtotal: subtotalEl.innerText,
-                discount: discountInput.value,
-                discountAmount: discountAmountEl.innerText,
-                netTotal: netEl.innerText,
-                invoiceDate: new Date().toLocaleString("en-IN")
+                subtotal: document.getElementById('subtotal').innerText,
+                discount: document.getElementById('discount').value,
+                discountAmount: document.getElementById('discountAmount').innerText,
+                netTotal: document.getElementById('netTotal').innerText,
+                invoiceDate: new Date().toLocaleString("en-IN"),
+                syncTime: new Date().toISOString()
             };
+
 
             fetch(url, {
                 method: "POST",
@@ -750,54 +796,89 @@
         });
 
         /* ---------- PDF DOWNLOAD ---------- */
-       const downloadBtn = document.getElementById('downloadPDF');
-if (downloadBtn) {
-  downloadBtn.addEventListener('click', async () => {
-    try {
-      // Prevent double-click
-      downloadBtn.disabled = true;
-      downloadBtn.innerText = "Preparing PDF...";
+        const downloadBtn = document.getElementById('downloadPDF');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', async () => {
+                try {
+                    // Prevent double-click
+                    downloadBtn.disabled = true;
+                    downloadBtn.innerText = "Preparing PDF...";
 
-      // Ensure print-friendly view
-      document.body.classList.add('for-pdf');
+                    // Ensure print-friendly view
+                    document.body.classList.add('for-pdf');
 
-      // give browser a tiny moment to reflow DOM (show print-name etc.)
-      await new Promise(r => setTimeout(r, 150));
+                    // give browser a tiny moment to reflow DOM (show print-name etc.)
+                    await new Promise(r => setTimeout(r, 150));
 
-      const elem = document.getElementById('invoiceCard');
-      const bgColor = getComputedStyle(document.body).backgroundColor || '#ffffff';
+                    const elem = document.getElementById('invoiceCard');
+                    const bgColor = getComputedStyle(document.body).backgroundColor || '#ffffff';
 
-      // html2canvas capture
-      const canvas = await html2canvas(elem, {
-        scale: 2,
-        backgroundColor: bgColor,
-        useCORS: true,
-        allowTaint: true,
-        imageTimeout: 0
-      });
+                    // html2canvas capture
+                    const canvas = await html2canvas(elem, {
+                        scale: 2,
+                        backgroundColor: bgColor,
+                        useCORS: true,
+                        allowTaint: true,
+                        imageTimeout: 0
+                    });
 
-      const imgData = canvas.toDataURL('image/png');
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('p', 'pt', 'a4');
+                    const imgData = canvas.toDataURL('image/png');
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'pt', 'a4');
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
 
-      const fileName = 'ar_invoice_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.pdf';
-      pdf.save(fileName);
-    } catch (err) {
-      console.error("PDF generation failed:", err);
-      alert("⚠️ PDF generation failed. Open console to debug.");
-    } finally {
-      // restore page and button
-      document.body.classList.remove('for-pdf');
-      downloadBtn.disabled = false;
-      downloadBtn.innerText = "Download PDF";
-    }
-  });
-}
+                    const fileName = 'ar_invoice_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.pdf';
+                    pdf.save(fileName);
+                } catch (err) {
+                    console.error("PDF generation failed:", err);
+                    alert("⚠️ PDF generation failed. Open console to debug.");
+                } finally {
+                    // restore page and button
+                    document.body.classList.remove('for-pdf');
+                    downloadBtn.disabled = false;
+                    downloadBtn.innerText = "Download PDF";
+                }
+            });
+        }
+
+        /* ---------- add item---------- */
+
+        // --- Add Row button wiring (production-safe)
+        const addRowBtn = document.getElementById('addRow');
+        if (addRowBtn) {
+            addRowBtn.addEventListener('click', () => {
+                createRow();
+                // focus the newly created item's name input for fast data entry
+                const lastRow = tbody.querySelector('tr:last-child');
+                if (lastRow) {
+                    const nameInput = lastRow.querySelector('.item-name') || lastRow.querySelector('.item-name-input');
+                    if (nameInput) nameInput.focus();
+                }
+            });
+        } else {
+            console.warn('Add Row button (id="addRow") not found — ensure the button exists in the DOM.');
+        }
+
+        /* ---------- PRINT HANDLER (Enterprise Mode) ---------- */
+        document.getElementById("printBtn").addEventListener("click", () => {
+            // Activate print-friendly masking
+            document.body.classList.add("for-pdf");
+
+            // Defer just enough for DOM repaint
+            setTimeout(() => {
+                window.print();
+
+                // Remove print mask post-render
+                setTimeout(() => {
+                    document.body.classList.remove("for-pdf");
+                }, 300);
+            }, 120);
+        });
+
 
 
         /* ---------- INIT ---------- */
@@ -811,7 +892,7 @@ if (downloadBtn) {
             }
         });
 
-        
+
     </script>
 
     </script>
