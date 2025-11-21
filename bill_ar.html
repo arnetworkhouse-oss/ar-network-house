@@ -452,6 +452,17 @@
             border-color: #60a5fa;
             box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
         }
+
+        .card {
+
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            min-width: 110px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -479,6 +490,33 @@
 
             <div class="top-extra">
                 <div class="fields">
+                    <!-- Live Google Sheet Values (Hidden in Print/PDF) -->
+                    <div id="liveSheetValues" class="no-print"
+                        style="margin-top:15px; display:flex; gap:15px; flex-wrap:wrap;">
+
+                        <div style="display:flex; flex-direction:column;">
+                            <label style="font-size:13px; color:var(--muted);">Last Project ID</label>
+                            <div class="card" id="a">—</div>
+                        </div>
+
+                        <div style="display:flex; flex-direction:column;">
+                            <label style="font-size:13px; color:var(--muted);">Last Invoice</label>
+                            <div class="card" id="b">—</div>
+                        </div>
+
+                        <div style="display:flex; flex-direction:column;">
+                            <label style="font-size:13px; color:var(--muted);">Pre-Book Project ID</label>
+                            <div class="card" id="c">—</div>
+                        </div>
+
+                        <div style="display:flex; flex-direction:column;">
+                            <label style="font-size:13px; color:var(--muted);">Largest Project ID</label>
+                            <div class="card" id="d">—</div>
+                        </div>
+
+                    </div>
+
+
                     <table border="0">
                         <tr>
                             <td><label>Invoice</label>
@@ -622,31 +660,51 @@
 
     <script>
 
+        /* ---------- LIVE PRICE FETCH (from price_list.html Google Sheet) ---------- */
+
+        const PRICE_FEED_URL =
+            "https://script.google.com/macros/s/AKfycbwx4mPP7y0esYqz0rwy9_EKe3Zd3865rSugMTw-RQFIyewjZ9CguLwPtskBREkxFAUY/exec";
+
+        let livePrices = {};
+        let priceLoaded = false;
+
+        async function loadLivePrices() {
+            try {
+                const res = await fetch(PRICE_FEED_URL);
+                const data = await res.json();
+
+                livePrices = {};
+
+                data.forEach(row => {
+                    if (row.colB && row.colD) {
+                        livePrices[row.colB.trim()] = Number(row.colD);
+                    }
+                });
+
+                priceLoaded = true;
+                renderPricePanel();
+            } catch (e) {
+                console.error("Error loading prices:", e);
+            }
+        }
+
+        /* Render the price list panel */
+        function renderPricePanel() {
+            const priceList = document.getElementById("priceList");
+
+            priceList.innerHTML = Object.keys(livePrices)
+                .map(name => `
+            <div class="price-item">
+                <span>${name}</span>
+                <strong>₹${livePrices[name]}</strong>
+            </div>
+        `)
+                .join("");
+        }
+
+
         /* ---------- ITEM LIST ---------- */
-        const items = {
-            "Cover Page": 5,
-            "Cover Page Design with Print": 8,
-            "Mergin Paper": 5,
-            "Content making": 7,
-            "Website making (html, css project)": 150,
-            "Website making (Single Page)": 250,
-            "CV": 50,
-            "Bussiness / Personal card Design": 80,
-            "Digital Wedding Card": 90,
-            "identity card ": 80,
-            "Fees card":80,
-            "Aniversary card":70,
-            "Image genaration": 5,
-            "Poster": 50,
-            "PAN Card": 170,
-            "Voter Card": 50,
-            "Birth Cirtificate Renewal": 150,
-            "CU registration": 100,
-            "ABC Id / Apaar no": 50,
-            "E-Shram card / UAN no": 50,
-            "Old File/photos Recovery": 300,
-            "Passport/stamp size Photo": 50
-        };
+
 
         /* ---------- BASIC SETUP ---------- */
         const tbody = document.querySelector("#itemsTable tbody");
@@ -663,10 +721,16 @@
 
         /* ---------- SINGLE DATALIST (to avoid red errors) ---------- */
         document.body.insertAdjacentHTML("beforeend", `
-<datalist id="itemList">
-    ${Object.keys(items).map(x => `<option value="${x}">`).join("")}
-</datalist>
+<datalist id="itemList"></datalist>
 `);
+
+        function updateDataList() {
+            const list = document.getElementById("itemList");
+            list.innerHTML = Object.keys(livePrices)
+                .map(x => `<option value="${x}"></option>`)
+                .join("");
+        }
+
 
         /* ---------- CREATE ROW ---------- */
         function createRow() {
@@ -687,17 +751,26 @@
             const price = tr.querySelector(".price");
             const lineTotal = tr.querySelector(".line-total");
 
-            function update() {
-                const name = itemName.value.trim();
+            async function update() {
 
-                // Auto-fill price ONLY if price is empty
-                if (items[name] !== undefined && price.value.trim() === "") {
-                    price.value = items[name];
+                // Load live prices once
+                if (!priceLoaded) {
+                    await loadLivePrices();
+                    updateDataList();
                 }
 
+                const name = itemName.value.trim();
+
+                // Auto-fill price from Google Sheet
+                if (livePrices[name] !== undefined && price.value.trim() === "") {
+                    price.value = livePrices[name];
+                }
+
+                // Now update total normally
                 lineTotal.value = (Number(qty.value) || 0) * (Number(price.value) || 0);
                 recalc();
             }
+
 
 
             itemName.addEventListener("input", update);
@@ -791,14 +864,19 @@
         /* ---------- PRICE PANEL ---------- */
         document.getElementById("togglePrice").addEventListener("click", () => {
             const panel = document.getElementById("pricePanel");
+
+            // Load from sheet only first time
+            if (!priceLoaded) {
+                loadLivePrices();
+            }
+
             panel.style.display = panel.style.display === "block" ? "none" : "block";
 
             if (panel.style.display === "block") {
-                priceList.innerHTML = Object.keys(items)
-                    .map(name => `<div class="price-item"><span>${name}</span> <strong>${fmt(items[name])}</strong></div>`)
-                    .join("");
+                renderPricePanel();
             }
         });
+
 
         /* ---------- PDF DOWNLOAD ---------- */
         const downloadBtn = document.getElementById('downloadPDF');
@@ -897,8 +975,28 @@
             }
         });
 
+        /* ---------- ggl sheet value ---------- */
 
-    </script>
+        const endpoint = "https://script.google.com/macros/s/AKfycbwm37tFzROpLJtJcecjBFK2Vwlmay39NiPLMaN1gAK04Oq-4IU7XXRo15q8ftsiphkJBw/exec";
+
+        async function loadData() {
+            try {
+                const res = await fetch(endpoint);
+                const data = await res.json();
+
+                document.getElementById("a").textContent = data.A2 ?? "—";
+                document.getElementById("b").textContent = data.B2 ?? "—";
+                document.getElementById("c").textContent = data.C2 ?? "—";
+                document.getElementById("d").textContent = data.D2 ?? "—";
+
+            } catch (err) {
+                console.log("Error loading:", err);
+            }
+        }
+
+        setInterval(loadData, 500);
+        loadData();
+
 
     </script>
 
