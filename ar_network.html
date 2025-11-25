@@ -308,7 +308,7 @@
             background: linear-gradient(45deg, #fd1d1d, #e1306c, #c13584, #833ab4);
         }
 
-          .btn-contact.threads {
+        .btn-contact.threads {
             background: black;
         }
 
@@ -348,8 +348,39 @@
         div.notice:hover {
             transform: translateY(-5px);
         }
+
+        /* Floating Home Button */
+        #homeBtn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #4f46e5;
+            color: white;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 26px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Visible state */
+        #homeBtn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
     </style>
 </head>
+<div id="homeBtn">
+    ⌂
+</div>
 
 <body>
     <header>
@@ -401,72 +432,9 @@
     <section id="services" class="services">
         <div class="container">
             <h2>Our Services</h2>
-            <div class="grid">
-                <div class="service-card">
-                    <h3>Projects & Posters</h3>
-                    <p>All kinds of school projects & content posters</p>
-                    <ul>
-                        <li>Academic projects & Project related pictures</li>
-                        <li>Cover page Design</li>
-                        <li>Poster design & layout</li>
-                        <li>Custom content formatting</li>
-                        <li>Image genaration</li>
-                    </ul>
-                </div>
-                <div class="service-card">
-                    <h3>Website Create & Design</h3>
-                    <p>Personalized website design with ongoing support</p>
-                    <ul>
-                        <li>Modern responsive layouts</li>
-                        <li>Update & maintenance package</li>
-                        <li>School-College Html,Css,Script projects</li>
 
-                    </ul>
-                </div>
-                <div class="service-card">
-                    <h3>Official Documents</h3>
-                    <p>Support for PAN, voter ID, Passport/stamp size Photo ,etc. like documents</p>
-                    <ul>
-                        <li>PAN Card</li>
-                        <li>Voter Card</li>
-                        <li>Birth Cirtificate Renewal</li>
-                        <li>CU registration</li>
-                        <li>ABC Id / Apaar no</li>
-                        <li>E-Shram card / UAN no</li>
-                        <li>Passport / stamp size Photo</li>
-                       
-                    </ul>
-                </div>
-                <div class="service-card">
-                    <h3>CV Creation</h3>
-                    <p>Customized resumes that stand out</p>
-                    <ul>
-                        <li>Content structuring</li>
-                        <li>Professional formatting</li>
-                        <li>Prompt-driven enhancements</li>
-                    </ul>
-                </div>
-                  <div class="service-card">
-                    <h3>Digital Cards</h3>
-                    <p>Customized invitation & Bussiness cards</p>
-                    <ul>
-                        <li>Birthday card</li>
-                         <li>identity card</li>
-                        <li>Bussiness Card</li>
-                        <li>Wedding Card</li>
-                        <li>Fees card</li>
-                        <li>Aniversary card</li>
-                    </ul>
-                </div>
-                <div class="service-card">
-                    <h3>Data Recovery</h3>
-                    <p>Files/photos etc</p>
-                    <ul>
-                        <li>the data should be recovered within 3-4 days</li>
-                        <li>there is less chance to get original photos ,videos or other files</li>
-                        
-                    </ul>
-                </div>
+            <div class="grid" id="services-grid">
+                <!-- Dynamic cards will load here -->
             </div>
         </div>
     </section>
@@ -552,9 +520,8 @@
                     Instagram
                 </a>
 
-                 <!-- Threads Button -->
-                 <a href="https://www.threads.com/@ar_network_house"
-                    class="btn-contact threads">
+                <!-- Threads Button -->
+                <a href="https://www.threads.com/@ar_network_house" class="btn-contact threads">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/d/db/Threads_%28app%29.png" alt="Threads">
                     Threads
                 </a>
@@ -577,6 +544,102 @@
         const links = document.getElementById("nav-links");
         toggle.addEventListener("click", () => {
             links.classList.toggle("active");
+        });
+
+        // GOOGLE WEBAPP URL
+        const WEBAPP_URL =
+            "https://script.google.com/macros/s/AKfycbzcxPIZ7wZWaewCMKmDsLiIYVOHTG0KzcvO32LzyxLmkhZrESS2qWPjdNtynie7j9PBvA/exec";
+
+        // SERVICE TITLES + DESCRIPTION
+        const SERVICE_INFO = [
+            { title: "Projects & Posters", desc: "All types of school/college projects & creative poster solutions.", c1: 0, c2: 1 },
+            { title: "Cards Design", desc: "Custom-designed digital cards.", c1: 3, c2: 4 },
+            { title: "Corporate Creation", desc: "Professional corporate assets for branding & identity.", c1: 6, c2: 7 },
+            { title: "Website Create & Design", desc: "Modern responsive websites with continuous support.", c1: 9, c2: 10 },
+            { title: "Official Documents", desc: "Various types of government and academic document services.", c1: 12, c2: 13 },
+            { title: "Data Recovery", desc: "Recovery services for lost files, photos & essential data.", c1: 15, c2: 16 }
+        ];
+
+        const grid = document.getElementById("services-grid");
+
+        // Create service card
+        function makeServiceCard(serviceTitle, desc, items) {
+            const card = document.createElement("div");
+            card.className = "service-card";
+
+            let html = `
+        <h3>${serviceTitle}</h3>
+        <p style="color:#6b7280; margin-top:5px;">${desc}</p>
+        <ul>
+    `;
+
+            items.forEach(item => {
+                html += `<li>${item}</li>`;
+            });
+
+            html += `</ul>`;
+            card.innerHTML = html;
+            return card;
+        }
+
+        // Fetch data
+        async function loadServices() {
+            try {
+                const res = await fetch(WEBAPP_URL, { cache: "no-store" });
+                const json = await res.json();
+
+                if (!json.table || !Array.isArray(json.table)) return;
+
+                const rows = json.table.slice(1); // skip header row
+                grid.innerHTML = "";
+
+                SERVICE_INFO.forEach(service => {
+                    const list = [];
+
+                    rows.forEach(r => {
+                        let a = r[service.c1] ?? "";
+                        let b = r[service.c2] ?? "";
+
+                        // --- FILTER OUT AR13, AR14, AR15 etc ---
+                        const skipCode = str => /^AR\d+/i.test(str.trim());
+
+                        if (a && !skipCode(a)) list.push(a);
+                        if (b && !skipCode(b)) list.push(b);
+                    });
+
+                    const card = makeServiceCard(service.title, service.desc, list);
+                    grid.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error("Error fetching services:", err);
+            }
+        }
+
+        loadServices();
+
+        // --- Floating Home Button Logic ---
+        const homeBtn = document.getElementById("homeBtn");
+
+        window.addEventListener("scroll", () => {
+            const scrollTop = window.scrollY;
+            const heroHeight = document.getElementById("home").offsetHeight;
+
+            if (scrollTop > heroHeight * 0.5) {
+                // show button when scrolled below hero section
+                homeBtn.classList.add("visible");
+            } else {
+                // hide button when user is back in home section
+                homeBtn.classList.remove("visible");
+            }
+        });
+
+        // Smooth scroll to top
+        homeBtn.addEventListener("click", () => {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
         });
     </script>
 </body>
