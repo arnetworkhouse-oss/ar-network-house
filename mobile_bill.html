@@ -129,7 +129,14 @@
         .total-and-stamp {
             display: flex;
             justify-content: space-between;
+            align-items: flex-end;
             margin-top: 20px;
+        }
+
+        .auth-block {
+            display: flex;
+            align-items: center;
+            gap: 30px;
         }
 
         .stamp-container {
@@ -137,8 +144,8 @@
         }
 
         .paid-stamp {
-            width: 130px;
-            height: 130px;
+            width: 110px;
+            height: 110px;
             border: 4px double var(--stamp-color);
             border-radius: 50%;
             display: flex;
@@ -147,10 +154,28 @@
             align-items: center;
             color: var(--stamp-color);
             transform: rotate(-15deg);
+            font-weight: bold;
+        }
+
+        .sig-container {
+            text-align: center;
+        }
+
+        #shopSignature {
+            max-width: 150px;
+            max-height: 80px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .sig-line {
+            border-top: 1px solid #333;
+            font-size: 11px;
+            padding-top: 5px;
         }
 
         .total-area {
-            width: 300px
+            width: 320px
         }
 
         .total-row {
@@ -174,83 +199,57 @@
         }
 
         @media print {
-
-            .input-panel,
-            .btn-print {
-                display: none
-            }
-
-            body {
-                padding: 0
-            }
-
-            #invoice {
-                border: none
-            }
+            .input-panel, .btn-print { display: none }
+            body { padding: 0 }
+            #invoice { border: none }
         }
     </style>
 </head>
 
 <body>
     <div class="main-wrapper">
-
-        <!-- ================= FORM ================= -->
         <div class="input-panel">
             <h2>Generate New Bill</h2>
-            <div class="form-group">
-                <label>Bill Number</label>
-                <input type="text" id="inBillNo" placeholder="Leave blank for auto">
-            </div>
-
-
-
             <div class="grid-row">
-                <div>
-                    <label>Customer Name *</label>
-                    <input id="inCustName">
-                </div>
-                <div>
-                    <label>Contact Number</label>
-                    <input id="inCustPhone">
-                </div>
+                <div><label>Bill Number</label><input type="text" id="inBillNo" placeholder="Auto"></div>
+                <div><label>Customer Name *</label><input id="inCustName"></div>
             </div>
-
             <div class="grid-row">
-
+                <div><label>Contact Number</label><input id="inCustPhone"></div>
+                <div style="grid-column: span 2;"><label>Customer Address</label><input id="inCustAddress" style="width:100%"></div>
+            </div>
+            <div class="grid-row">
                 <div><label>Brand *</label><input id="inBrand"></div>
                 <div><label>Model *</label><input id="inModel"></div>
                 <div><label>IMEI *</label><input id="inIMEI"></div>
             </div>
-
             <div class="grid-row">
                 <div><label>Color</label><input id="inColor"></div>
                 <div><label>Storage</label><input id="inStorage"></div>
                 <div><label>Qty</label><input id="inQty" type="number" value="1"></div>
             </div>
-
             <div class="grid-row">
                 <div><label>Price *</label><input id="inPrice" type="number"></div>
                 <div><label>Discount</label><input id="inDiscount" type="number" value="0"></div>
-                <div><label>GST %</label><input id="inGST" type="number" value="12"></div>
             </div>
-
             <button class="btn btn-generate" onclick="generateBill()">Generate</button>
             <button class="btn btn-clear" onclick="location.reload()">Clear</button>
         </div>
 
-        <!-- ================= INVOICE ================= -->
         <div id="invoice">
             <div class="bill-header">
                 <h1 id="shopName">---</h1>
                 <p><i>"Your Trusted Mobile Partner"</i></p>
                 <p id="shopAddress">---</p>
                 <p id="shopContact">Contact: ---</p>
+                <p id="shopGstDisplay">GSTIN: ---</p>
             </div>
 
             <div class="bill-meta">
                 <div>
                     <p><b>Name:</b> <span id="outCustName">---</span></p>
                     <p><b>Contact:</b> <span id="outCustPhone">---</span></p>
+                    <p><b>Address:</b> <span id="outCustAddress">---</span></p>
                 </div>
                 <div>
                     <p><b>Bill No:</b> <span id="outBillNo"></span></p>
@@ -259,83 +258,98 @@
             </div>
 
             <table class="bill-table">
-                <tr>
-                    <th>Description</th>
-                    <th>IMEI</th>
-                    <th>Qty</th>
-                    <th>Rate</th>
-                    <th>Total</th>
-                </tr>
-                <tr>
-                    <td>
-                        <span id="outBrand" class="brand-text"></span>
-                        <span id="outModel" class="model-text"></span>
-                        <span id="outVariant" class="variant-text"></span>
-                    </td>
-                    <td id="outIMEI"></td>
-                    <td id="outQty"></td>
-                    <td id="outRate"></td>
-                    <td id="outRowTotal"></td>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>IMEI</th>
+                        <th>Qty</th>
+                        <th>Rate</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <span id="outBrand" class="brand-text"></span>
+                            <span id="outModel" class="model-text"></span><br>
+                            <span id="outVariant" class="variant-text"></span>
+                        </td>
+                        <td id="outIMEI"></td>
+                        <td id="outQty"></td>
+                        <td id="outRate"></td>
+                        <td id="outRowTotal"></td>
+                    </tr>
+                </tbody>
             </table>
 
             <div class="total-and-stamp">
-                <div class="stamp-container" id="stampSection">
-                    <div class="paid-stamp">
-                        <div>PAID</div>
-                        <div id="stampDate"></div>
+                <div class="auth-block">
+                    <div class="stamp-container" id="stampSection">
+                        <div class="paid-stamp">
+                            <div>PAID</div>
+                            <div id="stampDate"></div>
+                        </div>
+                    </div>
+                    <div class="sig-container">
+                        <img id="shopSignature" src="" alt="">
+                        <div class="sig-line">Authorized Signatory</div>
                     </div>
                 </div>
 
                 <div class="total-area">
                     <div class="total-row"><span>Subtotal</span><span id="outSubTotal"></span></div>
                     <div class="total-row"><span>Discount</span><span id="outDiscount"></span></div>
-                    <div class="total-row"><span>+ GST</span><span id="outGST"></span></div>
+                    <div class="total-row"><span>+ GST (included <span id="outGstLabel">0</span>%)</span><span></span></div>
                     <div class="total-row grand-total"><span>Total</span><span id="outGrandTotal"></span></div>
                 </div>
             </div>
-
-            <div class="footer">
-                Thank you for your business
-            </div>
+            <div class="footer">Thank you for your business</div>
         </div>
-
         <button class="btn btn-print" onclick="window.print()">Print</button>
-
     </div>
 
     <script>
+        let globalGstLabel = 0;
+
         window.onload = () => {
             const d = new Date().toLocaleDateString("en-IN");
             outDate.innerText = d;
             stampDate.innerText = d;
-            const autoBillNo = "NM-" + Math.floor(1000 + Math.random() * 9000);
-            outBillNo.innerText = autoBillNo;
+            outBillNo.innerText = "NM-" + Math.floor(1000 + Math.random() * 9000);
 
-
+            // Fetching details from the Google Sheet
             fetch("https://opensheet.elk.sh/1OZKi19tk_igGHx_Y2wt9fptDyEyVD_eScqEsEjSBkS8/Sheet1")
                 .then(r => r.json())
-                .then(d => {
-                    shopName.innerText = d[0].shopname;
-                    shopAddress.innerText = d[0].shopaddress;
-                    shopContact.innerText = "Contact: +91 " + d[0].shopcontact;
+                .then(data => {
+                    const sheet = data[0];
+                    shopName.innerText = sheet.shopname;
+                    shopAddress.innerText = sheet.shopaddress;
+                    shopContact.innerText = "Contact: +91 " + sheet.shopcontact;
+                    shopGstDisplay.innerText = "GSTIN: " + (sheet.gstno || "N/A");
+                    
+                    // Pull the GST value just for the label (18%)
+                    globalGstLabel = parseFloat(sheet.gst) || 0; 
+                    outGstLabel.innerText = globalGstLabel;
+
+                    // Pull the Signature link
+                    if(sheet.photolink) shopSignature.src = sheet.photolink;
                 });
         }
 
         function generateBill() {
-            const manualBillNo = document.getElementById("inBillNo").value.trim();
-
-            if (manualBillNo) {
-                document.getElementById("outBillNo").innerText = manualBillNo;
+            if (document.getElementById("inBillNo").value.trim()) {
+                outBillNo.innerText = document.getElementById("inBillNo").value.trim();
             }
 
-            const price = +inPrice.value, qty = +inQty.value, disc = +inDiscount.value, gst = +inGST.value;
+            const price = +inPrice.value, qty = +inQty.value, disc = +inDiscount.value;
             const sub = price * qty;
-            const gstAmt = (sub - disc) * gst / 100;
-            const total = sub - disc + gstAmt;
+            
+            // Total is now strictly Subtotal minus Discount
+            const finalTotal = sub - disc;
 
             outCustName.innerText = inCustName.value;
             outCustPhone.innerText = inCustPhone.value || "N/A";
+            outCustAddress.innerText = inCustAddress.value || "N/A";
             outBrand.innerText = inBrand.value;
             outModel.innerText = inModel.value;
             outVariant.innerText = `Color: ${inColor.value || "N/A"} | Storage: ${inStorage.value || "N/A"}`;
@@ -346,13 +360,11 @@
 
             outSubTotal.innerText = sub.toFixed(2);
             outDiscount.innerText = "-" + disc.toFixed(2);
-            outGST.innerText = gstAmt.toFixed(2);
-            outGrandTotal.innerText = "₹ " + total.toFixed(2);
+            outGstLabel.innerText = globalGstLabel; // Updates display only
+            outGrandTotal.innerText = "₹ " + finalTotal.toFixed(2);
 
             stampSection.style.opacity = 1;
         }
     </script>
 </body>
-
-
 </html>
