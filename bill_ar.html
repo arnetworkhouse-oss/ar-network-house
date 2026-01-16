@@ -840,6 +840,20 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
+            /* ===== CRM RAWDATA SIDE-CAR SYNC ===== */
+            fetch("https://script.google.com/macros/s/AKfycbwlssVn3d_LkBIxVgMG5pZwoai3D9xqbinOFLFzguj6gxtjzhLSQ7YIg8499zTVzAczuQ/exec", {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    date: new Date().toLocaleDateString("en-IN"),
+                    name: document.getElementById('bill_to').value,
+                    phone: document.getElementById('phone').value,
+                    mail: document.getElementById('email').value,
+                    area: document.getElementById('locationCode').value
+                })
+            });
+
 
             const msg = document.getElementById("syncMsg");
             msg.innerText = "✔ Saved to Google Sheet";
