@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Mobile - Bill Generator</title>
+    <title>Mobile Bill Generator</title>
 
     <style>
         :root {
@@ -199,9 +199,19 @@
         }
 
         @media print {
-            .input-panel, .btn-print { display: none }
-            body { padding: 0 }
-            #invoice { border: none }
+
+            .input-panel,
+            .btn-print {
+                display: none
+            }
+
+            body {
+                padding: 0
+            }
+
+            #invoice {
+                border: none
+            }
         }
     </style>
 </head>
@@ -216,7 +226,8 @@
             </div>
             <div class="grid-row">
                 <div><label>Contact Number</label><input id="inCustPhone"></div>
-                <div style="grid-column: span 2;"><label>Customer Address</label><input id="inCustAddress" style="width:100%"></div>
+                <div style="grid-column: span 2;"><label>Customer Address</label><input id="inCustAddress"
+                        style="width:100%"></div>
             </div>
             <div class="grid-row">
                 <div><label>Brand *</label><input id="inBrand"></div>
@@ -264,7 +275,7 @@
                         <th>IMEI</th>
                         <th>Qty</th>
                         <th>Rate</th>
-                        <th>Total</th>
+                        <th>Subtotal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -274,10 +285,10 @@
                             <span id="outModel" class="model-text"></span><br>
                             <span id="outVariant" class="variant-text"></span>
                         </td>
-                        <td id="outIMEI"></td>
-                        <td id="outQty"></td>
-                        <td id="outRate"></td>
-                        <td id="outRowTotal"></td>
+                        <td id="outIMEI" align="center"></td>
+                        <td id="outQty" align="center"></td>
+                        <td id="outRate" align="center"></td>
+                        <td id="outRowTotal" align="center"></td>
                     </tr>
                 </tbody>
             </table>
@@ -299,7 +310,8 @@
                 <div class="total-area">
                     <div class="total-row"><span>Subtotal</span><span id="outSubTotal"></span></div>
                     <div class="total-row"><span>Discount</span><span id="outDiscount"></span></div>
-                    <div class="total-row"><span>+ GST (included <span id="outGstLabel">0</span>%)</span><span></span></div>
+                    <div class="total-row"><span>+ GST (included <span id="outGstLabel">0</span>%)</span><span></span>
+                    </div>
                     <div class="total-row grand-total"><span>Total</span><span id="outGrandTotal"></span></div>
                 </div>
             </div>
@@ -326,13 +338,13 @@
                     shopAddress.innerText = sheet.shopaddress;
                     shopContact.innerText = "Contact: +91 " + sheet.shopcontact;
                     shopGstDisplay.innerText = "GSTIN: " + (sheet.gstno || "N/A");
-                    
-                    // Pull the GST value just for the label (18%)
-                    globalGstLabel = parseFloat(sheet.gst) || 0; 
+
+                    // Pull the GST value just for the label (%)
+                    globalGstLabel = parseFloat(sheet.gst) || 0;
                     outGstLabel.innerText = globalGstLabel;
 
                     // Pull the Signature link
-                    if(sheet.photolink) shopSignature.src = sheet.photolink;
+                    if (sheet.photolink) shopSignature.src = sheet.photolink;
                 });
         }
 
@@ -343,7 +355,7 @@
 
             const price = +inPrice.value, qty = +inQty.value, disc = +inDiscount.value;
             const sub = price * qty;
-            
+
             // Total is now strictly Subtotal minus Discount
             const finalTotal = sub - disc;
 
@@ -367,4 +379,5 @@
         }
     </script>
 </body>
+
 </html>
