@@ -850,13 +850,14 @@
                     name: document.getElementById('bill_to').value,
                     phone: document.getElementById('phone').value,
                     mail: document.getElementById('email').value,
-                    area: document.getElementById('locationCode').value
+                    area: document.getElementById('locationCode').value,
+                    orderAmount: document.getElementById('netTotal').innerText.replace("₹", "")
                 })
             });
 
 
             const msg = document.getElementById("syncMsg");
-            msg.innerText = "✔ Saved to Google Sheet";
+            msg.innerText = "✔ Saved to Our Database";
             msg.style.display = "block";
             setTimeout(() => msg.style.display = "none", 2000);
         }
