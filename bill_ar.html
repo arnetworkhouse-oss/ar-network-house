@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>AR NETWORK HOUSE - Invoice</title>
 
-    <!-- html2canvas + jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -30,7 +29,6 @@
             background: #1f1f22;
         }
 
-        /* --- Fix for dark mode dropdowns (Billing System + Item selects) --- */
         .dark select,
         .dark option {
             background-color: #2e3136 !important;
@@ -41,7 +39,6 @@
         .dark select:focus {
             outline: 1px solid #ff8a00;
         }
-
 
         * {
             box-sizing: border-box;
@@ -117,7 +114,6 @@
             gap: 8px
         }
 
-        /* location & billing fields */
         .fields {
             display: flex;
             flex-direction: column;
@@ -131,6 +127,8 @@
         }
 
         .fields input[type="text"],
+        .fields input[type="number"],
+        .fields input[type="email"],
         .fields select {
             padding: 8px;
             border-radius: 6px;
@@ -140,7 +138,6 @@
             color: var(--text)
         }
 
-        /* invoice table */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -238,7 +235,6 @@
             font-size: 18px
         }
 
-        /* controls sticky bottom (mobile friendly) */
         .controls {
             position: sticky;
             bottom: 8px;
@@ -250,7 +246,6 @@
             z-index: 40
         }
 
-        /* ITEM NAME INPUT – Premium Clean Look */
         .item-name {
             width: 100%;
             padding: 8px 10px;
@@ -278,7 +273,6 @@
             box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
         }
 
-
         .controls .btn {
             padding: 10px 12px;
             border-radius: 8px;
@@ -286,7 +280,6 @@
             cursor: pointer
         }
 
-        /* price list panel */
         .price-panel {
             background: linear-gradient(180deg, var(--accent), #ffb25a);
             color: white;
@@ -301,7 +294,6 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.06)
         }
 
-        /* hide on print */
         @media print {
 
             .controls,
@@ -313,27 +305,21 @@
                 display: none !important;
             }
 
-            /* ensure selects hidden when generating pdf */
             .print-name {
                 display: inline-block !important;
             }
-
-            /* show plain text names for print */
         }
 
-        /* hidden print-name (text that mirrors select) */
         .print-name {
             display: none;
             font-weight: 600;
         }
 
-        /* ensure select shows full text */
         select.item-select {
             -webkit-appearance: none;
             appearance: none;
         }
 
-        /* responsive */
         @media(max-width:860px) {
             .wrap {
                 padding: 8px
@@ -383,11 +369,8 @@
             .card {
                 padding-bottom: 72px
             }
-
-            /* space for sticky controls */
         }
 
-        /* dark mode styles */
         .dark .card {
             background: #2b2f33;
             color: var(--text)
@@ -403,7 +386,6 @@
         .dark table td {
             border-color: rgba(255, 255, 255, 0.06)
         }
-
 
         .sync-btn {
             padding: 10px 18px;
@@ -453,8 +435,8 @@
             box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
         }
 
-        .card {
-
+        .card-stat {
+            background: var(--panel);
             padding: 20px;
             border-radius: 20px;
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
@@ -474,7 +456,6 @@
                     <div class="logo" id="logoHolder">
                         <img
                             src="https://raw.githubusercontent.com/arnetworkhouse-oss/ar-network-house/main/ar%20logo.jpg">
-
                     </div>
                     <div>
                         <h1>AR NETWORK HOUSE</h1>
@@ -483,39 +464,31 @@
                 </div>
 
                 <div style="text-align:right">
-
                     <div class="meta">Date: <strong id="invDate"></strong></div>
                 </div>
             </header>
 
             <div class="top-extra">
                 <div class="fields">
-                    <!-- Live Google Sheet Values (Hidden in Print/PDF) -->
                     <div id="liveSheetValues" class="no-print"
                         style="margin-top:15px; display:flex; gap:15px; flex-wrap:wrap;">
-
                         <div style="display:flex; flex-direction:column;">
                             <label style="font-size:13px; color:var(--muted);">Last Project ID</label>
-                            <div class="card" id="a">—</div>
+                            <div class="card-stat" id="a">—</div>
                         </div>
-
                         <div style="display:flex; flex-direction:column;">
                             <label style="font-size:13px; color:var(--muted);">Last Invoice</label>
-                            <div class="card" id="b">—</div>
+                            <div class="card-stat" id="b">—</div>
                         </div>
-
                         <div style="display:flex; flex-direction:column;">
                             <label style="font-size:13px; color:var(--muted);">Pre-Book Project ID</label>
-                            <div class="card" id="c">—</div>
+                            <div class="card-stat" id="c">—</div>
                         </div>
-
                         <div style="display:flex; flex-direction:column;">
                             <label style="font-size:13px; color:var(--muted);">Largest Project ID</label>
-                            <div class="card" id="d">—</div>
+                            <div class="card-stat" id="d">—</div>
                         </div>
-
                     </div>
-
 
                     <table border="0">
                         <tr>
@@ -529,12 +502,12 @@
                         </tr>
                     </table>
 
-
                     <label>Bill to</label>
-                    <input type="text" id="bill_to" placeholder="name ">
+                    <input type="text" id="bill_to" list="customerList" placeholder="name ">
+                    <datalist id="customerList"></datalist>
 
                     <label>Phone</label>
-                    <input type="number" id="phone" placeholder="Ph no.">
+                    <input type="text" id="phone" placeholder="Ph no.">
 
                     <label>Email</label>
                     <input type="email" id="email" placeholder=".....@gmail.com">
@@ -554,7 +527,6 @@
                                 <select id="billingSystem">
                                     <option value="AD_1">AD_1</option>
                                     <option value="RSR_2">RSR_2</option>
-
                                 </select>
                             </td>
                             <td>
@@ -571,11 +543,6 @@
                             </td>
                         </tr>
                     </table>
-
-
-
-
-
                 </div>
             </div>
 
@@ -586,12 +553,9 @@
                         <th class="col-qty">Qty</th>
                         <th class="col-price">Price</th>
                         <th class="col-total">Total</th>
-
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- initial row inserted by JS -->
-                </tbody>
+                <tbody></tbody>
             </table>
 
             <div
@@ -602,7 +566,6 @@
                         style="background:var(--accent);color:white;border:0;padding:8px 12px;border-radius:8px;cursor:pointer">Show/Hide
                         Price List</button>
                 </div>
-
                 <div style="min-width:220px">
                     <div class="summary">
                         <div class="row">
@@ -623,25 +586,19 @@
                 </div>
             </div>
 
-            <div style="margin-top:14px;font-size:13px;color:var(--muted)"></div>
-
             <footer style="margin-top:18px">
                 <div style="text-align:center">
                     <p>Thank you very much for trusting AR NETWORK HOUSE !</p>
-
                 </div>
             </footer>
         </div>
 
-        <!-- Price list panel -->
         <div class="price-panel card" id="pricePanel" style="display:none">
             <h3 style="margin:0 0 8px 0">ITEMS & PRICES</h3>
             <div id="priceList"></div>
         </div>
-
     </div>
 
-    <!-- Sticky controls (hidden when printing) -->
     <div class="controls no-print" aria-hidden="true"
         style="position:fixed;left:0;right:0;bottom:10px;justify-content:center">
         <button id="downloadPDF" class="btn"
@@ -651,63 +608,75 @@
             style="background:#666;color:white;padding:10px 14px;border-radius:8px;border:0;margin-right:8px"
             title="Ctrl + P">Print</button>
         <button id="themeToggle" class="btn"
-            style="background:#444;color:white;padding:10px 14px;border-radius:8px;border:0" title="Ctrl + D">Light /
+            style="background:#444;color:white;padding:10px 14px;border-radius:8px;border:0" title="Ctrl + D" action="toggle(dark)">Light /
             Dark</button>
-
         <button id="syncBtn" class="sync-btn">Sync to Sheet </button>
         <div id="syncMsg" class="sync-msg" style="display:none;"></div>
-
     </div>
 
     <script>
-
-        /* ---------- LIVE PRICE FETCH (from price_list.html Google Sheet) ---------- */
-
-        const PRICE_FEED_URL =
-            "https://script.google.com/macros/s/AKfycbwx4mPP7y0esYqz0rwy9_EKe3Zd3865rSugMTw-RQFIyewjZ9CguLwPtskBREkxFAUY/exec";
+        /* ---------- CONFIG & STATE ---------- */
+        const PRICE_FEED_URL = "https://script.google.com/macros/s/AKfycbwx4mPP7y0esYqz0rwy9_EKe3Zd3865rSugMTw-RQFIyewjZ9CguLwPtskBREkxFAUY/exec";
+        const CRM_DATA_URL = "https://script.google.com/macros/s/AKfycbzFXZVZK1PTUd7fwXfzpoI3y89PAagHKV3IUodognGOIsg1A95RaQj5Yli9XHe7d2innw/exec";
+        const STATS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwm37tFzROpLJtJcecjBFK2Vwlmay39NiPLMaN1gAK04Oq-4IU7XXRo15q8ftsiphkJBw/exec";
+        const SYNC_URL = "https://script.google.com/macros/s/AKfycbwzIGnZ-827RUjSuhBu42779IbC0FUjcisTQDJRaL1wePTNqi1Ghvbb79I2DR1z5UcZ5g/exec";
 
         let livePrices = {};
         let priceLoaded = false;
+        let crmCustomers = [];
 
+        /* ---------- CRM DATA FETCH & INSTANT FILL ---------- */
+        async function loadCRMData() {
+            try {
+                const res = await fetch(CRM_DATA_URL);
+                const data = await res.json();
+                crmCustomers = data.customers || [];
+                const list = document.getElementById("customerList");
+                list.innerHTML = crmCustomers.map(c => `<option value="${c.NAME}">`).join("");
+            } catch (e) { console.error("CRM Error:", e); }
+        }
+
+        document.getElementById('bill_to').addEventListener('input', function (e) {
+            const val = e.target.value;
+            const customer = crmCustomers.find(c => c.NAME === val);
+            if (customer) {
+                document.getElementById('phone').value = customer.NUMBER || "";
+                document.getElementById('email').value = customer.GMAIL || "";
+                const locDropdown = document.getElementById('locationCode');
+                if (customer.AREA) { locDropdown.value = customer.AREA; }
+            }
+        });
+
+        /* ---------- PRICE LIST LOGIC ---------- */
         async function loadLivePrices() {
             try {
                 const res = await fetch(PRICE_FEED_URL);
                 const data = await res.json();
-
                 livePrices = {};
-
                 data.forEach(row => {
-                    if (row.colB && row.colD) {
-                        livePrices[row.colB.trim()] = Number(row.colD);
-                    }
+                    if (row.colB && row.colD) { livePrices[row.colB.trim()] = Number(row.colD); }
                 });
-
                 priceLoaded = true;
+                updateDataList();
                 renderPricePanel();
-            } catch (e) {
-                console.error("Error loading prices:", e);
-            }
+            } catch (e) { console.error("Price List Error:", e); }
         }
 
-        /* Render the price list panel */
         function renderPricePanel() {
             const priceList = document.getElementById("priceList");
-
             priceList.innerHTML = Object.keys(livePrices)
-                .map(name => `
-            <div class="price-item">
-                <span>${name}</span>
-                <strong>₹${livePrices[name]}</strong>
-            </div>
-        `)
-                .join("");
+                .map(name => `<div class="price-item"><span>${name}</span><strong>₹${livePrices[name]}</strong></div>`).join("");
         }
 
+        function updateDataList() {
+            if (!document.getElementById("itemList")) {
+                document.body.insertAdjacentHTML("beforeend", `<datalist id="itemList"></datalist>`);
+            }
+            const list = document.getElementById("itemList");
+            list.innerHTML = Object.keys(livePrices).map(x => `<option value="${x}"></option>`).join("");
+        }
 
-        /* ---------- ITEM LIST ---------- */
-
-
-        /* ---------- BASIC SETUP ---------- */
+        /* ---------- CORE INVOICE FUNCTIONS ---------- */
         const tbody = document.querySelector("#itemsTable tbody");
         const subtotalEl = document.getElementById("subtotal");
         const discountInput = document.getElementById("discount");
@@ -715,36 +684,16 @@
         const netEl = document.getElementById("netTotal");
         document.getElementById("invDate").innerText = new Date().toLocaleDateString("en-IN");
 
-        /* ---------- FORMAT ---------- */
-        function fmt(n) {
-            return "₹" + Number(n || 0).toFixed(2);
-        }
+        function fmt(n) { return "₹" + Number(n || 0).toFixed(2); }
 
-        /* ---------- SINGLE DATALIST (to avoid red errors) ---------- */
-        document.body.insertAdjacentHTML("beforeend", `
-<datalist id="itemList"></datalist>
-`);
-
-        function updateDataList() {
-            const list = document.getElementById("itemList");
-            list.innerHTML = Object.keys(livePrices)
-                .map(x => `<option value="${x}"></option>`)
-                .join("");
-        }
-
-
-        /* ---------- CREATE ROW ---------- */
         function createRow() {
             const tr = document.createElement("tr");
-
             tr.innerHTML = `
-        <td><input type="text" class="item-name" list="itemList"></td>
-        <td><input type="number" class="qty" min="1" value="1"></td>
-        <td><input type="number" class="price"></td>
-        <td><input type="number" class="line-total" readonly></td>
-        <td><button class="remove-btn">Remove</button></td>
-    `;
-
+                <td><input type="text" class="item-name" list="itemList"></td>
+                <td><input type="number" class="qty" min="1" value="1"></td>
+                <td><input type="number" class="price"></td>
+                <td><input type="number" class="line-total" readonly></td>
+                <td><button class="remove-btn no-print">Remove</button></td>`;
             tbody.appendChild(tr);
 
             const itemName = tr.querySelector(".item-name");
@@ -753,60 +702,33 @@
             const lineTotal = tr.querySelector(".line-total");
 
             async function update() {
-
-                // Load live prices once
-                if (!priceLoaded) {
-                    await loadLivePrices();
-                    updateDataList();
-                }
-
+                if (!priceLoaded) await loadLivePrices();
                 const name = itemName.value.trim();
-
-                // Auto-fill price from Google Sheet
-                if (livePrices[name] !== undefined && price.value.trim() === "") {
-                    price.value = livePrices[name];
-                }
-
-                // Now update total normally
+                if (livePrices[name] !== undefined && price.value.trim() === "") { price.value = livePrices[name]; }
                 lineTotal.value = (Number(qty.value) || 0) * (Number(price.value) || 0);
                 recalc();
             }
 
-
-
             itemName.addEventListener("input", update);
             qty.addEventListener("input", update);
             price.addEventListener("input", update);
-
-            tr.querySelector(".remove-btn").addEventListener("click", () => {
-                tr.remove();
-                recalc();
-            });
-
+            tr.querySelector(".remove-btn").addEventListener("click", () => { tr.remove(); recalc(); });
             update();
         }
 
-        /* ---------- RECALC ---------- */
         function recalc() {
             let sum = 0;
-            Array.from(tbody.querySelectorAll("tr")).forEach(tr => {
-                sum += Number(tr.querySelector(".line-total").value || 0);
-            });
-
+            Array.from(tbody.querySelectorAll("tr")).forEach(tr => { sum += Number(tr.querySelector(".line-total").value || 0); });
             subtotalEl.innerText = fmt(sum);
-
             const disc = Number(discountInput.value || 0);
             const discAmt = sum * (disc / 100);
             discountAmountEl.innerText = "-" + fmt(discAmt);
-
-            const net = sum - discAmt;
-            netEl.innerText = fmt(net);
+            netEl.innerText = fmt(sum - discAmt);
         }
 
-        /* ---------- MANUAL SYNC ---------- */
+        /* ---------- DATA SYNC (PRECAUTION) ---------- */
+        /* ---------- DATA SYNC (PRECAUTION) ---------- */
         async function syncNow() {
-            const url = "https://script.google.com/macros/s/AKfycbwzIGnZ-827RUjSuhBu42779IbC0FUjcisTQDJRaL1wePTNqi1Ghvbb79I2DR1z5UcZ5g/exec";  // ← UPDATE THIS
-
             const rows = Array.from(tbody.querySelectorAll("tr")).map(tr => ({
                 itemName: tr.querySelector(".item-name").value,
                 qty: tr.querySelector(".qty").value,
@@ -817,205 +739,130 @@
             const payload = {
                 invoice: document.getElementById('invoice').value,
                 projectId: document.getElementById('projectId').value,
-
                 billto: document.getElementById('bill_to').value,
                 phone: document.getElementById('phone').value,
                 email: document.getElementById('email').value,
                 locationCode: document.getElementById('locationCode').value,
                 billingSystem: document.getElementById('billingSystem').value,
-                sellerName: document.getElementById('sellerName').value,   // ✔ NEW
+                sellerName: document.getElementById('sellerName').value,
                 items: rows,
-                subtotal: document.getElementById('subtotal').innerText,
-                discount: document.getElementById('discount').value,
-                discountAmount: document.getElementById('discountAmount').innerText,
-                netTotal: document.getElementById('netTotal').innerText,
-                invoiceDate: new Date().toLocaleString("en-IN"),
-                syncTime: new Date().toISOString()
+                subtotal: subtotalEl.innerText,
+                discount: discountInput.value,
+                discountAmount: discountAmountEl.innerText,
+                netTotal: netEl.innerText,
+                invoiceDate: new Date().toLocaleString("en-IN")
             };
 
+            try {
+                // Main Invoice Sync to Google Sheets
+                await fetch(SYNC_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
 
-            fetch(url, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-            /* ===== CRM RAWDATA SIDE-CAR SYNC ===== */
-            fetch("https://script.google.com/macros/s/AKfycbwlssVn3d_LkBIxVgMG5pZwoai3D9xqbinOFLFzguj6gxtjzhLSQ7YIg8499zTVzAczuQ/exec", {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    date: new Date().toLocaleDateString("en-IN"),
-                    name: document.getElementById('bill_to').value,
-                    phone: document.getElementById('phone').value,
-                    mail: document.getElementById('email').value,
-                    area: document.getElementById('locationCode').value,
-                    orderAmount: document.getElementById('netTotal').innerText.replace("₹", "")
-                })
-            });
+                // Secondary Log for CRM
+                fetch("https://script.google.com/macros/s/AKfycbwlssVn3d_LkBIxVgMG5pZwoai3D9xqbinOFLFzguj6gxtjzhLSQ7YIg8499zTVzAczuQ/exec", {
+                    method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        date: new Date().toLocaleDateString("en-IN"),
+                        name: payload.billto, phone: payload.phone, mail: payload.email,
+                        area: payload.locationCode, orderAmount: payload.netTotal.replace("₹", "")
+                    })
+                });
 
-
-            const msg = document.getElementById("syncMsg");
-            msg.innerText = "✔ Saved to Our Database";
-            msg.style.display = "block";
-            setTimeout(() => msg.style.display = "none", 2000);
+                const msg = document.getElementById("syncMsg");
+                msg.innerText = "✔ Data Secured In Sheet";
+                msg.style.display = "block";
+                setTimeout(() => msg.style.display = "none", 2000);
+            } catch (e) { console.error("Sync Error:", e); }
         }
+// Add click functionality to the Light / Dark button
+document.getElementById("themeToggle").addEventListener("click", () => {
+    document.documentElement.classList.toggle("dark");
+});
+        /* ---------- EVENT LISTENERS FOR SAVING ---------- */
+        
 
-        /* ---------- BUTTON + SHORTCUT ---------- */
+        // 1. SYNC TO SHEET BUTTON
         document.getElementById("syncBtn").addEventListener("click", syncNow);
 
-        document.addEventListener("keydown", e => {
+        // 2. PRINT BUTTON (Saves before opening print dialog)
+        document.getElementById("printBtn").addEventListener("click", async () => {
+            await syncNow(); // Precautionary Save
+            window.print();
+        });
+
+        // 3. DOWNLOAD PDF BUTTON (Saves before rendering)
+       // 3. DOWNLOAD PDF BUTTON (Saves before rendering)
+document.getElementById('downloadPDF').addEventListener('click', async () => {
+    const btn = document.getElementById('downloadPDF');
+    const invId = document.getElementById('invoice').value || 'New';
+    const clientName = document.getElementById('bill_to').value || 'Customer';
+    
+    btn.innerText = "Saving & Rendering...";
+    btn.disabled = true;
+
+    await syncNow(); // Precautionary Save
+
+    document.body.classList.add('for-pdf');
+    const elem = document.getElementById('invoiceCard');
+    const canvas = await html2canvas(elem, { scale: 2, useCORS: true });
+    const imgData = canvas.toDataURL('image/png');
+    
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'pt', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, (canvas.height * pdfWidth) / canvas.width);
+    
+    // Updated Naming Convention: InvoiceID_CustomerName.pdf
+    pdf.save(`invoice_${invId}_${clientName}.pdf`);
+
+    document.body.classList.remove('for-pdf');
+    btn.innerText = "Download PDF";
+    btn.disabled = false;
+});
+
+        /* ---------- SHORTCUTS ---------- */
+        document.addEventListener("keydown", function (e) {
+            // Theme Toggle (Ctrl + D)
+            if (e.ctrlKey && e.key.toLowerCase() === "d") {
+                e.preventDefault();
+                document.documentElement.classList.toggle("dark");
+            }
+            // Save (Ctrl + S)
             if (e.ctrlKey && e.key.toLowerCase() === "s") {
                 e.preventDefault();
                 syncNow();
             }
-        });
-
-        /* ---------- DARK MODE ---------- */
-        document.getElementById("themeToggle").addEventListener("click", () => {
-            document.documentElement.classList.toggle("dark");
-        });
-
-        /* ---------- PRICE PANEL ---------- */
-        document.getElementById("togglePrice").addEventListener("click", () => {
-            const panel = document.getElementById("pricePanel");
-
-            // Load from sheet only first time
-            if (!priceLoaded) {
-                loadLivePrices();
-            }
-
-            panel.style.display = panel.style.display === "block" ? "none" : "block";
-
-            if (panel.style.display === "block") {
-                renderPricePanel();
+            // Print (Ctrl + P)
+            if (e.ctrlKey && e.key.toLowerCase() === "p") {
+                e.preventDefault();
+                document.getElementById("printBtn").click();
             }
         });
 
-
-        /* ---------- PDF DOWNLOAD ---------- */
-        const downloadBtn = document.getElementById('downloadPDF');
-        if (downloadBtn) {
-            downloadBtn.addEventListener('click', async () => {
-                try {
-                    // Prevent double-click
-                    downloadBtn.disabled = true;
-                    downloadBtn.innerText = "Preparing PDF...";
-
-                    // Ensure print-friendly view
-                    document.body.classList.add('for-pdf');
-
-                    // give browser a tiny moment to reflow DOM (show print-name etc.)
-                    await new Promise(r => setTimeout(r, 150));
-
-                    const elem = document.getElementById('invoiceCard');
-                    const bgColor = getComputedStyle(document.body).backgroundColor || '#ffffff';
-
-                    // html2canvas capture
-                    const canvas = await html2canvas(elem, {
-                        scale: 2,
-                        backgroundColor: bgColor,
-                        useCORS: true,
-                        allowTaint: true,
-                        imageTimeout: 0
-                    });
-
-                    const imgData = canvas.toDataURL('image/png');
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF('p', 'pt', 'a4');
-
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-                    const fileName = 'ar_invoice_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.pdf';
-                    pdf.save(fileName);
-                } catch (err) {
-                    console.error("PDF generation failed:", err);
-                    alert("⚠️ PDF generation failed. Open console to debug.");
-                } finally {
-                    // restore page and button
-                    document.body.classList.remove('for-pdf');
-                    downloadBtn.disabled = false;
-                    downloadBtn.innerText = "Download PDF";
-                }
-            });
-        }
-
-        /* ---------- add item---------- */
-
-        // --- Add Row button wiring (production-safe)
-        const addRowBtn = document.getElementById('addRow');
-        if (addRowBtn) {
-            addRowBtn.addEventListener('click', () => {
-                createRow();
-                // focus the newly created item's name input for fast data entry
-                const lastRow = tbody.querySelector('tr:last-child');
-                if (lastRow) {
-                    const nameInput = lastRow.querySelector('.item-name') || lastRow.querySelector('.item-name-input');
-                    if (nameInput) nameInput.focus();
-                }
-            });
-        } else {
-            console.warn('Add Row button (id="addRow") not found — ensure the button exists in the DOM.');
-        }
-
-        /* ---------- PRINT HANDLER (Enterprise Mode) ---------- */
-        document.getElementById("printBtn").addEventListener("click", () => {
-            // Activate print-friendly masking
-            document.body.classList.add("for-pdf");
-
-            // Defer just enough for DOM repaint
-            setTimeout(() => {
-                window.print();
-
-                // Remove print mask post-render
-                setTimeout(() => {
-                    document.body.classList.remove("for-pdf");
-                }, 300);
-            }, 120);
-        });
-
-
-
-        /* ---------- INIT ---------- */
-        createRow();
-
-
-        document.addEventListener("keydown", function (e) {
-            if (e.ctrlKey && e.key.toLowerCase() === "d") {
-                e.preventDefault();     // 🔥 stops bookmark popup
-                document.documentElement.classList.toggle("dark");
-            }
-        });
-
-        /* ---------- ggl sheet value ---------- */
-
-        const endpoint = "https://script.google.com/macros/s/AKfycbwm37tFzROpLJtJcecjBFK2Vwlmay39NiPLMaN1gAK04Oq-4IU7XXRo15q8ftsiphkJBw/exec";
-
-        async function loadData() {
+        /* ---------- STATS FEED ---------- */
+        async function loadStats() {
             try {
-                const res = await fetch(endpoint);
+                const res = await fetch(STATS_ENDPOINT);
                 const data = await res.json();
-
                 document.getElementById("a").textContent = data.A2 ?? "—";
                 document.getElementById("b").textContent = data.B2 ?? "—";
                 document.getElementById("c").textContent = data.C2 ?? "—";
                 document.getElementById("d").textContent = data.D2 ?? "—";
-
-            } catch (err) {
-                console.log("Error loading:", err);
-            }
+            } catch (err) { console.log("Stats Error:", err); }
         }
+        
 
-        setInterval(loadData, 500);
-        loadData();
-
-
+        /* ---------- INIT ---------- */
+        loadStats();
+        loadCRMData();
+        createRow();
+        setInterval(loadStats, 10000); // Update stats every 10s
     </script>
-
 </body>
 
 </html>
