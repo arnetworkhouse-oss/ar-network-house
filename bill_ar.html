@@ -178,26 +178,6 @@
             text-align: center
         }
 
-        select.item-select {
-            width: 100%;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            background: transparent;
-            color: var(--text)
-        }
-
-        input.qty,
-        input.price,
-        input.line-total {
-            width: 100%;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            background: transparent;
-            color: var(--text)
-        }
-
         .remove-btn {
             background: var(--red);
             color: white;
@@ -246,7 +226,7 @@
             z-index: 40
         }
 
-        .item-name {
+        .item-name, .qty, .price, .line-total {
             width: 100%;
             padding: 8px 10px;
             border: 1.5px solid #d1d5db;
@@ -257,27 +237,10 @@
             transition: 0.2s ease;
         }
 
-        .item-name:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
-        }
-
-        .dark .item-name {
+        .dark .item-name, .dark .qty, .dark .price, .dark .line-total {
             background: #1e1e1e;
             border-color: #555;
             color: #eee;
-        }
-
-        .dark .item-name:focus {
-            border-color: #60a5fa;
-            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
-        }
-
-        .controls .btn {
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 0;
-            cursor: pointer
         }
 
         .price-panel {
@@ -295,98 +258,21 @@
         }
 
         @media print {
-
-            .controls,
-            .no-print {
-                display: none !important;
-            }
-
-            body.for-pdf select.item-select {
-                display: none !important;
-            }
-
-            .print-name {
-                display: inline-block !important;
-            }
+            .controls, .no-print { display: none !important; }
+            .card { box-shadow: none; border: none; }
         }
 
-        .print-name {
-            display: none;
-            font-weight: 600;
+        .card-stat {
+            background: var(--panel);
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            min-width: 110px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
         }
-
-        select.item-select {
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        @media(max-width:860px) {
-            .wrap {
-                padding: 8px
-            }
-
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px
-            }
-
-            .brand {
-                align-items: flex-start
-            }
-
-            .logo {
-                width: 68px;
-                height: 68px
-            }
-
-            .col-item {
-                width: 56%
-            }
-
-            .col-qty {
-                width: 12%
-            }
-
-            .col-price {
-                width: 16%
-            }
-
-            .col-total {
-                width: 14%
-            }
-
-            .controls {
-                position: fixed;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: var(--panel);
-                padding: 10px;
-                border-top: 1px solid rgba(0, 0, 0, 0.06)
-            }
-
-            .card {
-                padding-bottom: 72px
-            }
-        }
-
-        .dark .card {
-            background: #2b2f33;
-            color: var(--text)
-        }
-
-        .dark select.item-select,
-        .dark input {
-            background: #333;
-            color: var(--text)
-        }
-
-        .dark table th,
-        .dark table td {
-            border-color: rgba(255, 255, 255, 0.06)
-        }
-
+        
         .sync-btn {
             padding: 10px 18px;
             background: #2563eb;
@@ -397,53 +283,17 @@
             font-weight: 600;
         }
 
-        .sync-btn:hover {
-            background: #1d4ed8;
-        }
-
         .sync-msg {
             margin-top: 8px;
             font-size: 14px;
             color: #16a34a;
             font-weight: 600;
-        }
-
-        .seller-select {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1.5px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 15px;
-            background: #fff;
-            outline: none;
-            transition: 0.2s ease;
-        }
-
-        .seller-select:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
-        }
-
-        .dark .seller-select {
-            background: #1e1e1e;
-            border-color: #555;
-            color: #fff;
-        }
-
-        .dark .seller-select:focus {
-            border-color: #60a5fa;
-            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
-        }
-
-        .card-stat {
-            background: var(--panel);
-            padding: 20px;
+            position: fixed;
+            bottom: 70px;
+            background: white;
+            padding: 5px 15px;
             border-radius: 20px;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-            min-width: 110px;
-            text-align: center;
-            font-size: 10px;
-            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -454,8 +304,7 @@
             <header>
                 <div class="brand">
                     <div class="logo" id="logoHolder">
-                        <img
-                            src="https://raw.githubusercontent.com/arnetworkhouse-oss/ar-network-house/main/ar%20logo.jpg">
+                        <img src="https://raw.githubusercontent.com/arnetworkhouse-oss/ar-network-house/main/ar%20logo.jpg">
                     </div>
                     <div>
                         <h1>AR NETWORK HOUSE</h1>
@@ -470,47 +319,46 @@
 
             <div class="top-extra">
                 <div class="fields">
-                    <div id="liveSheetValues" class="no-print"
-                        style="margin-top:15px; display:flex; gap:15px; flex-wrap:wrap;">
-                        <div style="display:flex; flex-direction:column;">
-                            <label style="font-size:13px; color:var(--muted);">Last Project ID</label>
-                            <div class="card-stat" id="a">—</div>
+                    <div id="liveSheetValues" class="no-print" style="margin-top:15px; display:flex; gap:15px; flex-wrap:wrap;">
+                        <div>
+                            <label>Last Project ID</label>
+                            <div class="card-stat" id="stat-a">Loading...</div>
                         </div>
-                        <div style="display:flex; flex-direction:column;">
-                            <label style="font-size:13px; color:var(--muted);">Last Invoice</label>
-                            <div class="card-stat" id="b">—</div>
+                        <div>
+                            <label>Last Invoice</label>
+                            <div class="card-stat" id="stat-b">Loading...</div>
                         </div>
-                        <div style="display:flex; flex-direction:column;">
-                            <label style="font-size:13px; color:var(--muted);">Pre-Book Project ID</label>
-                            <div class="card-stat" id="c">—</div>
+                        <div>
+                            <label>Pre-Book Project ID</label>
+                            <div class="card-stat" id="stat-c">Loading...</div>
                         </div>
-                        <div style="display:flex; flex-direction:column;">
-                            <label style="font-size:13px; color:var(--muted);">Largest Project ID</label>
-                            <div class="card-stat" id="d">—</div>
+                        <div>
+                            <label>Largest Project ID</label>
+                            <div class="card-stat" id="stat-d">Loading...</div>
                         </div>
                     </div>
 
                     <table border="0">
                         <tr>
                             <td><label>Invoice</label>
-                                <input type="text" id="invoice" placeholder="enter invoice " value="2k26_">
+                                <input type="text" id="invoice" value="2k26_">
                             </td>
                             <td>
                                 <label>Project Id</label>
-                                <input type="text" id="projectId" placeholder="Projest Id " value="AR2k26_">
+                                <input type="text" id="projectId" value="AR2k26_">
                             </td>
                         </tr>
                     </table>
 
                     <label>Bill to</label>
-                    <input type="text" id="bill_to" list="customerList" placeholder="name ">
+                    <input type="text" id="bill_to" list="customerList" placeholder="Search customer...">
                     <datalist id="customerList"></datalist>
 
                     <label>Phone</label>
                     <input type="text" id="phone" placeholder="Ph no.">
 
                     <label>Email</label>
-                    <input type="email" id="email" placeholder=".....@gmail.com">
+                    <input type="email" id="email" placeholder="example@gmail.com">
 
                     <table>
                         <tr>
@@ -530,41 +378,37 @@
                                 </select>
                             </td>
                             <td>
-                                <div class="form-row">
-                                    <label for="sellerName">Seller </label>
-                                    <select id="sellerName" class="seller-select">
-                                        <option value="Company">Company</option>
-                                        <option value="RSR">RSR</option>
-                                        <option value="AD">AD</option>
-                                        <option value="AR">AR</option>
-                                        <option value="PJ">PJ</option>
-                                    </select>
-                                </div>
+                                <label>Seller</label>
+                                <select id="sellerName">
+                                    <option value="Company">Company</option>
+                                    <option value="RSR">RSR</option>
+                                    <option value="AD">AD</option>
+                                    <option value="AR">AR</option>
+                                    <option value="PJ">PJ</option>
+                                </select>
                             </td>
                         </tr>
                     </table>
                 </div>
             </div>
 
-            <table id="itemsTable" aria-label="Invoice items">
+            <table id="itemsTable">
                 <thead>
                     <tr>
                         <th class="col-item">Item</th>
                         <th class="col-qty">Qty</th>
                         <th class="col-price">Price</th>
                         <th class="col-total">Total</th>
+                        <th class="no-print">Action</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
 
-            <div
-                style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:10px;flex-wrap:wrap">
-                <div style="max-width:65%">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:10px;flex-wrap:wrap">
+                <div>
                     <button id="addRow" class="add-btn no-print">+ Add Item</button>
-                    <button id="togglePrice" class="no-print"
-                        style="background:var(--accent);color:white;border:0;padding:8px 12px;border-radius:8px;cursor:pointer">Show/Hide
-                        Price List</button>
+                    <button id="togglePrice" class="no-print" style="background:var(--accent);color:white;border:0;padding:10px 14px;border-radius:8px;cursor:pointer">Show/Hide Price List</button>
                 </div>
                 <div style="min-width:220px">
                     <div class="summary">
@@ -572,10 +416,9 @@
                             <div class="meta">Subtotal</div>
                             <div id="subtotal" class="big">₹0.00</div>
                         </div>
-                        <div class="row" style="align-items:center;gap:8px">
+                        <div class="row">
                             <div class="meta">Discount (%)</div>
-                            <input id="discount" type="number" value="0" min="0" max="100"
-                                style="width:90px;padding:6px;border-radius:6px;border:1px solid rgba(0,0,0,0.06);background:transparent">
+                            <input id="discount" type="number" value="0" min="0" max="100" style="width:60px">
                             <div id="discountAmount" class="meta">-₹0.00</div>
                         </div>
                         <div class="row">
@@ -586,10 +429,8 @@
                 </div>
             </div>
 
-            <footer style="margin-top:18px">
-                <div style="text-align:center">
-                    <p>Thank you very much for trusting AR NETWORK HOUSE !</p>
-                </div>
+            <footer style="margin-top:18px; text-align:center">
+                <p>Thank you very much for trusting AR NETWORK HOUSE!</p>
             </footer>
         </div>
 
@@ -599,18 +440,11 @@
         </div>
     </div>
 
-    <div class="controls no-print" aria-hidden="true"
-        style="position:fixed;left:0;right:0;bottom:10px;justify-content:center">
-        <button id="downloadPDF" class="btn"
-            style="background:var(--accent);color:white;padding:10px 14px;border-radius:8px;border:0;margin-right:8px">Download
-            PDF</button>
-        <button id="printBtn" class="btn"
-            style="background:#666;color:white;padding:10px 14px;border-radius:8px;border:0;margin-right:8px"
-            title="Ctrl + P">Print</button>
-        <button id="themeToggle" class="btn"
-            style="background:#444;color:white;padding:10px 14px;border-radius:8px;border:0" title="Ctrl + D" action="toggle(dark)">Light /
-            Dark</button>
-        <button id="syncBtn" class="sync-btn">Sync to Sheet </button>
+    <div class="controls no-print">
+        <button id="downloadPDF" class="sync-btn" style="background:var(--accent)">Download PDF</button>
+        <button id="printBtn" class="sync-btn" style="background:#666">Print</button>
+        <button id="themeToggle" class="sync-btn" style="background:#444">Light / Dark</button>
+        <button id="syncBtn" class="sync-btn">Sync to Sheet</button>
         <div id="syncMsg" class="sync-msg" style="display:none;"></div>
     </div>
 
@@ -618,73 +452,84 @@
         /* ---------- CONFIG & STATE ---------- */
         const PRICE_FEED_URL = "https://script.google.com/macros/s/AKfycbwx4mPP7y0esYqz0rwy9_EKe3Zd3865rSugMTw-RQFIyewjZ9CguLwPtskBREkxFAUY/exec";
         const CRM_DATA_URL = "https://script.google.com/macros/s/AKfycbzFXZVZK1PTUd7fwXfzpoI3y89PAagHKV3IUodognGOIsg1A95RaQj5Yli9XHe7d2innw/exec";
-        const STATS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwm37tFzROpLJtJcecjBFK2Vwlmay39NiPLMaN1gAK04Oq-4IU7XXRo15q8ftsiphkJBw/exec";
+        const STATS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxJYghtCd4bUkz9bV2HpUoiV9Y6VYPq-kUHGSrQw0K7VaZakOoZWJA4QehllwgX2F1dmQ/exec";
         const SYNC_URL = "https://script.google.com/macros/s/AKfycbwzIGnZ-827RUjSuhBu42779IbC0FUjcisTQDJRaL1wePTNqi1Ghvbb79I2DR1z5UcZ5g/exec";
 
         let livePrices = {};
         let priceLoaded = false;
         let crmCustomers = [];
 
-        /* ---------- CRM DATA FETCH & INSTANT FILL ---------- */
+        /* ---------- SHORTCUTS ---------- */
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + T to toggle Theme
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'q') {
+                e.preventDefault();
+                document.documentElement.classList.toggle("dark");
+            }
+            // Ctrl + S to Sync
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                syncNow();
+            }
+        });
+
+        /* ---------- STATS FETCHING ---------- */
+        async function loadLiveStats() {
+            try {
+                const res = await fetch(STATS_ENDPOINT);
+                const data = await res.json();
+                
+                if (data) {
+                    document.getElementById("stat-a").innerText = data.lastProjectId || "—";
+                    document.getElementById("stat-b").innerText = data.lastInvoiceId || "—";
+                    document.getElementById("stat-c").innerText = data.preBookId || "—";
+                    document.getElementById("stat-d").innerText = data.largestId || "—";
+                }
+            } catch (e) { 
+                console.error("Stats Error:", e);
+                document.querySelectorAll('.card-stat').forEach(el => el.innerText = "Error");
+            }
+        }
+
+        /* ---------- CRM & PRICES ---------- */
         async function loadCRMData() {
             try {
                 const res = await fetch(CRM_DATA_URL);
                 const data = await res.json();
                 crmCustomers = data.customers || [];
-                const list = document.getElementById("customerList");
-                list.innerHTML = crmCustomers.map(c => `<option value="${c.NAME}">`).join("");
+                document.getElementById("customerList").innerHTML = crmCustomers.map(c => `<option value="${c.NAME}">`).join("");
             } catch (e) { console.error("CRM Error:", e); }
         }
 
-        document.getElementById('bill_to').addEventListener('input', function (e) {
-            const val = e.target.value;
-            const customer = crmCustomers.find(c => c.NAME === val);
-            if (customer) {
-                document.getElementById('phone').value = customer.NUMBER || "";
-                document.getElementById('email').value = customer.GMAIL || "";
-                const locDropdown = document.getElementById('locationCode');
-                if (customer.AREA) { locDropdown.value = customer.AREA; }
-            }
-        });
-
-        /* ---------- PRICE LIST LOGIC ---------- */
         async function loadLivePrices() {
             try {
                 const res = await fetch(PRICE_FEED_URL);
                 const data = await res.json();
                 livePrices = {};
-                data.forEach(row => {
-                    if (row.colB && row.colD) { livePrices[row.colB.trim()] = Number(row.colD); }
-                });
+                data.forEach(row => { if (row.colB && row.colD) livePrices[row.colB.trim()] = Number(row.colD); });
                 priceLoaded = true;
                 updateDataList();
                 renderPricePanel();
-            } catch (e) { console.error("Price List Error:", e); }
-        }
-
-        function renderPricePanel() {
-            const priceList = document.getElementById("priceList");
-            priceList.innerHTML = Object.keys(livePrices)
-                .map(name => `<div class="price-item"><span>${name}</span><strong>₹${livePrices[name]}</strong></div>`).join("");
+            } catch (e) { console.error("Price Error:", e); }
         }
 
         function updateDataList() {
-            if (!document.getElementById("itemList")) {
+            let list = document.getElementById("itemList");
+            if (!list) {
                 document.body.insertAdjacentHTML("beforeend", `<datalist id="itemList"></datalist>`);
+                list = document.getElementById("itemList");
             }
-            const list = document.getElementById("itemList");
-            list.innerHTML = Object.keys(livePrices).map(x => `<option value="${x}"></option>`).join("");
+            list.innerHTML = Object.keys(livePrices).map(x => `<option value="${x}">`).join("");
         }
 
-        /* ---------- CORE INVOICE FUNCTIONS ---------- */
-        const tbody = document.querySelector("#itemsTable tbody");
-        const subtotalEl = document.getElementById("subtotal");
-        const discountInput = document.getElementById("discount");
-        const discountAmountEl = document.getElementById("discountAmount");
-        const netEl = document.getElementById("netTotal");
-        document.getElementById("invDate").innerText = new Date().toLocaleDateString("en-IN");
+        function renderPricePanel() {
+            document.getElementById("priceList").innerHTML = Object.keys(livePrices)
+                .map(name => `<div class="price-item"><span>${name}</span><strong>₹${livePrices[name]}</strong></div>`).join("");
+        }
 
-        function fmt(n) { return "₹" + Number(n || 0).toFixed(2); }
+        /* ---------- CORE LOGIC ---------- */
+        const tbody = document.querySelector("#itemsTable tbody");
+        document.getElementById("invDate").innerText = new Date().toLocaleDateString("en-IN");
 
         function createRow() {
             const tr = document.createElement("tr");
@@ -693,41 +538,33 @@
                 <td><input type="number" class="qty" min="1" value="1"></td>
                 <td><input type="number" class="price"></td>
                 <td><input type="number" class="line-total" readonly></td>
-                <td><button class="remove-btn no-print">Remove</button></td>`;
+                <td class="no-print"><button class="remove-btn">Remove</button></td>`;
             tbody.appendChild(tr);
 
-            const itemName = tr.querySelector(".item-name");
-            const qty = tr.querySelector(".qty");
-            const price = tr.querySelector(".price");
-            const lineTotal = tr.querySelector(".line-total");
-
-            async function update() {
+            const inputs = tr.querySelectorAll("input");
+            inputs.forEach(i => i.addEventListener("input", async () => {
                 if (!priceLoaded) await loadLivePrices();
-                const name = itemName.value.trim();
-                if (livePrices[name] !== undefined && price.value.trim() === "") { price.value = livePrices[name]; }
-                lineTotal.value = (Number(qty.value) || 0) * (Number(price.value) || 0);
+                const name = tr.querySelector(".item-name").value.trim();
+                const priceInput = tr.querySelector(".price");
+                if (livePrices[name] && priceInput.value === "") priceInput.value = livePrices[name];
+                
+                tr.querySelector(".line-total").value = (tr.querySelector(".qty").value * tr.querySelector(".price").value).toFixed(2);
                 recalc();
-            }
+            }));
 
-            itemName.addEventListener("input", update);
-            qty.addEventListener("input", update);
-            price.addEventListener("input", update);
             tr.querySelector(".remove-btn").addEventListener("click", () => { tr.remove(); recalc(); });
-            update();
         }
 
         function recalc() {
             let sum = 0;
-            Array.from(tbody.querySelectorAll("tr")).forEach(tr => { sum += Number(tr.querySelector(".line-total").value || 0); });
-            subtotalEl.innerText = fmt(sum);
-            const disc = Number(discountInput.value || 0);
+            tbody.querySelectorAll(".line-total").forEach(lt => sum += Number(lt.value));
+            document.getElementById("subtotal").innerText = "₹" + sum.toFixed(2);
+            const disc = document.getElementById("discount").value;
             const discAmt = sum * (disc / 100);
-            discountAmountEl.innerText = "-" + fmt(discAmt);
-            netEl.innerText = fmt(sum - discAmt);
+            document.getElementById("discountAmount").innerText = "-₹" + discAmt.toFixed(2);
+            document.getElementById("netTotal").innerText = "₹" + (sum - discAmt).toFixed(2);
         }
 
-        /* ---------- DATA SYNC (PRECAUTION) ---------- */
-        /* ---------- DATA SYNC (PRECAUTION) ---------- */
         async function syncNow() {
             const rows = Array.from(tbody.querySelectorAll("tr")).map(tr => ({
                 itemName: tr.querySelector(".item-name").value,
@@ -746,123 +583,63 @@
                 billingSystem: document.getElementById('billingSystem').value,
                 sellerName: document.getElementById('sellerName').value,
                 items: rows,
-                subtotal: subtotalEl.innerText,
-                discount: discountInput.value,
-                discountAmount: discountAmountEl.innerText,
-                netTotal: netEl.innerText,
+                subtotal: document.getElementById("subtotal").innerText,
+                discount: document.getElementById("discount").value,
+                netTotal: document.getElementById("netTotal").innerText,
                 invoiceDate: new Date().toLocaleString("en-IN")
             };
 
             try {
-                // Main Invoice Sync to Google Sheets
-                await fetch(SYNC_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-
-                // Secondary Log for CRM
-                fetch("https://script.google.com/macros/s/AKfycbwlssVn3d_LkBIxVgMG5pZwoai3D9xqbinOFLFzguj6gxtjzhLSQ7YIg8499zTVzAczuQ/exec", {
-                    method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        date: new Date().toLocaleDateString("en-IN"),
-                        name: payload.billto, phone: payload.phone, mail: payload.email,
-                        area: payload.locationCode, orderAmount: payload.netTotal.replace("₹", "")
-                    })
-                });
-
+                await fetch(SYNC_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
                 const msg = document.getElementById("syncMsg");
                 msg.innerText = "✔ Data Secured In Sheet";
                 msg.style.display = "block";
                 setTimeout(() => msg.style.display = "none", 2000);
             } catch (e) { console.error("Sync Error:", e); }
         }
-// Add click functionality to the Light / Dark button
-document.getElementById("themeToggle").addEventListener("click", () => {
-    document.documentElement.classList.toggle("dark");
-});
-        /* ---------- EVENT LISTENERS FOR SAVING ---------- */
-        
 
-        // 1. SYNC TO SHEET BUTTON
+        /* ---------- EVENT LISTENERS ---------- */
+        document.getElementById("addRow").addEventListener("click", createRow);
+        
+        document.getElementById("togglePrice").addEventListener("click", async () => {
+            const panel = document.getElementById("pricePanel");
+            if (!priceLoaded) await loadLivePrices();
+            panel.style.display = panel.style.display === "none" ? "block" : "none";
+        });
+
+        document.getElementById("themeToggle").addEventListener("click", () => document.documentElement.classList.toggle("dark"));
         document.getElementById("syncBtn").addEventListener("click", syncNow);
+        document.getElementById("printBtn").addEventListener("click", async () => { await syncNow(); window.print(); });
 
-        // 2. PRINT BUTTON (Saves before opening print dialog)
-        document.getElementById("printBtn").addEventListener("click", async () => {
-            await syncNow(); // Precautionary Save
-            window.print();
+        document.getElementById('downloadPDF').addEventListener('click', async () => {
+            const btn = document.getElementById('downloadPDF');
+            const invId = document.getElementById('invoice').value || 'New';
+            const clientName = document.getElementById('bill_to').value || 'Customer';
+            btn.innerText = "Processing...";
+            await syncNow();
+            document.body.classList.add('for-pdf');
+            const canvas = await html2canvas(document.getElementById('invoiceCard'), { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jspdf.jsPDF('p', 'pt', 'a4');
+            pdf.addImage(imgData, 'PNG', 0, 0, 595, (canvas.height * 595) / canvas.width);
+            pdf.save(`invoice_${invId}_${clientName}.pdf`);
+            document.body.classList.remove('for-pdf');
+            btn.innerText = "Download PDF";
         });
 
-        // 3. DOWNLOAD PDF BUTTON (Saves before rendering)
-       // 3. DOWNLOAD PDF BUTTON (Saves before rendering)
-document.getElementById('downloadPDF').addEventListener('click', async () => {
-    const btn = document.getElementById('downloadPDF');
-    const invId = document.getElementById('invoice').value || 'New';
-    const clientName = document.getElementById('bill_to').value || 'Customer';
-    
-    btn.innerText = "Saving & Rendering...";
-    btn.disabled = true;
-
-    await syncNow(); // Precautionary Save
-
-    document.body.classList.add('for-pdf');
-    const elem = document.getElementById('invoiceCard');
-    const canvas = await html2canvas(elem, { scale: 2, useCORS: true });
-    const imgData = canvas.toDataURL('image/png');
-    
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'pt', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, (canvas.height * pdfWidth) / canvas.width);
-    
-    // Updated Naming Convention: InvoiceID_CustomerName.pdf
-    pdf.save(`invoice_${invId}_${clientName}.pdf`);
-
-    document.body.classList.remove('for-pdf');
-    btn.innerText = "Download PDF";
-    btn.disabled = false;
-});
-
-        /* ---------- SHORTCUTS ---------- */
-        document.addEventListener("keydown", function (e) {
-            // Theme Toggle (Ctrl + D)
-            if (e.ctrlKey && e.key.toLowerCase() === "d") {
-                e.preventDefault();
-                document.documentElement.classList.toggle("dark");
-            }
-            // Save (Ctrl + S)
-            if (e.ctrlKey && e.key.toLowerCase() === "s") {
-                e.preventDefault();
-                syncNow();
-            }
-            // Print (Ctrl + P)
-            if (e.ctrlKey && e.key.toLowerCase() === "p") {
-                e.preventDefault();
-                document.getElementById("printBtn").click();
+        document.getElementById('bill_to').addEventListener('input', (e) => {
+            const customer = crmCustomers.find(c => c.NAME === e.target.value);
+            if (customer) {
+                document.getElementById('phone').value = customer.NUMBER || "";
+                document.getElementById('email').value = customer.GMAIL || "";
+                document.getElementById('locationCode').value = customer.AREA || "HWH";
             }
         });
-
-        /* ---------- STATS FEED ---------- */
-        async function loadStats() {
-            try {
-                const res = await fetch(STATS_ENDPOINT);
-                const data = await res.json();
-                document.getElementById("a").textContent = data.A2 ?? "—";
-                document.getElementById("b").textContent = data.B2 ?? "—";
-                document.getElementById("c").textContent = data.C2 ?? "—";
-                document.getElementById("d").textContent = data.D2 ?? "—";
-            } catch (err) { console.log("Stats Error:", err); }
-        }
-        
 
         /* ---------- INIT ---------- */
-        loadStats();
         loadCRMData();
+        loadLiveStats(); 
         createRow();
-        setInterval(loadStats, 10000); // Update stats every 10s
     </script>
 </body>
-
 </html>
