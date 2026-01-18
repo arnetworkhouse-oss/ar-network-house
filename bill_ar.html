@@ -173,11 +173,6 @@
             width: 14%
         }
 
-        .col-act {
-            width: 60px;
-            text-align: center
-        }
-
         .remove-btn {
             background: var(--red);
             color: white;
@@ -452,8 +447,9 @@
         /* ---------- CONFIG & STATE ---------- */
         const PRICE_FEED_URL = "https://script.google.com/macros/s/AKfycbwx4mPP7y0esYqz0rwy9_EKe3Zd3865rSugMTw-RQFIyewjZ9CguLwPtskBREkxFAUY/exec";
         const CRM_DATA_URL = "https://script.google.com/macros/s/AKfycbzFXZVZK1PTUd7fwXfzpoI3y89PAagHKV3IUodognGOIsg1A95RaQj5Yli9XHe7d2innw/exec";
-        const STATS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxJYghtCd4bUkz9bV2HpUoiV9Y6VYPq-kUHGSrQw0K7VaZakOoZWJA4QehllwgX2F1dmQ/exec";
+        const STATS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwm37tFzROpLJtJcecjBFK2Vwlmay39NiPLMaN1gAK04Oq-4IU7XXRo15q8ftsiphkJBw/exec";
         const SYNC_URL = "https://script.google.com/macros/s/AKfycbwzIGnZ-827RUjSuhBu42779IbC0FUjcisTQDJRaL1wePTNqi1Ghvbb79I2DR1z5UcZ5g/exec";
+        const CRM_SIDE_CAR_URL = "https://script.google.com/macros/s/AKfycbwlssVn3d_LkBIxVgMG5pZwoai3D9xqbinOFLFzguj6gxtjzhLSQ7YIg8499zTVzAczuQ/exec";
 
         let livePrices = {};
         let priceLoaded = false;
@@ -461,35 +457,36 @@
 
         /* ---------- SHORTCUTS ---------- */
         document.addEventListener('keydown', function(e) {
-            // Ctrl + T to toggle Theme
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'q') {
                 e.preventDefault();
                 document.documentElement.classList.toggle("dark");
             }
-            // Ctrl + S to Sync
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
                 e.preventDefault();
                 syncNow();
             }
         });
 
-        /* ---------- STATS FETCHING ---------- */
+        /* ---------- STATS FETCHING (Merged Logic) ---------- */
         async function loadLiveStats() {
             try {
                 const res = await fetch(STATS_ENDPOINT);
                 const data = await res.json();
                 
                 if (data) {
-                    document.getElementById("stat-a").innerText = data.lastProjectId || "—";
-                    document.getElementById("stat-b").innerText = data.lastInvoiceId || "—";
-                    document.getElementById("stat-c").innerText = data.preBookId || "—";
-                    document.getElementById("stat-d").innerText = data.largestId || "—";
+                    // Mapping data keys from test.html logic
+                    document.getElementById("stat-a").innerText = data.A2 || data.lastProjectId || "—";
+                    document.getElementById("stat-b").innerText = data.B2 || data.lastInvoiceId || "—";
+                    document.getElementById("stat-c").innerText = data.C2 || data.preBookId || "—";
+                    document.getElementById("stat-d").innerText = data.D2 || data.largestId || "—";
                 }
             } catch (e) { 
                 console.error("Stats Error:", e);
-                document.querySelectorAll('.card-stat').forEach(el => el.innerText = "Error");
             }
         }
+
+        // Auto-refresh stats every 500ms (from test.html)
+        setInterval(loadLiveStats, 500);
 
         /* ---------- CRM & PRICES ---------- */
         async function loadCRMData() {
@@ -590,8 +587,23 @@
             };
 
             try {
+                // Primary Sync
                 await fetch(SYNC_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
-                // FIXED: Changed ID to 'syncMsg' to match HTML
+                
+                // Side-Car CRM Sync (Merged from test.html)
+                await fetch(CRM_SIDE_CAR_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({
+                        date: new Date().toLocaleDateString("en-IN"),
+                        name: payload.billto,
+                        phone: payload.phone,
+                        mail: payload.email,
+                        area: payload.locationCode,
+                        orderAmount: payload.netTotal.replace("₹", "")
+                    })
+                });
+
                 const msg = document.getElementById("syncMsg"); 
                 msg.innerText = "✔ Data Secured In Sheet";
                 msg.style.display = "block";
@@ -610,7 +622,14 @@
 
         document.getElementById("themeToggle").addEventListener("click", () => document.documentElement.classList.toggle("dark"));
         document.getElementById("syncBtn").addEventListener("click", syncNow);
-        document.getElementById("printBtn").addEventListener("click", async () => { await syncNow(); window.print(); });
+        document.getElementById("printBtn").addEventListener("click", async () => { 
+            await syncNow(); 
+            document.body.classList.add("for-pdf");
+            setTimeout(() => {
+                window.print();
+                document.body.classList.remove("for-pdf");
+            }, 150);
+        });
 
         document.getElementById('downloadPDF').addEventListener('click', async () => {
             const btn = document.getElementById('downloadPDF');
@@ -631,8 +650,8 @@
         document.getElementById('bill_to').addEventListener('input', (e) => {
             const customer = crmCustomers.find(c => c.NAME === e.target.value);
             if (customer) {
-                document.getElementById('phone').value = customer.NUMBER || "";
-                document.getElementById('email').value = customer.GMAIL || "";
+                document.getElementById('phone').value = customer.NUMBER || customer.PHONE || "";
+                document.getElementById('email').value = customer.GMAIL || customer.MAIL || "";
                 document.getElementById('locationCode').value = customer.AREA || "HWH";
             }
         });
