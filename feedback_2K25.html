@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+  font-family: Segoe UI, sans-serif;
+  background: #eef2f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+.card {
+  background: #fff;
+  max-width: 420px;
+  width: 100%;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.1);
+}
+h2 { text-align: center; color: #1a365d; }
+p{text-align: center;color: #000;}
+label { font-weight: 600; margin-top: 15px; display: block; }
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+.stars {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.stars input { display: none; }
+.stars label {
+  font-size: 36px;
+  color: #ddd;
+  cursor: pointer;
+}
+.stars input:checked ~ label,
+.stars label:hover,
+.stars label:hover ~ label {
+  color: #f6ad55;
+}
+button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  background: #1a365d;
+  color: white;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+<div class="card">
+  <h2>AR Network House</h2>
+    <p>We value your feedback! Please rate your experience.</p>
+    <p>Please share your feedback based on your experience with our services in 2025.</p>
+
+  <label>Your Name *</label>
+  <input id="name" required>
+
+  <label>Rating *</label>
+  <div class="stars">
+    <input type="radio" id="r5" name="rating" value="5"><label for="r5">★</label>
+    <input type="radio" id="r4" name="rating" value="4"><label for="r4">★</label>
+    <input type="radio" id="r3" name="rating" value="3"><label for="r3">★</label>
+    <input type="radio" id="r2" name="rating" value="2"><label for="r2">★</label>
+    <input type="radio" id="r1" name="rating" value="1"><label for="r1">★</label>
+  </div>
+
+  <label>Message (Optional)</label>
+  <textarea id="message" rows="3"></textarea>
+
+  <button onclick="submitFeedback()">Submit Feedback</button>
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbyxn2Od9q_p6JOyJmrEPeXsbRAkwVK57PKtej0s7ay0wcoeCZBCn3Q_80ux3yxn43JW7Q/exec";
+
+function submitFeedback() {
+  const name = document.getElementById("name").value.trim();
+  const rating = document.querySelector("input[name='rating']:checked");
+  const message = document.getElementById("message").value;
+
+  if (!name || !rating) {
+    alert("Name and rating are mandatory");
+    return;
+  }
+
+  const payload = {
+    name: name,
+    rating: rating.value,
+    message: message,
+    userEmail: "",      // optional future enhancement
+    source: "Feedback"
+  };
+
+  fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  alert("Thank you for your feedback!");
+  location.reload();
+}
+</script>
+</body>
+</html>
