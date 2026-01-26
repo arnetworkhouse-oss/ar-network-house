@@ -96,17 +96,61 @@ button {
   color: white;
   cursor: pointer;
 }
+
+/* SUCCESS CARD */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.success-card {
+  background: #ffffff;
+  max-width: 360px;
+  width: 100%;
+  padding: 26px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 14px 30px rgba(0,0,0,0.2);
+}
+
+.success-card h3 {
+  margin-top: 10px;
+  color: #1a365d;
+}
+
+.success-card p {
+  font-size: 14px;
+  margin-top: 8px;
+  color: #333;
+}
+
+.success-card button {
+  margin-top: 18px;
+  background: #1a365d;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.emoji {
+  font-size: 42px;
+}
 </style>
 </head>
 
 <body>
 
 <div class="card">
-
-  <img
-    src="https://github.com/arnetworkhouse-oss/ar-network-house/blob/main/ar%20logo.jpg?raw=true"
-    alt="AR Network House Logo"
-    class="brand-logo">
+  <img src="https://github.com/arnetworkhouse-oss/ar-network-house/blob/main/ar%20logo.jpg?raw=true"
+       class="brand-logo">
 
   <h2>AR Network House</h2>
   <p>Please rate your experience with our services.</p>
@@ -123,10 +167,23 @@ button {
     <input type="radio" id="r1" name="rating" value="1"><label for="r1">★</label>
   </div>
 
+  <label>Your Invoice No OR Project ID (Optional)</label>
+  <input id="pid" placeholder="Enter your 2k26_## or AR2k26_##" value="2k26_ or AR2k26_">
+
   <label>Message (Optional)</label>
-  <textarea id="message" rows="3"></textarea>
+  <textarea id="message" rows="4"></textarea>
 
   <button onclick="submitFeedback()">Submit Feedback</button>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="overlay" id="successOverlay">
+  <div class="success-card">
+    <div class="emoji" id="successEmoji"></div>
+    <h3 id="successTitle"></h3>
+    <p id="successMessage"></p>
+    <button onclick="location.reload()">Close</button>
+  </div>
 </div>
 
 <script>
@@ -134,13 +191,16 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyxn2Od9q_p6JOyJmrEPeXs
 
 function submitFeedback() {
   const name = document.getElementById("name").value.trim();
-  const rating = document.querySelector("input[name='rating']:checked");
+  const ratingEl = document.querySelector("input[name='rating']:checked");
+  const projectId = document.getElementById("pid").value.trim();
   const message = document.getElementById("message").value;
 
-  if (!name || !rating) {
+  if (!name || !ratingEl) {
     alert("Name and rating are mandatory");
     return;
   }
+
+  const rating = Number(ratingEl.value);
 
   fetch(API_URL, {
     method: "POST",
@@ -148,14 +208,43 @@ function submitFeedback() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       name: name,
-      rating: rating.value,
+      rating: rating,
+      projectId: projectId,   // ✅ FIXED: now sent to sheet
       message: message,
       source: "Feedback Page"
     })
   });
 
-  alert("Thank you for your feedback!");
-  location.reload();
+  const emoji = document.getElementById("successEmoji");
+  const title = document.getElementById("successTitle");
+  const msg = document.getElementById("successMessage");
+
+  if (rating <= 2) {
+    emoji.innerText = "😔";
+    title.innerText = "We’re Sorry";
+    msg.innerText =
+      "We apologize for the inconvenience. Your feedback has been logged and corrective action will be taken.";
+  } 
+  else if (rating === 3) {
+    emoji.innerText = "🙂";
+    title.innerText = "Thank You";
+    msg.innerText =
+      "Thank you for your feedback. We value your input.";
+  } 
+  else if (rating === 4) {
+    emoji.innerText = "😊";
+    title.innerText = "Thank You So Much!";
+    msg.innerText =
+      "We’re pleased to hear about your positive experience.";
+  } 
+  else {
+    emoji.innerText = "😊😊😊😊😊";
+    title.innerText = "Huge Appreciation!";
+    msg.innerText =
+      "Thank you for your exceptional feedback. Your support is highly appreciated.";
+  }
+
+  document.getElementById("successOverlay").style.display = "flex";
 }
 </script>
 
