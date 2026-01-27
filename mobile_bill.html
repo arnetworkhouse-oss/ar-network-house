@@ -74,6 +74,52 @@
             color: #fff
         }
 
+        /* ================= SWITCH ================= */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #27ae60;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
         /* ================= INVOICE ================= */
         #invoice {
             background: #fff;
@@ -220,29 +266,46 @@
     <div class="main-wrapper">
         <div class="input-panel">
             <h2>Generate New Bill</h2>
+
+            <div class="grid-row">
+                <div>
+                    <label>Switch </label><br>
+                    <label class="switch">
+                        <input type="checkbox" id="rowSwitch" onchange="reloadSheetData()">
+                        <span class="slider"></span>
+                    </label>
+                    <small id="rowLabel">Using BIRBHUM</small>
+                </div>
+            </div>
+
             <div class="grid-row">
                 <div><label>Bill Number</label><input type="text" id="inBillNo" placeholder="Auto"></div>
                 <div><label>Customer Name *</label><input id="inCustName"></div>
             </div>
+
             <div class="grid-row">
                 <div><label>Contact Number</label><input id="inCustPhone"></div>
                 <div style="grid-column: span 2;"><label>Customer Address</label><input id="inCustAddress"
                         style="width:100%"></div>
             </div>
+
             <div class="grid-row">
                 <div><label>Brand *</label><input id="inBrand"></div>
                 <div><label>Model *</label><input id="inModel"></div>
                 <div><label>IMEI *</label><input id="inIMEI"></div>
             </div>
+
             <div class="grid-row">
                 <div><label>Color</label><input id="inColor"></div>
                 <div><label>Storage</label><input id="inStorage"></div>
                 <div><label>Qty</label><input id="inQty" type="number" value="1"></div>
             </div>
+
             <div class="grid-row">
                 <div><label>Price *</label><input id="inPrice" type="number"></div>
                 <div><label>Discount</label><input id="inDiscount" type="number" value="0"></div>
             </div>
+
             <button class="btn btn-generate" onclick="generateBill()">Generate</button>
             <button class="btn btn-clear" onclick="location.reload()">Clear</button>
         </div>
@@ -315,37 +378,53 @@
                     <div class="total-row grand-total"><span>Total</span><span id="outGrandTotal"></span></div>
                 </div>
             </div>
+
             <div class="footer">Thank you for your business</div>
         </div>
+
         <button class="btn btn-print" onclick="window.print()">Print</button>
     </div>
 
     <script>
         let globalGstLabel = 0;
+        let sheetData = [];
+        let activeRow = 0; // 0 = Row 1, 1 = Row 2
 
         window.onload = () => {
             const d = new Date().toLocaleDateString("en-IN");
             outDate.innerText = d;
             stampDate.innerText = d;
-            outBillNo.innerText = "NM-" + Math.floor(1000 + Math.random() * 9000);
+            outBillNo.innerText = Math.floor(1000 + Math.random() * 9000);
 
-            // Fetching details from the Google Sheet
             fetch("https://opensheet.elk.sh/1OZKi19tk_igGHx_Y2wt9fptDyEyVD_eScqEsEjSBkS8/Sheet1")
                 .then(r => r.json())
                 .then(data => {
-                    const sheet = data[0];
-                    shopName.innerText = sheet.shopname;
-                    shopAddress.innerText = sheet.shopaddress;
-                    shopContact.innerText = "Contact: +91 " + sheet.shopcontact;
-                    shopGstDisplay.innerText = "GSTIN: " + (sheet.gstno || "N/A");
-
-                    // Pull the GST value just for the label (%)
-                    globalGstLabel = parseFloat(sheet.gst) || 0;
-                    outGstLabel.innerText = globalGstLabel;
-
-                    // Pull the Signature link
-                    if (sheet.photolink) shopSignature.src = sheet.photolink;
+                    sheetData = data;
+                    loadRowData();
                 });
+        }
+
+        function reloadSheetData() {
+            activeRow = document.getElementById("rowSwitch").checked ? 1 : 0;
+            document.getElementById("rowLabel").innerText =
+                activeRow === 0 ? "Using BIRBHUM" : "Using HOWRAH";
+            loadRowData();
+        }
+
+        function loadRowData() {
+            if (!sheetData[activeRow]) return;
+
+            const sheet = sheetData[activeRow];
+
+            shopName.innerText = sheet.shopname;
+            shopAddress.innerText = sheet.shopaddress;
+            shopContact.innerText = "Contact: +91 " + sheet.shopcontact;
+            shopGstDisplay.innerText = "GSTIN: " + (sheet.gstno || "N/A");
+
+            globalGstLabel = parseFloat(sheet.gst) || 0;
+            outGstLabel.innerText = globalGstLabel;
+
+            if (sheet.photolink) shopSignature.src = sheet.photolink;
         }
 
         function generateBill() {
@@ -355,8 +434,6 @@
 
             const price = +inPrice.value, qty = +inQty.value, disc = +inDiscount.value;
             const sub = price * qty;
-
-            // Total is now strictly Subtotal minus Discount
             const finalTotal = sub - disc;
 
             outCustName.innerText = inCustName.value;
@@ -372,7 +449,7 @@
 
             outSubTotal.innerText = sub.toFixed(2);
             outDiscount.innerText = "-" + disc.toFixed(2);
-            outGstLabel.innerText = globalGstLabel; // Updates display only
+            outGstLabel.innerText = globalGstLabel;
             outGrandTotal.innerText = "₹ " + finalTotal.toFixed(2);
 
             stampSection.style.opacity = 1;
