@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEGHDOOT | WEATHER PODCAST</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg-gradient: linear-gradient(135deg,#4facfe,#00f2fe);
+    --glass: rgba(255,255,255,0.18);
+    --border: rgba(255,255,255,0.25);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:var(--bg-gradient);
+    color:#fff;
+    display:flex;
+    justify-content:center;
+}
+
+/* Background Glow */
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:radial-gradient(circle at top right,rgba(255,255,255,.25),transparent 40%);
+    z-index:-1;
+}
+
+/* Layout */
+.container{
+    width:100%;
+    max-width:460px;
+    padding:24px 18px 40px;
+}
+
+/* Header */
+h1{
+    text-align:center;
+    font-size:2.6rem;
+    font-weight:600;
+    margin-bottom:24px;
+    letter-spacing:.5px;
+}
+
+/* Search */
+.search-nav{
+    background:var(--glass);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:14px 18px;
+    backdrop-filter:blur(18px);
+}
+
+.search-nav input{
+    width:100%;
+    background:none;
+    border:none;
+    outline:none;
+    color:#fff;
+    font-size:16px;
+}
+
+/* Current Location CTA */
+.geo-wrapper{
+    margin-top:14px;
+    display:flex;
+    justify-content:center;
+}
+
+.geo-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 22px;
+    border-radius:30px;
+    background:linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.15));
+    border:1px solid var(--border);
+    backdrop-filter:blur(12px);
+    font-size:14px;
+    font-weight:500;
+    cursor:pointer;
+    transition:.35s ease;
+}
+
+.geo-box:hover{
+    transform:translateY(-2px) scale(1.05);
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+/* Suggestions */
+.suggestions{
+    position:absolute;
+    top:145px;
+    left:18px;
+    right:18px;
+    background:#fff;
+    color:#333;
+    border-radius:18px;
+    overflow:hidden;
+    display:none;
+    z-index:50;
+}
+
+.suggestions div{
+    padding:14px 16px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.suggestions div:hover{
+    background:#f1f5f9;
+}
+
+/* Main Card */
+.main-card{
+    margin:34px 0;
+    text-align:center;
+}
+
+#cityName{
+    font-size:1.8rem;
+    font-weight:600;
+}
+
+.temp{
+    font-size:5.8rem;
+    font-weight:300;
+    margin:6px 0;
+}
+
+#desc{
+    opacity:.85;
+    text-transform:capitalize;
+}
+
+/* Info Cards */
+.section-card{
+    background:var(--glass);
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:18px;
+    margin-bottom:14px;
+    backdrop-filter:blur(18px);
+}
+
+.details-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.details-grid small{
+    opacity:.7;
+}
+
+.details-grid strong{
+    font-size:1.2rem;
+}
+
+/* Hourly */
+.hourly-row{
+    display:flex;
+    gap:22px;
+    overflow-x:auto;
+    padding-bottom:6px;
+}
+
+/* Forecast */
+.forecast-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 0;
+    border-bottom:1px solid rgba(255,255,255,.15);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>MEGHDOOT ☁️</h1>
+
+    <div class="search-nav">
+        <input id="cityInput" placeholder="Search city weather…" autocomplete="off">
+    </div>
+
+    <div class="geo-wrapper">
+        <div id="geoBtn" class="geo-box">
+            📍 Use Current Location
+        </div>
+    </div>
+
+    <div id="suggestions" class="suggestions"></div>
+
+    <div class="main-card">
+        <h2 id="cityName">Welcome</h2>
+        <div class="temp" id="mainTemp">--°C</div>
+        <p id="desc">Search to get started</p>
+    </div>
+
+    <div class="details-grid">
+        <div class="section-card" style="text-align:center">
+            <small>Humidity</small><br>
+            <strong id="hum">--%</strong>
+        </div>
+        <div class="section-card" style="text-align:center">
+            <small>Wind</small><br>
+            <strong id="wind">-- km/h</strong>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <p style="font-size:13px;font-weight:600;margin-bottom:14px;">Hourly Forecast</p>
+        <div class="hourly-row" id="hourlyList"></div>
+    </div>
+
+    <div class="section-card">
+        <p style="font-size:13px;font-weight:600;margin-bottom:14px;">5-Day Outlook</p>
+        <div id="dailyList"></div>
+    </div>
+    <p style="font-size:12px;opacity:.6;text-align:center;margin-top:10px;">
+        Site Management by <a href="https://arnetworkhouse.in/" target="_blank" style="color:#fff;text-decoration:underline;">AR NETWORK HOUSE</a>
+    </p>
+    <p style="font-size:12px;opacity:.6;text-align:center;margin-top:10px;">
+        Data provided by <a href="https://openweathermap.org/" target="_blank" style="color:#fff;text-decoration:underline;">OpenWeatherMap</a>
+    </p>
+    <footer style="text-align:center;margin-top:20px;font-size:12px;opacity:.7;">
+            © <span id="year"></span> AR Network House | All rights reserved. <a
+            href="https://arnetworkhouse-oss.github.io/ar-network-house/privacy_ar.html"><strong>
+            Privacy Policy
+            </strong></a>
+</footer>
+</div>
+
+<script>
+const API_KEY = 'f82ef3dc4d4673d145d5195de6e56561';
+const cityInput = document.getElementById('cityInput');
+const suggestions = document.getElementById('suggestions');
+
+cityInput.addEventListener('input', async ()=>{
+    if(cityInput.value.length<3){ suggestions.style.display='none'; return; }
+    const res = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${cityInput.value}&limit=5&appid=${API_KEY}`);
+    const data = await res.json();
+    suggestions.innerHTML='';
+    data.forEach(c=>{
+        const d=document.createElement('div');
+        d.textContent=`${c.name}, ${c.country}`;
+        d.onclick=()=>{ cityInput.value=c.name; suggestions.style.display='none'; fetchAll(c.name); };
+        suggestions.appendChild(d);
+    });
+    suggestions.style.display='block';
+});
+
+async function fetchAll(city){
+    const c = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`).then(r=>r.json());
+    const f = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${API_KEY}`).then(r=>r.json());
+    updateUI(c,f);
+}
+
+function updateUI(c,f){
+    cityName.textContent=c.name;
+    mainTemp.textContent=Math.round(c.main.temp)+"°C";
+    desc.textContent=c.weather[0].description;
+    hum.textContent=c.main.humidity+"%";
+    wind.textContent=c.wind.speed+" km/h";
+
+    hourlyList.innerHTML='';
+    f.list.slice(0,8).forEach(h=>{
+        hourlyList.innerHTML+=`
+        <div style="text-align:center;min-width:60px">
+            <p style="font-size:11px">${new Date(h.dt*1000).getHours()}:00</p>
+            <img src="https://openweathermap.org/img/wn/${h.weather[0].icon}.png">
+            <p style="font-weight:600">${Math.round(h.main.temp)}°</p>
+        </div>`;
+    });
+
+    dailyList.innerHTML='';
+    f.list.filter(x=>x.dt_txt.includes("12:00")).forEach(d=>{
+        dailyList.innerHTML+=`
+        <div class="forecast-row">
+            <span>${new Date(d.dt*1000).toLocaleDateString('en-US',{weekday:'short'})}</span>
+            <img src="https://openweathermap.org/img/wn/${d.weather[0].icon}.png">
+            <strong>${Math.round(d.main.temp)}°C</strong>
+        </div>`;
+    });
+}
+
+geoBtn.onclick=()=>{
+    navigator.geolocation.getCurrentPosition(p=>{
+        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${p.coords.latitude}&lon=${p.coords.longitude}&units=metric&appid=${API_KEY}`)
+        .then(r=>r.json()).then(d=>fetchAll(d.name));
+    });
+};
+</script>
+
+</body>
+</html>
