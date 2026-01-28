@@ -642,7 +642,7 @@
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jspdf.jsPDF('p', 'pt', 'a4');
             pdf.addImage(imgData, 'PNG', 0, 0, 595, (canvas.height * 595) / canvas.width);
-            pdf.save(`invoice_${invId}_${clientName}.pdf`);
+            pdf.save(`${invId}.pdf`);
             document.body.classList.remove('for-pdf');
             btn.innerText = "Download PDF";
         });
