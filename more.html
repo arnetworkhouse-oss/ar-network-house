@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR NETWORK HOUSE |ALL PROJECTS</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header & Logo */
+        header {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container img {
+            max-height: 80px;
+            width: auto;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .logo-container img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            width: 100%;
+        }
+
+        section {
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            letter-spacing: 0.1rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 1rem;
+            text-transform: uppercase;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Card Component */
+        .app-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.05rem;
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.05);
+            min-height: 80px;
+        }
+
+        .app-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .app-card:active {
+            transform: scale(0.98);
+        }
+
+        /* Footer */
+        footer {
+            background: #ffffff;
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+            margin-top: auto;
+        }
+
+        footer a {
+            text-decoration: none;
+            color: inherit;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        footer a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 640px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .logo-container img {
+                max-height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        
+        <div class="logo-container">
+            <img src="https://github.com/arnetworkhouse-oss/ar-network-house/blob/main/ar%20logo.jpg?raw=true" alt="AR NETWORK HOUSE Logo">
+        </div>
+        <h1>AR NETWORK HOUSE</h1>
+    </header>
+
+    <main>
+        <section>
+            <h2>Education Sector</h2>
+            <div class="grid">
+                <a href="https://duyare-physics.github.io/turbo/home.html" class="app-card" target="_blank">DUYARE PHYSICS</a>
+                <a href="https://arnetworkhouse-oss.github.io/Solar-System/" class="app-card" target="_blank">SOLAR SYSTEM</a>
+            </div>
+        </section>
+
+        <section>
+            <h2>Games Sector</h2>
+            <div class="grid">
+                <a href="https://arnetworkhouse-oss.github.io/aura/" class="app-card" target="_blank">AURA GAME</a>
+                <a href="https://arnetworkhouse-oss.github.io/snake-game/" class="app-card" target="_blank">SNAKE GAME</a>
+                <a href="https://arnetworkhouse-oss.github.io/tic_tac_toe/" class="app-card" target="_blank">TIC TAC TOE</a>
+                <a href="https://arnetworkhouse-oss.github.io/ar-network-house/poke_match.html" class="app-card" target="_blank">POKE MATCH</a>
+            </div>
+        </section>
+
+        <section>
+            <h2>Tools Sector</h2>
+            <div class="grid">
+                <a href="https://arnetworkhouse-oss.github.io/ar-network-house/weather.html" class="app-card" target="_blank">INDRODOOT (WEATHER TOOL)</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 <a href="https://arnetworkhouse.in/">AR NETWORK HOUSE</a></p>
+    </footer>
+
+</body>
+</html>
