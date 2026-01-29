@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MEGHDOOT | WEATHER PODCAST</title>
+<title>INDRADOOT | WEATHER PODCAST</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
@@ -191,7 +191,7 @@ h1{
 <body>
 
 <div class="container">
-    <h1>MEGHDOOT ☁️</h1>
+    <h1>INDRADOOT ☁️</h1>
 
     <div class="search-nav">
         <input id="cityInput" placeholder="Search city weather…" autocomplete="off">
@@ -231,13 +231,13 @@ h1{
         <p style="font-size:13px;font-weight:600;margin-bottom:14px;">5-Day Outlook</p>
         <div id="dailyList"></div>
     </div>
-    <p style="font-size:12px;opacity:.6;text-align:center;margin-top:10px;">
-        Site Management by <a href="https://arnetworkhouse.in/" target="_blank" style="color:#fff;text-decoration:underline;">AR NETWORK HOUSE</a>
+    <p style="font-size:12px;opacity:.6;text-align:center;margin-top:10px; color: #010101;">
+        Site Management by <a href="https://arnetworkhouse.in/" target="_blank" style="color:#010101;text-decoration:underline;">AR NETWORK HOUSE</a>
     </p>
-    <p style="font-size:12px;opacity:.6;text-align:center;margin-top:10px;">
-        Data provided by <a href="https://openweathermap.org/" target="_blank" style="color:#fff;text-decoration:underline;">OpenWeatherMap</a>
+    <p style="font-size:12px;opacity:.6;text-align:center;margin-top:10px;color: #010101;">
+        Data provided by <a href="https://openweathermap.org/" target="_blank" style="color:#010101;text-decoration:underline;">OpenWeatherMap</a>
     </p>
-    <footer style="text-align:center;margin-top:20px;font-size:12px;opacity:.7;">
+    <footer style="text-align:center;margin-top:20px;font-size:12px;opacity:.7;color: #1a1a1a;">
             © <span id="year"></span> AR Network House | All rights reserved. <a
             href="https://arnetworkhouse-oss.github.io/ar-network-house/privacy_ar.html"><strong>
             Privacy Policy
@@ -304,8 +304,8 @@ geoBtn.onclick=()=>{
         .then(r=>r.json()).then(d=>fetchAll(d.name));
     });
 };
+  document.getElementById("year").textContent = new Date().getFullYear();
 </script>
 
 </body>
 </html>
-
