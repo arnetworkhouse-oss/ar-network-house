@@ -17,9 +17,9 @@ body {
 }
 
 .card {
-  background: #fff;
-  width: 100%;
+  background: #ffffff;
   max-width: 420px;
+  width: 100%;
   padding: 26px;
   border-radius: 16px;
   box-shadow: 0 12px 28px rgba(0,0,0,0.12);
@@ -27,8 +27,8 @@ body {
 
 .brand-logo {
   width: 90px;
-  margin: 0 auto 14px;
   display: block;
+  margin: 0 auto 14px;
   border-radius: 12px;
 }
 
@@ -98,6 +98,7 @@ button {
   cursor: pointer;
 }
 
+/* SUCCESS OVERLAY */
 .overlay {
   position: fixed;
   inset: 0;
@@ -109,7 +110,7 @@ button {
 }
 
 .success-card {
-  background: #fff;
+  background: #ffffff;
   max-width: 360px;
   width: 100%;
   padding: 26px;
@@ -119,14 +120,14 @@ button {
 }
 
 .success-card h3 {
-  color: #1a365d;
   margin-top: 10px;
+  color: #1a365d;
 }
 
 .success-card p {
-  color: #333;
   font-size: 14px;
   margin-top: 8px;
+  color: #333;
 }
 
 .success-card button {
@@ -149,7 +150,8 @@ button {
 <body>
 
 <div class="card">
-  <img src="https://github.com/arnetworkhouse-oss/ar-network-house/blob/main/ar%20logo.jpg?raw=true" class="brand-logo">
+  <img src="https://github.com/arnetworkhouse-oss/ar-network-house/blob/main/ar%20logo.jpg?raw=true"
+       class="brand-logo">
 
   <h2>AR Network House</h2>
   <p>Please rate your experience with our services.</p>
@@ -166,10 +168,18 @@ button {
     <input type="radio" id="r1" name="rating" value="1"><label for="r1">★</label>
   </div>
 
-  <label>Select Tool or Game Name (Optional)</label>
-  <select id="pid">
-    <option value="">-- Loading list… --</option>
-  </select>
+  <label for="pid">📝 Select Feedback Type (Optional)</label>
+<select id="pid">
+  <option value="">-- Choose Feedback Category --</option>
+  <option value="Bug Report">Bug Report</option>
+  <option value="Gameplay Issue">Gameplay Issue</option>
+  <option value="Graphics / Visuals">Graphics / Visuals</option>
+  <option value="Sound / Music">Sound / Music</option>
+  <option value="Performance / Lag">Performance / Lag</option>
+  <option value="Feature Request">Feature Request</option>
+  <option value="Other">Other</option>
+</select>
+
 
   <label>Message (Optional)</label>
   <textarea id="message" rows="4"></textarea>
@@ -177,7 +187,8 @@ button {
   <button onclick="submitFeedback()">Submit Feedback</button>
 
   <footer style="text-align:center;margin-top:20px;font-size:12px;opacity:.7;">
-    Feedback year <span id="year"></span> · Contact us <a href="https://arnetworkhouse.in/"><strong>AR Network House</strong></a>
+    Feedback year <span id="year"></span> ·
+    Contact us <a href="https://arnetworkhouse.in/"><strong>AR Network House</strong></a>
   </footer>
 </div>
 
@@ -193,29 +204,6 @@ button {
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbyO5IpPQybjeLNm-Rq87PeuxG_tXmPeV7doakuutGTDv6srlW3ClsoxfdDI9LJhIj9X/exec";
-
-// Fetch & populate dropdown from Sheets API
-async function populateDropdown() {
-  try {
-    const response = await fetch(API_URL);
-    const data = await response.json();
-
-    const selectEl = document.getElementById("pid");
-    selectEl.innerHTML = '<option value="">-- Select an option --</option>';
-
-    data.forEach(item => {
-      const opt = document.createElement("option");
-      opt.value = item;
-      opt.textContent = item;
-      selectEl.appendChild(opt);
-    });
-  } catch (err) {
-    console.error("Dropdown load failed:", err);
-    document.getElementById("pid").innerHTML = '<option value="">-- Load failed – try again --</option>';
-  }
-}
-
-populateDropdown();
 
 function submitFeedback() {
   const name = document.getElementById("name").value.trim();
@@ -234,7 +222,13 @@ function submitFeedback() {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, rating, projectId, message, source: "Feedback Page" })
+    body: JSON.stringify({
+      name,
+      rating,
+      projectId,
+      message,
+      source: "POKE MATCH"
+    })
   });
 
   const emoji = document.getElementById("successEmoji");
@@ -244,19 +238,19 @@ function submitFeedback() {
   if (rating <= 2) {
     emoji.innerText = "😔";
     title.innerText = "We’re Sorry";
-    msg.innerText = "We’ve logged your feedback and will address any issues.";
+    msg.innerText = "We apologize for the inconvenience. Your feedback has been logged and corrective action will be taken.";
   } else if (rating === 3) {
     emoji.innerText = "🙂";
     title.innerText = "Thank You";
-    msg.innerText = "We value your input and appreciate your time.";
+    msg.innerText = "Thank you for your feedback. We value your input.";
   } else if (rating === 4) {
     emoji.innerText = "😊";
     title.innerText = "Thank You So Much!";
-    msg.innerText = "We’re delighted with your positive experience.";
+    msg.innerText = "We’re pleased to hear about your positive experience.";
   } else {
     emoji.innerText = "😊😊😊😊😊";
     title.innerText = "Huge Appreciation!";
-    msg.innerText = "Your exceptional feedback is highly valued.";
+    msg.innerText = "Thank you for your exceptional feedback. Your support is highly appreciated.";
   }
 
   document.getElementById("successOverlay").style.display = "flex";
@@ -267,4 +261,3 @@ document.getElementById("year").textContent = new Date().getFullYear();
 
 </body>
 </html>
-
