@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Secure Login</title>
+
+  <!-- ===== VISUAL LAYER ONLY (NO LOGIC CHANGE) ===== -->
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      text-align: center;
+    }
+
+    /* ===== LOGO ===== */
+    .login-logo {
+      margin-bottom: 20px;
+    }
+
+    .login-logo img {
+      max-width: 140px;
+      height: auto;
+    }
+
+    h2 {
+      margin: 0 0 16px 0;
+      color: #1f2937;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    p {
+      margin: 0 0 24px 0;
+      color: #4b5563;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    button:hover {
+      background: #1e40af;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    /* ===== LOADER OVERLAY (UI ONLY) ===== */
+    .loader-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 32, 39, 0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .loader-box {
+      text-align: center;
+      color: #ffffff;
+    }
+
+    .loader-circle {
+      width: 80px;
+      height: 80px;
+      border: 6px solid rgba(255, 255, 255, 0.2);
+      border-top: 6px solid #ffffff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loader-text {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-card">
+
+    <!-- ===== BRAND LOGO ===== -->
+    <div class="login-logo">
+      <img src="https://github.com/arnetworkhouse-oss/ar-network-house/blob/main/ar%20logo.jpg?raw=true" alt="AR Network House">
+    </div>
+
+    <h2>Employee Login</h2>
+    <p>Please enter your credentials to access the dashboard.</p>
+
+    <input id="userId" placeholder="User ID">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+  </div>
+
+  <!-- ===== LOADER OVERLAY ===== -->
+  <div class="loader-overlay" id="loader">
+    <div class="loader-box">
+      <div class="loader-circle"></div>
+      <div class="loader-text">
+        Authenticating… <span id="progress">0</span>%
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCRIPT LAYER (UNCHANGED LOGIC) ===== -->
+  <script>
+    function login() {
+      const loader = document.getElementById("loader");
+      const progressText = document.getElementById("progress");
+
+      loader.style.display = "flex";
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        if (progress < 100) {
+          progress++;
+          progressText.textContent = progress;
+        }
+      }, 20);
+
+      fetch("https://script.google.com/macros/s/AKfycbzPQvT_qfowk1kYaoo1DF6hbMI2UL3UV0jAf5zeUW1Jdj-dDMCoGm2-4IOzGGOmdDoHhg/exec", {
+        method: "POST",
+        body: JSON.stringify({
+          userId: document.getElementById("userId").value,
+          password: document.getElementById("password").value
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        clearInterval(interval);
+
+        if (data.status === "success") {
+          localStorage.setItem("userData", JSON.stringify(data.user));
+          progressText.textContent = "100";
+          window.location.href = "https://arnetworkhouse-oss.github.io/ar-network-house/dashboard.html";
+        } else {
+          loader.style.display = "none";
+          alert("Invalid Credentials");
+        }
+      })
+      .catch(() => {
+        clearInterval(interval);
+        loader.style.display = "none";
+        alert("System Error. Please retry.");
+      });
+    }
+  </script>
+
+</body>
+</html>
