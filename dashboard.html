@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>User Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #f3f4f6;
+}
+
+/* ===== Header ===== */
+.header {
+  background: #111827;
+  color: #fff;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-left h2 {
+  margin: 0;
+}
+
+.logout-btn {
+  background: #ef4444;
+  border: none;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+}
+
+/* ===== Layout ===== */
+.container {
+  padding: 25px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #111827;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+}
+
+.label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.value {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.kpi {
+  text-align: center;
+}
+
+.kpi .value {
+  font-size: 22px;
+  color: #2563eb;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== Header ===== -->
+<div class="header">
+  <div class="header-left">
+    <h2 id="empName"></h2>
+    <div id="designation"></div>
+  </div>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<div class="container">
+
+  <!-- Personal Details -->
+  <div class="card">
+    <div class="card-title">Personal Details</div>
+    <div class="grid">
+      <div><div class="label">Email ID</div><div class="value" id="email"></div></div>
+      <div><div class="label">Contact No</div><div class="value" id="contact"></div></div>
+      <div><div class="label">Department</div><div class="value" id="department"></div></div>
+      <div><div class="label">Report To</div><div class="value" id="reportTo"></div></div>
+    </div>
+  </div>
+
+  <!-- Role & Timeline -->
+  <div class="card">
+    <div class="card-title">Role & Timeline</div>
+    <div class="grid">
+      <div>
+        <div class="label">Percentage</div>
+        <div class="value" id="percentage"></div>
+      </div>
+      <div>
+        <div class="label">Share Amount</div>
+        <div class="value" id="shareAmount"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Targets & Performance -->
+  <div class="card">
+    <div class="card-title">Targets & Performance</div>
+    <div class="grid">
+      <div>
+        <div class="label">Start Date</div>
+        <div class="value" id="startDate"></div>
+      </div>
+      <div>
+        <div class="label">End Date</div>
+        <div class="value" id="endDate"></div>
+      </div>
+      <div class="kpi">
+        <div class="label">Profit Target</div>
+        <div class="value" id="profitTarget"></div>
+      </div>
+      <div class="kpi">
+        <div class="label">Profit Achieved</div>
+        <div class="value" id="profitAchieved"></div>
+      </div>
+      <div class="kpi">
+        <div class="label">Dew Amount</div>
+        <div class="value" id="dewamm"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Financial Outcome -->
+  <div class="card">
+    <div class="card-title">Financial Outcome</div>
+    <div class="grid">
+      <div class="kpi">
+        <div class="label">Total Profit by Agent</div>
+        <div class="value" id="totalProfit"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ===== Session Gate ===== */
+const u = JSON.parse(localStorage.getItem("userData"));
+if (!u) location.href = "login.html";
+
+/* ===== Utilities ===== */
+function formatDate(d) {
+  if (!d) return "";
+  return new Date(d).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
+}
+
+function safeINR(amount) {
+  const n = Number(amount);
+  if (isNaN(n)) return "₹0.00";
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 2
+  }).format(n);
+}
+
+/* ===== Logout ===== */
+function logout() {
+  localStorage.removeItem("userData");
+  location.href = "login.html";
+}
+
+/* ===== Data Binding ===== */
+document.getElementById("empName").innerText = u.name || "";
+document.getElementById("designation").innerText = u.designation || "";
+
+document.getElementById("email").innerText = u.email || "";
+document.getElementById("contact").innerText = u.contact || "";
+document.getElementById("department").innerText = u.department || "";
+document.getElementById("reportTo").innerText = u.reportTo || "";
+
+document.getElementById("percentage").innerText =
+  u.percentage !== undefined && u.percentage !== null && u.percentage !== ""
+    ? u.percentage + "%"
+    : "";
+
+
+document.getElementById("shareAmount").innerText = safeINR(u.shareAmount);
+document.getElementById("profitTarget").innerText = safeINR(u.profitTarget);
+document.getElementById("profitAchieved").innerText = safeINR(u.profitAchieved);
+document.getElementById("totalProfit").innerText = safeINR(u.totalProfit);
+
+/* 🔑 Column R → Dew Amount (final authority) */
+document.getElementById("dewamm").innerText = safeINR(u.dewamm);
+
+document.getElementById("startDate").innerText = formatDate(u.startDate);
+document.getElementById("endDate").innerText = formatDate(u.endDate);
+</script>
+
+</body>
+</html>
