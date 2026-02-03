@@ -172,7 +172,7 @@ body {
 <script>
 /* ===== Session Gate ===== */
 const u = JSON.parse(localStorage.getItem("userData"));
-if (!u) location.href = "login.html";
+if (!u) location.href = "https://arnetworkhouse-oss.github.io/ar-network-house/login.html";
 
 /* ===== Utilities ===== */
 function formatDate(d) {
@@ -197,7 +197,7 @@ function safeINR(amount) {
 /* ===== Logout ===== */
 function logout() {
   localStorage.removeItem("userData");
-  location.href = "login.html";
+  location.href = "https://arnetworkhouse-oss.github.io/ar-network-house/login.html";
 }
 
 /* ===== Data Binding ===== */
@@ -229,3 +229,4 @@ document.getElementById("endDate").innerText = formatDate(u.endDate);
 
 </body>
 </html>
+
