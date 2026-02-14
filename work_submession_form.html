@@ -209,7 +209,8 @@ button {
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxbodbtwbtDVBA7tc1uA2b-o3evPLk5GTYAuHka-Mc8OC5u_vmOS1aVKfXd3q1KkSw2/exec";
+const API_URL_PRIMARY = "https://script.google.com/macros/s/AKfycbxbodbtwbtDVBA7tc1uA2b-o3evPLk5GTYAuHka-Mc8OC5u_vmOS1aVKfXd3q1KkSw2/exec";
+const API_URL_SECONDARY = "https://script.google.com/macros/s/AKfycbxz4MbhVxPDCUHaTLMilTlZKCnX411Y8iQkBHRI253Vf7Smf9kKMaJtBJa6sz9WJMnBag/exec";
 
 function submitForm() {
   const fname = document.getElementById("fname").value.trim();
@@ -233,14 +234,21 @@ function submitForm() {
   formData.append("deadline", deadline);
   formData.append("source", "Client Work Submission Page");
 
-  fetch(API_URL, {
+  // ===== Send to BOTH Web Apps =====
+  fetch(API_URL_PRIMARY, {
     method: "POST",
     body: formData
-  });
-    document.getElementById("confirmName").textContent = fname;
-    document.getElementById("confirmWhatsApp").textContent = whatsapp;
-    document.getElementById("confirmEmail").textContent = email;
+  }).catch(() => {});
 
+  fetch(API_URL_SECONDARY, {
+    method: "POST",
+    body: formData
+  }).catch(() => {});
+
+  // ===== Confirmation Data =====
+  document.getElementById("confirmName").textContent = fname;
+  document.getElementById("confirmWhatsApp").textContent = whatsapp;
+  document.getElementById("confirmEmail").textContent = email;
 
   document.getElementById("successModal").style.display = "flex";
 }
@@ -252,6 +260,7 @@ function closeModal() {
 
 document.getElementById("year").textContent = new Date().getFullYear();
 </script>
+
 
 </body>
 </html>
