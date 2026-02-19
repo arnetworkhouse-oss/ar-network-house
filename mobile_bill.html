@@ -2,459 +2,417 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mobile Bill Generator</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile Bill Generator</title>
 
-    <style>
-        :root {
-            --primary-color: #2c3e50;
-            --border-color: #333;
-            --stamp-color: #550072;
-        }
+<style>
+:root {
+    --primary-color: #2c3e50;
+    --border-color: #333;
+    --stamp-color: #550072;
+}
 
-        body {
-            font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
-            background: #f4f7f6;
-            padding: 20px;
-        }
+body {
+    font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+    background: #f4f7f6;
+    padding: 20px;
+}
 
-        .main-wrapper {
-            max-width: 900px;
-            margin: auto
-        }
+.main-wrapper {
+    max-width: 900px;
+    margin: auto
+}
 
-        /* ================= FORM ================= */
-        .input-panel {
-            background: #fff;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, .1);
-            margin-bottom: 30px;
-        }
+/* ================= FORM ================= */
+.input-panel {
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, .1);
+    margin-bottom: 30px;
+}
 
-        .grid-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
-        }
+.grid-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
 
-        label {
-            font-size: 12px;
-            font-weight: 700
-        }
+label {
+    font-size: 12px;
+    font-weight: 700
+}
 
-        input {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px
-        }
+input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px
+}
 
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            font-weight: 700;
-            cursor: pointer;
-        }
+.btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-weight: 700;
+    cursor: pointer;
+}
 
-        .btn-generate {
-            background: #27ae60;
-            color: #fff
-        }
+.btn-generate { background: #27ae60; color: #fff }
+.btn-clear { background: #95a5a6; color: #fff }
+.btn-print { background: #2980b9; color: #fff }
 
-        .btn-clear {
-            background: #95a5a6;
-            color: #fff
-        }
+/* ================= SWITCH ================= */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
 
-        .btn-print {
-            background: #2980b9;
-            color: #fff
-        }
+.switch input { opacity: 0; width: 0; height: 0; }
 
-        /* ================= SWITCH ================= */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 26px;
-        }
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: .3s;
+    border-radius: 34px;
+}
 
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+}
 
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .3s;
-            border-radius: 34px;
-        }
+input:checked + .slider { background-color: #27ae60; }
+input:checked + .slider:before { transform: translateX(24px); }
 
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .3s;
-            border-radius: 50%;
-        }
+/* ================= INVOICE ================= */
+#invoice {
+    background: #fff;
+    padding: 40px;
+    border: 2px solid var(--border-color);
+}
 
-        input:checked + .slider {
-            background-color: #27ae60;
-        }
+.bill-header {
+    text-align: center;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
 
-        input:checked + .slider:before {
-            transform: translateX(24px);
-        }
+.bill-header h1 { margin: 0; font-size: 32px }
 
-        /* ================= INVOICE ================= */
-        #invoice {
-            background: #fff;
-            padding: 40px;
-            border: 2px solid var(--border-color);
-        }
+.bill-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
 
-        .bill-header {
-            text-align: center;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-        }
+.bill-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
 
-        .bill-header h1 {
-            margin: 0;
-            font-size: 32px
-        }
+.bill-table th,
+.bill-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+}
 
-        .bill-meta {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-        }
+.brand-text { font-size: 18px; font-weight: 700 }
+.model-text { font-size: 16px }
+.variant-text { font-size: 13px; font-style: italic; color: #555 }
 
-        .bill-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
+.total-and-stamp {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 20px;
+}
 
-        .bill-table th,
-        .bill-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
-        }
+.auth-block {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
 
-        .brand-text {
-            font-size: 18px;
-            font-weight: 700
-        }
+.stamp-container { opacity: 0 }
 
-        .model-text {
-            font-size: 16px
-        }
+.paid-stamp {
+    width: 110px;
+    height: 110px;
+    border: 4px double var(--stamp-color);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--stamp-color);
+    transform: rotate(-15deg);
+    font-weight: bold;
+}
 
-        .variant-text {
-            font-size: 13px;
-            font-style: italic;
-            color: #555
-        }
+.sig-container { text-align: center; }
 
-        .total-and-stamp {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-top: 20px;
-        }
+#shopSignature {
+    max-width: 150px;
+    max-height: 80px;
+    display: block;
+    margin-bottom: 5px;
+}
 
-        .auth-block {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
+.sig-line {
+    border-top: 1px solid #333;
+    font-size: 11px;
+    padding-top: 5px;
+}
 
-        .stamp-container {
-            opacity: 0
-        }
+.total-area { width: 320px }
 
-        .paid-stamp {
-            width: 110px;
-            height: 110px;
-            border: 4px double var(--stamp-color);
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: var(--stamp-color);
-            transform: rotate(-15deg);
-            font-weight: bold;
-        }
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed #ccc;
+}
 
-        .sig-container {
-            text-align: center;
-        }
+.grand-total { font-size: 20px; font-weight: 700 }
 
-        #shopSignature {
-            max-width: 150px;
-            max-height: 80px;
-            display: block;
-            margin-bottom: 5px;
-        }
+.footer {
+    margin-top: 60px;
+    text-align: center;
+    font-size: 12px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
 
-        .sig-line {
-            border-top: 1px solid #333;
-            font-size: 11px;
-            padding-top: 5px;
-        }
-
-        .total-area {
-            width: 320px
-        }
-
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px dashed #ccc;
-        }
-
-        .grand-total {
-            font-size: 20px;
-            font-weight: 700
-        }
-
-        .footer {
-            margin-top: 60px;
-            text-align: center;
-            font-size: 12px;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
-
-        @media print {
-
-            .input-panel,
-            .btn-print {
-                display: none
-            }
-
-            body {
-                padding: 0
-            }
-
-            #invoice {
-                border: none
-            }
-        }
-    </style>
+@media print {
+    .input-panel, .btn-print { display: none }
+    body { padding: 0 }
+    #invoice { border: none }
+}
+</style>
 </head>
 
 <body>
-    <div class="main-wrapper">
-        <div class="input-panel">
-            <h2>Generate New Bill</h2>
+<div class="main-wrapper">
 
-            <div class="grid-row">
-                <div>
-                    <label>Switch </label><br>
-                    <label class="switch">
-                        <input type="checkbox" id="rowSwitch" onchange="reloadSheetData()">
-                        <span class="slider"></span>
-                    </label>
-                    <small id="rowLabel">Using BIRBHUM</small>
-                </div>
-            </div>
+<div class="input-panel">
+<h2>Generate New Bill</h2>
 
-            <div class="grid-row">
-                <div><label>Bill Number</label><input type="text" id="inBillNo" placeholder="Auto"></div>
-                <div><label>Customer Name *</label><input id="inCustName"></div>
-            </div>
+<div class="grid-row">
+<div>
+<label>Switch</label><br>
+<label class="switch">
+<input type="checkbox" id="rowSwitch" onchange="reloadSheetData()">
+<span class="slider"></span>
+</label>
+<small id="rowLabel">Using BIRBHUM</small>
+</div>
+</div>
 
-            <div class="grid-row">
-                <div><label>Contact Number</label><input id="inCustPhone"></div>
-                <div style="grid-column: span 2;"><label>Customer Address</label><input id="inCustAddress"
-                        style="width:100%"></div>
-            </div>
+<div class="grid-row">
+<div><label>Bill Number</label><input type="text" id="inBillNo" placeholder="Auto"></div>
+<div><label>Bill Date</label><input type="date" id="inBillDate"></div>
+<div><label>Customer Name *</label><input id="inCustName"></div>
+</div>
 
-            <div class="grid-row">
-                <div><label>Brand *</label><input id="inBrand"></div>
-                <div><label>Model *</label><input id="inModel"></div>
-                <div><label>IMEI *</label><input id="inIMEI"></div>
-            </div>
+<div class="grid-row">
+<div><label>Contact Number</label><input id="inCustPhone"></div>
+<div style="grid-column: span 2;"><label>Customer Address</label><input id="inCustAddress" style="width:100%"></div>
+</div>
 
-            <div class="grid-row">
-                <div><label>Color</label><input id="inColor"></div>
-                <div><label>Storage</label><input id="inStorage"></div>
-                <div><label>Qty</label><input id="inQty" type="number" value="1"></div>
-            </div>
+<div class="grid-row">
+<div><label>Brand *</label><input id="inBrand"></div>
+<div><label>Model *</label><input id="inModel"></div>
+<div><label>IMEI *</label><input id="inIMEI"></div>
+</div>
 
-            <div class="grid-row">
-                <div><label>Price *</label><input id="inPrice" type="number"></div>
-                <div><label>Discount</label><input id="inDiscount" type="number" value="0"></div>
-            </div>
+<div class="grid-row">
+<div><label>Color</label><input id="inColor"></div>
+<div><label>Storage</label><input id="inStorage"></div>
+<div><label>Qty</label><input id="inQty" type="number" value="1"></div>
+</div>
 
-            <button class="btn btn-generate" onclick="generateBill()">Generate</button>
-            <button class="btn btn-clear" onclick="location.reload()">Clear</button>
-        </div>
+<div class="grid-row">
+<div><label>Price *</label><input id="inPrice" type="number"></div>
+<div><label>Discount</label><input id="inDiscount" type="number" value="0"></div>
+</div>
 
-        <div id="invoice">
-            <div class="bill-header">
-                <h1 id="shopName">---</h1>
-                <p><i>"Your Trusted Mobile Partner"</i></p>
-                <p id="shopAddress">---</p>
-                <p id="shopContact">Contact: ---</p>
-                <p id="shopGstDisplay">GSTIN: ---</p>
-            </div>
+<button class="btn btn-generate" onclick="generateBill()">Generate</button>
+<button class="btn btn-clear" onclick="location.reload()">Clear</button>
+</div>
 
-            <div class="bill-meta">
-                <div>
-                    <p><b>Name:</b> <span id="outCustName">---</span></p>
-                    <p><b>Contact:</b> <span id="outCustPhone">---</span></p>
-                    <p><b>Address:</b> <span id="outCustAddress">---</span></p>
-                </div>
-                <div>
-                    <p><b>Bill No:</b> <span id="outBillNo"></span></p>
-                    <p><b>Date:</b> <span id="outDate"></span></p>
-                </div>
-            </div>
+<div id="invoice">
+<div class="bill-header">
+<h1 id="shopName">---</h1>
+<p><i>"Your Trusted Mobile Partner"</i></p>
+<p id="shopAddress">---</p>
+<p id="shopContact">Contact: ---</p>
+<p id="shopGstDisplay">GSTIN: ---</p>
+</div>
 
-            <table class="bill-table">
-                <thead>
-                    <tr>
-                        <th>Description</th>
-                        <th>IMEI</th>
-                        <th>Qty</th>
-                        <th>Rate</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <span id="outBrand" class="brand-text"></span>
-                            <span id="outModel" class="model-text"></span><br>
-                            <span id="outVariant" class="variant-text"></span>
-                        </td>
-                        <td id="outIMEI" align="center"></td>
-                        <td id="outQty" align="center"></td>
-                        <td id="outRate" align="center"></td>
-                        <td id="outRowTotal" align="center"></td>
-                    </tr>
-                </tbody>
-            </table>
+<div class="bill-meta">
+<div>
+<p><b>Name:</b> <span id="outCustName">---</span></p>
+<p><b>Contact:</b> <span id="outCustPhone">---</span></p>
+<p><b>Address:</b> <span id="outCustAddress">---</span></p>
+</div>
+<div>
+<p><b>Bill No:</b> <span id="outBillNo"></span></p>
+<p><b>Date:</b> <span id="outDate"></span></p>
+</div>
+</div>
 
-            <div class="total-and-stamp">
-                <div class="auth-block">
-                    <div class="stamp-container" id="stampSection">
-                        <div class="paid-stamp">
-                            <div>PAID</div>
-                            <div id="stampDate"></div>
-                        </div>
-                    </div>
-                    <div class="sig-container">
-                        <img id="shopSignature" src="" alt="">
-                        <div class="sig-line">Authorized Signatory</div>
-                    </div>
-                </div>
+<table class="bill-table">
+<thead>
+<tr>
+<th>Description</th>
+<th>IMEI</th>
+<th>Qty</th>
+<th>Rate</th>
+<th>Subtotal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<span id="outBrand" class="brand-text"></span>
+<span id="outModel" class="model-text"></span><br>
+<span id="outVariant" class="variant-text"></span>
+</td>
+<td id="outIMEI" align="center"></td>
+<td id="outQty" align="center"></td>
+<td id="outRate" align="center"></td>
+<td id="outRowTotal" align="center"></td>
+</tr>
+</tbody>
+</table>
 
-                <div class="total-area">
-                    <div class="total-row"><span>Subtotal</span><span id="outSubTotal"></span></div>
-                    <div class="total-row"><span>Discount</span><span id="outDiscount"></span></div>
-                    <div class="total-row"><span>+ GST (included <span id="outGstLabel">0</span>%)</span><span></span>
-                    </div>
-                    <div class="total-row grand-total"><span>Total</span><span id="outGrandTotal"></span></div>
-                </div>
-            </div>
+<div class="total-and-stamp">
+<div class="auth-block">
+<div class="stamp-container" id="stampSection">
+<div class="paid-stamp">
+<div>PAID</div>
+<div id="stampDate"></div>
+</div>
+</div>
+<div class="sig-container">
+<img id="shopSignature" src="" alt="">
+<div class="sig-line">Authorized Signatory</div>
+</div>
+</div>
 
-            <div class="footer">Thank you for your business</div>
-        </div>
+<div class="total-area">
+<div class="total-row"><span>Subtotal</span><span id="outSubTotal"></span></div>
+<div class="total-row"><span>Discount</span><span id="outDiscount"></span></div>
+<div class="total-row"><span>+ GST (included <span id="outGstLabel">0</span>%)</span></div>
+<div class="total-row grand-total"><span>Total</span><span id="outGrandTotal"></span></div>
+</div>
+</div>
 
-        <button class="btn btn-print" onclick="window.print()">Print</button>
-    </div>
+<div class="footer">Thank you for your business</div>
+</div>
 
-    <script>
-        let globalGstLabel = 0;
-        let sheetData = [];
-        let activeRow = 0; // 0 = Row 1, 1 = Row 2
+<button class="btn btn-print" onclick="window.print()">Print</button>
+</div>
 
-        window.onload = () => {
-            const d = new Date().toLocaleDateString("en-IN");
-            outDate.innerText = d;
-            stampDate.innerText = d;
-            outBillNo.innerText = Math.floor(1000 + Math.random() * 9000);
+<script>
+let globalGstLabel = 0;
+let sheetData = [];
+let activeRow = 0;
 
-            fetch("https://opensheet.elk.sh/1OZKi19tk_igGHx_Y2wt9fptDyEyVD_eScqEsEjSBkS8/Sheet1")
-                .then(r => r.json())
-                .then(data => {
-                    sheetData = data;
-                    loadRowData();
-                });
-        }
+window.onload = () => {
+    const today = new Date().toLocaleDateString("en-IN");
+    outDate.innerText = today;
+    stampDate.innerText = today;
+    outBillNo.innerText = Math.floor(1000 + Math.random() * 9000);
 
-        function reloadSheetData() {
-            activeRow = document.getElementById("rowSwitch").checked ? 1 : 0;
-            document.getElementById("rowLabel").innerText =
-                activeRow === 0 ? "Using BIRBHUM" : "Using HOWRAH";
+    fetch("https://opensheet.elk.sh/1OZKi19tk_igGHx_Y2wt9fptDyEyVD_eScqEsEjSBkS8/Sheet1")
+        .then(r => r.json())
+        .then(data => {
+            sheetData = data;
             loadRowData();
-        }
+        });
+};
 
-        function loadRowData() {
-            if (!sheetData[activeRow]) return;
+function setBillDate() {
+    let selectedDate = document.getElementById("inBillDate").value;
 
-            const sheet = sheetData[activeRow];
+    if (!selectedDate) {
+        const today = new Date();
+        selectedDate = today.toISOString().split("T")[0];
+    }
 
-            shopName.innerText = sheet.shopname;
-            shopAddress.innerText = sheet.shopaddress;
-            shopContact.innerText = "Contact: +91 " + sheet.shopcontact;
-            shopGstDisplay.innerText = "GSTIN: " + (sheet.gstno || "N/A");
+    const formatted = new Date(selectedDate).toLocaleDateString("en-IN");
+    outDate.innerText = formatted;
+    stampDate.innerText = formatted;
+}
 
-            globalGstLabel = parseFloat(sheet.gst) || 0;
-            outGstLabel.innerText = globalGstLabel;
+function reloadSheetData() {
+    activeRow = document.getElementById("rowSwitch").checked ? 1 : 0;
+    document.getElementById("rowLabel").innerText =
+        activeRow === 0 ? "Using BIRBHUM" : "Using HOWRAH";
+    loadRowData();
+}
 
-            if (sheet.photolink) shopSignature.src = sheet.photolink;
-        }
+function loadRowData() {
+    if (!sheetData[activeRow]) return;
 
-        function generateBill() {
-            if (document.getElementById("inBillNo").value.trim()) {
-                outBillNo.innerText = document.getElementById("inBillNo").value.trim();
-            }
+    const sheet = sheetData[activeRow];
 
-            const price = +inPrice.value, qty = +inQty.value, disc = +inDiscount.value;
-            const sub = price * qty;
-            const finalTotal = sub - disc;
+    shopName.innerText = sheet.shopname;
+    shopAddress.innerText = sheet.shopaddress;
+    shopContact.innerText = "Contact: +91 " + sheet.shopcontact;
+    shopGstDisplay.innerText = "GSTIN: " + (sheet.gstno || "N/A");
 
-            outCustName.innerText = inCustName.value;
-            outCustPhone.innerText = inCustPhone.value || "N/A";
-            outCustAddress.innerText = inCustAddress.value || "N/A";
-            outBrand.innerText = inBrand.value;
-            outModel.innerText = inModel.value;
-            outVariant.innerText = `Color: ${inColor.value || "N/A"} | Storage: ${inStorage.value || "N/A"}`;
-            outIMEI.innerText = inIMEI.value;
-            outQty.innerText = qty;
-            outRate.innerText = price.toFixed(2);
-            outRowTotal.innerText = sub.toFixed(2);
+    globalGstLabel = parseFloat(sheet.gst) || 0;
+    outGstLabel.innerText = globalGstLabel;
 
-            outSubTotal.innerText = sub.toFixed(2);
-            outDiscount.innerText = "-" + disc.toFixed(2);
-            outGstLabel.innerText = globalGstLabel;
-            outGrandTotal.innerText = "₹ " + finalTotal.toFixed(2);
+    if (sheet.photolink) shopSignature.src = sheet.photolink;
+}
 
-            stampSection.style.opacity = 1;
-        }
-    </script>
+function generateBill() {
+
+    setBillDate();
+
+    if (document.getElementById("inBillNo").value.trim()) {
+        outBillNo.innerText = document.getElementById("inBillNo").value.trim();
+    }
+
+    const price = +inPrice.value, qty = +inQty.value, disc = +inDiscount.value;
+    const sub = price * qty;
+    const finalTotal = sub - disc;
+
+    outCustName.innerText = inCustName.value;
+    outCustPhone.innerText = inCustPhone.value || "N/A";
+    outCustAddress.innerText = inCustAddress.value || "N/A";
+    outBrand.innerText = inBrand.value;
+    outModel.innerText = inModel.value;
+    outVariant.innerText = `Color: ${inColor.value || "N/A"} | Storage: ${inStorage.value || "N/A"}`;
+    outIMEI.innerText = inIMEI.value;
+    outQty.innerText = qty;
+    outRate.innerText = price.toFixed(2);
+    outRowTotal.innerText = sub.toFixed(2);
+
+    outSubTotal.innerText = sub.toFixed(2);
+    outDiscount.innerText = "-" + disc.toFixed(2);
+    outGrandTotal.innerText = "₹ " + finalTotal.toFixed(2);
+
+    stampSection.style.opacity = 1;
+}
+</script>
 </body>
-
 </html>
