@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeGive — Blood Donation Registration</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>emailjs.init("y_nnzxP_pb9gFELh3");</script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --red: #C8102E;
+            --red-dark: #9B0B22;
+            --red-light: #FF3352;
+            --cream: #FDF8F5;
+            --grey: #F3EEE9;
+            --charcoal: #1A1A1A;
+            --mid: #6B6560;
+            --border: #E2D9D1;
+            --white: #FFFFFF;
+            --success: #2D7D46;
+            --shadow: 0 4px 32px rgba(200, 16, 46, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            color: var(--charcoal);
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 5vw;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--red);
+            text-decoration: none;
+        }
+
+        .logo-drop {
+            width: 36px;
+            height: 36px;
+            background: var(--red);
+            clip-path: polygon(50% 0%, 80% 30%, 100% 60%, 80% 85%, 50% 100%, 20% 85%, 0% 60%, 20% 30%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-drop::after {
+            content: '♥';
+            color: white;
+            font-size: 14px;
+        }
+
+        .header-tag {
+            font-size: 0.75rem;
+            color: var(--mid);
+            background: var(--grey);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+            padding: 70px 5vw 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -120px;
+            left: 40%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 50%;
+        }
+
+        .hero-inner {
+            max-width: 700px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            color: white;
+            line-height: 1.15;
+            margin-bottom: 16px;
+        }
+
+        .hero p {
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            max-width: 520px;
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-wrap {
+            background: var(--white);
+            padding: 28px 5vw;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 70px;
+            z-index: 90;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-steps {
+            display: flex;
+            align-items: center;
+            max-width: 800px;
+            gap: 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            position: relative;
+        }
+
+        .step-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 46px;
+            right: 10px;
+            top: 18px;
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+            transition: background 0.4s;
+        }
+
+        .step-item.done:not(:last-child)::after {
+            background: var(--red);
+        }
+
+        .step-item.active:not(:last-child)::after {
+            background: var(--border);
+        }
+
+        .step-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--grey);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--mid);
+            z-index: 1;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .step-item.active .step-num {
+            background: var(--red);
+            border-color: var(--red);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(200, 16, 46, 0.15);
+        }
+
+        .step-item.done .step-num {
+            background: var(--red-dark);
+            border-color: var(--red-dark);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--mid);
+            white-space: nowrap;
+            z-index: 1;
+            position: relative;
+            background-color: white;
+        }
+
+        .step-item.active .step-label {
+            color: var(--red);
+            font-weight: 600;
+        }
+
+        .step-item.done .step-label {
+            color: var(--charcoal);
+        }
+
+        @media (max-width: 600px) {
+            .step-label {
+                display: none;
+            }
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        main {
+            max-width: 860px;
+            margin: 40px auto;
+            padding: 0 5vw 80px;
+        }
+
+        /* ===== FORM STEPS ===== */
+        .form-step {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: var(--charcoal);
+            margin-bottom: 6px;
+        }
+
+        .step-subtitle {
+            color: var(--mid);
+            font-size: 0.95rem;
+            margin-bottom: 32px;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .card-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            display: block;
+            width: 3px;
+            height: 16px;
+            background: var(--red);
+            border-radius: 2px;
+        }
+
+        /* ===== FORM GRID ===== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-grid.cols-3 {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .form-grid.cols-1 {
+            grid-template-columns: 1fr;
+        }
+
+        .col-span-2 {
+            grid-column: span 2;
+        }
+
+        .col-span-full {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 640px) {
+
+            .form-grid,
+            .form-grid.cols-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .col-span-2,
+            .col-span-full {
+                grid-column: span 1;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+
+        /* ===== FORM FIELDS ===== */
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--charcoal);
+        }
+
+        label .req {
+            color: var(--red);
+            margin-left: 2px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.92rem;
+            color: var(--charcoal);
+            background: var(--cream);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            appearance: none;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.1);
+            background: white;
+        }
+
+        input.invalid {
+            border-color: #e53e3e;
+            background: #fff5f5;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .field-hint {
+            font-size: 0.76rem;
+            color: var(--mid);
+            font-style: italic;
+        }
+
+        .field-error {
+            font-size: 0.76rem;
+            color: #e53e3e;
+            display: none;
+        }
+
+        .field-error.show {
+            display: block;
+        }
+
+        /* ===== AGE BADGE ===== */
+        .age-badge {
+            display: inline-block;
+            background: var(--grey);
+            color: var(--mid);
+            font-size: 0.78rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-top: 4px;
+        }
+
+        .age-badge.ok {
+            background: #E8F5E9;
+            color: var(--success);
+        }
+
+        .age-badge.fail {
+            background: #FFEBEE;
+            color: #e53e3e;
+        }
+
+        /* ===== CHECKBOXES & RADIOS ===== */
+        .check-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.88rem;
+        }
+
+        .check-item input[type="checkbox"],
+        .check-item input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--red);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .yn-group {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        /* ===== INFO BOX ===== */
+        .info-box {
+            background: #FFF8E1;
+            border: 1px solid #FFD54F;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.84rem;
+            color: #795548;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .info-box .icon {
+            flex-shrink: 0;
+            font-size: 1rem;
+        }
+
+        /* ===== CONFIDENTIAL BOX ===== */
+        .confidential-box {
+            background: #FFF3E0;
+            border-left: 4px solid #FF9800;
+            border-radius: 0 10px 10px 0;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            font-size: 0.82rem;
+            color: #5D4037;
+        }
+
+        /* ===== CONSENT ===== */
+        .consent-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            background: var(--cream);
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .consent-item:hover {
+            border-color: var(--red);
+        }
+
+        .consent-item input {
+            flex-shrink: 0;
+            margin-top: 2px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--red);
+        }
+
+        .consent-item p {
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        .consent-item strong {
+            display: block;
+            margin-bottom: 2px;
+            font-size: 0.9rem;
+        }
+
+        /* ===== SIGNATURE ===== */
+        .signature-field {
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            background: var(--cream);
+        }
+
+        .signature-field input {
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--charcoal);
+            width: 100%;
+        }
+
+        .signature-field input:focus {
+            box-shadow: none;
+        }
+
+        .sig-label {
+            font-size: 0.75rem;
+            color: var(--mid);
+            border-top: 1px solid var(--border);
+            margin-top: 10px;
+            padding-top: 8px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 32px;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 13px 32px;
+            border-radius: 50px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--red);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--red-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(200, 16, 46, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--mid);
+            border: 1.5px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--charcoal);
+            color: var(--charcoal);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            color: white;
+            padding: 16px 40px;
+            font-size: 1rem;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* ===== OTP MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px 36px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.95);
+            transition: transform 0.3s;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-overlay.open .modal {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .modal h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .modal p {
+            color: var(--mid);
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+
+        .modal p strong {
+            color: var(--charcoal);
+        }
+
+        .otp-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .otp-inputs input {
+            width: 50px;
+            height: 56px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--charcoal);
+            background: var(--cream);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .otp-inputs input:focus {
+            border-color: var(--red);
+            background: white;
+        }
+
+        .otp-error {
+            color: #e53e3e;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .otp-error.show {
+            display: block;
+        }
+
+        .otp-resend {
+            font-size: 0.82rem;
+            color: var(--mid);
+        }
+
+        .otp-resend a {
+            color: var(--red);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .countdown {
+            font-weight: 600;
+        }
+
+        /* ===== SUCCESS PAGE ===== */
+        #step-success {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        #step-success.active {
+            display: block;
+        }
+
+        .success-icon {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #2D7D46, #1B5E20);
+            border-radius: 50%;
+            margin: 0 auto 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            animation: popIn 0.5s ease;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            70% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        #step-success h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        #step-success p {
+            color: var(--mid);
+            font-size: 1rem;
+            margin-bottom: 24px;
+        }
+
+        .donor-id-box {
+            display: inline-block;
+            background: var(--grey);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 32px;
+            margin-bottom: 32px;
+        }
+
+        .donor-id-box small {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--mid);
+            margin-bottom: 4px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .donor-id-box strong {
+            font-size: 1.6rem;
+            font-family: 'Playfair Display', serif;
+            color: var(--red);
+            letter-spacing: 0.05em;
+        }
+
+        /* ===== LOADING ===== */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(253, 248, 245, 0.85);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .loading-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--red);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 0.9rem;
+            color: var(--mid);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .otp-inputs input {
+                width: 42px;
+                height: 48px;
+                font-size: 1.2rem;
+            }
+
+            .btn-row {
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* ===== FOOTER ===== */
+footer {
+  background: var(--charcoal);
+  color: rgba(255,255,255,0.75);
+  margin-top: 60px;
+}
+
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 60px 5vw 40px;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+
+@media (max-width: 768px) {
+  .footer-inner {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-inner {
+    grid-template-columns: 1fr;
+  }
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 14px;
+}
+
+.footer-brand p {
+  font-size: 0.88rem;
+  line-height: 1.7;
+  margin-bottom: 16px;
+  max-width: 260px;
+}
+
+.footer-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.footer-badges span {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.7);
+}
+
+.footer-col h4 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: white;
+  margin-bottom: 16px;
+}
+
+.footer-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-col ul li {
+  font-size: 0.87rem;
+}
+
+.footer-col ul li a {
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-col ul li a:hover {
+  color: var(--red-light);
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 20px 5vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.4);
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+    </style>
+</head>
+
+<body>
+
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">Sending verification code...</div>
+    </div>
+
+    <!-- OTP MODAL -->
+    <div class="modal-overlay" id="otpModal">
+        <div class="modal">
+            <div class="modal-icon">📧</div>
+            <h2>Verify Your Email</h2>
+            <p>We sent a 6-digit code to <strong id="otpEmail"></strong>. Please enter it below.</p>
+            <div class="otp-inputs" id="otpInputs">
+                <input type="text" maxlength="1" class="otp-digit" inputmode="numeric">
+                <input type="text" maxlength="1" class="otp-digit" inputmode="numeric">
+                <input type="text" maxlength="1" class="otp-digit" inputmode="numeric">
+                <input type="text" maxlength="1" class="otp-digit" inputmode="numeric">
+                <input type="text" maxlength="1" class="otp-digit" inputmode="numeric">
+                <input type="text" maxlength="1" class="otp-digit" inputmode="numeric">
+            </div>
+            <div class="otp-error" id="otpError">❌ Incorrect code. Please try again.</div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:16px;"
+                onclick="verifyOTP()">Verify & Submit</button>
+            <div class="otp-resend">Didn't receive it? <a onclick="resendOTP()">Resend</a> <span id="resendCountdown"
+                    class="countdown"></span></div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <a class="logo" href="#">
+            <div class="logo-drop"></div>
+            LifeGive
+        </a>
+        <span class="header-tag">🩸 Donor Registration Portal</span>
+    </header>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-inner">
+            <div class="hero-badge">🌍 Save Lives Today</div>
+            <h1>Register as a Blood Donor</h1>
+            <p>Every donation can save up to three lives. Complete the registration to join our life-saving community.
+                The entire process takes about 10 minutes.</p>
+        </div>
+    </div>
+
+    <!-- PROGRESS BAR -->
+    <div class="progress-wrap">
+        <div class="progress-steps">
+            <div class="step-item active" id="ps1">
+                <div class="step-num">1</div>
+                <span class="step-label">Personal Info</span>
+            </div>
+            <div class="step-item" id="ps2">
+                <div class="step-num">2</div>
+                <span class="step-label">Medical History</span>
+            </div>
+            <div class="step-item" id="ps3">
+                <div class="step-num">3</div>
+                <span class="step-label">Screening</span>
+            </div>
+            <div class="step-item" id="ps4">
+                <div class="step-num">4</div>
+                <span class="step-label">Consent</span>
+            </div>
+        </div>
+    </div>
+
+    <main>
+
+        <!-- ===== STEP 1: PERSONAL INFO ===== -->
+        <div class="form-step active" id="step1">
+            <div class="step-title">Personal Information</div>
+            <div class="step-subtitle">Tell us about yourself so we can create your donor profile.</div>
+
+            <div class="card">
+                <div class="card-title">Basic Details</div>
+                <div class="form-grid">
+                    <div class="field col-span-2">
+                        <label>Full Name <span class="req">*</span></label>
+                        <input type="text" id="fullName" placeholder="As on your ID document">
+                        <div class="field-error" id="err-fullName">Full name is required.</div>
+                    </div>
+
+                    <div class="field">
+                        <label>Date of Birth <span class="req">*</span></label>
+                        <input type="date" id="dob" onchange="calcAge()">
+                        <div id="ageBadge" class="age-badge" style="display:none"></div>
+                        <div class="field-error" id="err-dob">Date of birth is required.</div>
+                    </div>
+
+                    <div class="field">
+                        <label>Gender <span class="req">*</span></label>
+                        <select id="gender">
+                            <option value="">Select gender</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
+                            <option>Prefer not to say</option>
+                        </select>
+                        <div class="field-error" id="err-gender">Please select your gender.</div>
+                    </div>
+
+                    <div class="field">
+                        <label>Blood Group</label>
+                        <select id="bloodGroup">
+                            <option value="">Unknown / Not sure</option>
+                            <option>A+</option>
+                            <option>A-</option>
+                            <option>B+</option>
+                            <option>B-</option>
+                            <option>AB+</option>
+                            <option>AB-</option>
+                            <option>O+</option>
+                            <option>O-</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>Phone Number <span class="req">*</span></label>
+                        <input type="tel" id="phone" placeholder="+91 99999 99999">
+                        <div class="field-error" id="err-phone">Valid phone number required.</div>
+                    </div>
+
+                    <div class="field col-span-2">
+                        <label>Email Address <span class="req">*</span></label>
+                        <input type="email" id="email" placeholder="you@example.com">
+                        <div class="field-error" id="err-email">Valid email address required.</div>
+                    </div>
+
+                    <div class="field col-span-2">
+                        <label>Full Address</label>
+                        <textarea id="address" placeholder="House no., Street, City, State, PIN"></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label>Identification Number <span
+                                style="font-weight:300;color:var(--mid)">(optional)</span></label>
+                        <input type="text" id="idNumber" placeholder="Aadhar / Passport / Driving License">
+                    </div>
+
+                    <div class="field">
+                        <label>Occupation <span style="font-weight:300;color:var(--mid)">(optional)</span></label>
+                        <input type="text" id="occupation" placeholder="e.g. Teacher, Engineer, Student">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Physical Criteria</div>
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Weight (kg) <span class="req">*</span></label>
+                        <input type="number" id="weight" placeholder="Min. 50 kg" min="1">
+                        <div class="field-error" id="err-weight">Minimum weight is 50 kg to be eligible.</div>
+                    </div>
+
+                    <div class="field">
+                        <label>Height (cm) <span style="font-weight:300;color:var(--mid)">(optional)</span></label>
+                        <input type="number" id="height" placeholder="e.g. 165">
+                    </div>
+
+                    <div class="field col-span-2">
+                        <div class="info-box">
+                            <span class="icon">ℹ️</span>
+                            <span><strong>Hemoglobin, Blood Pressure & Pulse</strong> will be measured at the donation
+                                site by our medical staff prior to donation.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <div></div>
+                <button class="btn btn-primary" onclick="goToStep(2)">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ===== STEP 2: MEDICAL HISTORY ===== -->
+        <div class="form-step" id="step2">
+            <div class="step-title">Medical History</div>
+            <div class="step-subtitle">Your health information helps ensure safe donation for you and recipients.</div>
+
+            <div class="card">
+                <div class="card-title">Current Health Status</div>
+                <div class="field">
+                    <label>Do you currently have any of the following? <span class="req">*</span></label>
+                    <div class="check-group" style="margin-top:8px">
+                        <label class="check-item"><input type="checkbox" name="currentHealth" value="fever">
+                            Fever</label>
+                        <label class="check-item"><input type="checkbox" name="currentHealth" value="infection">
+                            Infection / Cold / Flu</label>
+                        <label class="check-item"><input type="checkbox" name="currentHealth" value="cough"> Persistent
+                            Cough</label>
+                        <label class="check-item"><input type="checkbox" name="currentHealth" value="none"> None of the
+                            above</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Chronic Conditions</div>
+                <div class="field">
+                    <label>Do you have (or have had) any of the following?</label>
+                    <div class="check-group" style="margin-top:8px">
+                        <label class="check-item"><input type="checkbox" name="chronic" value="heart"> Heart
+                            Disease</label>
+                        <label class="check-item"><input type="checkbox" name="chronic" value="cancer"> Cancer</label>
+                        <label class="check-item"><input type="checkbox" name="chronic" value="kidney"> Kidney
+                            Disease</label>
+                        <label class="check-item"><input type="checkbox" name="chronic" value="liver"> Liver
+                            Disease</label>
+                        <label class="check-item"><input type="checkbox" name="chronic" value="diabetes">
+                            Diabetes</label>
+                        <label class="check-item"><input type="checkbox" name="chronic" value="hypertension">
+                            Hypertension</label>
+                        <label class="check-item"><input type="checkbox" name="chronic" value="hemophilia">
+                            Hemophilia</label>
+                        <label class="check-item"><input type="checkbox" name="chronic" value="anemia"> Anemia</label>
+                        <label class="check-item"><input type="checkbox" name="chronic" value="none"> None</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Surgery & Medications</div>
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Past surgeries? <span class="req">*</span></label>
+                        <div class="yn-group">
+                            <label class="check-item"><input type="radio" name="surgery" value="no" checked> No</label>
+                            <label class="check-item"><input type="radio" name="surgery" value="yes"> Yes</label>
+                        </div>
+                    </div>
+
+                    <div class="field" id="surgeryDetailWrap" style="display:none">
+                        <label>Surgery details</label>
+                        <input type="text" id="surgeryDetail" placeholder="Type and approximate date">
+                    </div>
+
+                    <div class="field col-span-2">
+                        <label>Current medications</label>
+                        <textarea id="medications"
+                            placeholder="List any medications you are currently taking (or write 'None')"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Donation History</div>
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Have you donated blood before?</label>
+                        <div class="yn-group">
+                            <label class="check-item"><input type="radio" name="donated" value="no" checked> No</label>
+                            <label class="check-item"><input type="radio" name="donated" value="yes"> Yes</label>
+                        </div>
+                    </div>
+
+                    <div class="field" id="lastDonationWrap" style="display:none">
+                        <label>Date of last donation <span class="req">*</span></label>
+                        <input type="date" id="lastDonation" onchange="checkDonationGap()">
+                        <div class="field-error" id="err-lastDonation">Minimum 90 days since last donation required.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="goToStep(1)">← Back</button>
+                <button class="btn btn-primary" onclick="goToStep(3)">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ===== STEP 3: DISEASE SCREENING ===== -->
+        <div class="form-step" id="step3">
+            <div class="step-title">Disease Screening & Lifestyle</div>
+            <div class="step-subtitle">This information is strictly confidential and used only for safety screening.
+            </div>
+
+            <div class="card">
+                <div class="card-title">Infectious Disease History</div>
+                <div class="form-grid cols-1">
+                    <div class="field">
+                        <label>Have you ever been diagnosed with or tested positive for HIV/AIDS?</label>
+                        <div class="yn-group">
+                            <label class="check-item"><input type="radio" name="hiv" value="no" checked> No</label>
+                            <label class="check-item"><input type="radio" name="hiv" value="yes"> Yes</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Hepatitis B or C?</label>
+                        <div class="yn-group">
+                            <label class="check-item"><input type="radio" name="hepatitis" value="no" checked>
+                                No</label>
+                            <label class="check-item"><input type="radio" name="hepatitis" value="yes"> Yes</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Syphilis?</label>
+                        <div class="yn-group">
+                            <label class="check-item"><input type="radio" name="syphilis" value="no" checked> No</label>
+                            <label class="check-item"><input type="radio" name="syphilis" value="yes"> Yes</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Malaria (in the past 3 years)?</label>
+                        <div class="yn-group">
+                            <label class="check-item"><input type="radio" name="malaria" value="no" checked> No</label>
+                            <label class="check-item"><input type="radio" name="malaria" value="yes"> Yes</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Tuberculosis (TB)?</label>
+                        <div class="yn-group">
+                            <label class="check-item"><input type="radio" name="tb" value="no" checked> No</label>
+                            <label class="check-item"><input type="radio" name="tb" value="yes"> Yes</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Vaccinations & Travel</div>
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Recent vaccinations in past 4 weeks?</label>
+                        <div class="yn-group">
+                            <label class="check-item"><input type="radio" name="vaccine" value="no" checked> No</label>
+                            <label class="check-item"><input type="radio" name="vaccine" value="yes"> Yes</label>
+                        </div>
+                    </div>
+                    <div class="field" id="vaccineDetailWrap" style="display:none">
+                        <label>Vaccine name & date</label>
+                        <input type="text" id="vaccineDetail" placeholder="e.g. COVID-19 (Jan 2025)">
+                    </div>
+
+                    <div class="field">
+                        <label>Recent travel to malaria-endemic areas?</label>
+                        <div class="yn-group">
+                            <label class="check-item"><input type="radio" name="travel" value="no" checked> No</label>
+                            <label class="check-item"><input type="radio" name="travel" value="yes"> Yes</label>
+                        </div>
+                    </div>
+                    <div class="field" id="travelDetailWrap" style="display:none">
+                        <label>Country / region & travel date</label>
+                        <input type="text" id="travelDetail" placeholder="e.g. Sub-Saharan Africa, Dec 2024">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="specialCondCard">
+                <div class="card-title">Special Conditions (if applicable)</div>
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Currently pregnant?</label>
+                        <div class="yn-group">
+                            <label class="check-item"><input type="radio" name="pregnant" value="na" checked>
+                                N/A</label>
+                            <label class="check-item"><input type="radio" name="pregnant" value="no"> No</label>
+                            <label class="check-item"><input type="radio" name="pregnant" value="yes"> Yes</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Currently breastfeeding?</label>
+                        <div class="yn-group">
+                            <label class="check-item"><input type="radio" name="breastfeeding" value="na" checked>
+                                N/A</label>
+                            <label class="check-item"><input type="radio" name="breastfeeding" value="no"> No</label>
+                            <label class="check-item"><input type="radio" name="breastfeeding" value="yes"> Yes</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Last childbirth date (if applicable)</label>
+                        <input type="date" id="lastChildbirth">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Lifestyle & Risk Assessment</div>
+                <div class="confidential-box">
+                    🔒 The following questions are strictly confidential. This information is collected solely to
+                    protect the safety of blood recipients. Your answers will not affect your registration or be shared
+                    with anyone outside the medical team.
+                </div>
+                <div class="form-grid cols-1" style="gap:16px">
+                    <div class="field">
+                        <label>Have you used injectable drugs (non-prescribed) in the past 12 months?</label>
+                        <div class="yn-group">
+                            <label class="check-item"><input type="radio" name="drugs" value="no" checked> No</label>
+                            <label class="check-item"><input type="radio" name="drugs" value="yes"> Yes</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Have you engaged in high-risk sexual behavior in the past 12 months?</label>
+                        <div class="yn-group">
+                            <label class="check-item"><input type="radio" name="riskyBehavior" value="no" checked>
+                                No</label>
+                            <label class="check-item"><input type="radio" name="riskyBehavior" value="yes"> Yes</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Have you consumed heavy alcohol in the past 24–48 hours?</label>
+                        <div class="yn-group">
+                            <label class="check-item"><input type="radio" name="alcohol" value="no" checked> No</label>
+                            <label class="check-item"><input type="radio" name="alcohol" value="yes"> Yes</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="goToStep(2)">← Back</button>
+                <button class="btn btn-primary" onclick="goToStep(4)">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ===== STEP 4: CONSENT ===== -->
+        <div class="form-step" id="step4">
+            <div class="step-title">Declaration & Consent</div>
+            <div class="step-subtitle">Please read and agree to the following before submitting.</div>
+
+            <div class="card">
+                <div class="card-title">Consent Statements</div>
+
+                <label class="consent-item">
+                    <input type="checkbox" id="consent1">
+                    <p><strong>Truthfulness Declaration</strong>
+                        I confirm that all information provided in this form is true and accurate to the best of my
+                        knowledge. I understand that providing false information may disqualify me from donating.</p>
+                </label>
+
+                <label class="consent-item">
+                    <input type="checkbox" id="consent2">
+                    <p><strong>Donation Consent</strong>
+                        I voluntarily consent to donate blood and acknowledge that my blood will be subjected to
+                        mandatory medical testing including for infectious diseases such as HIV, Hepatitis B/C,
+                        Syphilis, and others.</p>
+                </label>
+
+                <label class="consent-item">
+                    <input type="checkbox" id="consent3">
+                    <p><strong>Data Privacy Consent</strong>
+                        I consent to my personal and medical information being stored securely for the purposes of blood
+                        donation management. My data will not be shared with third parties without my consent, except as
+                        required by law.</p>
+                </label>
+
+                <div class="field-error" id="err-consent" style="margin-top:8px">Please agree to all consent statements
+                    to proceed.</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Digital Signature</div>
+                <div class="signature-field">
+                    <input type="text" id="signature" placeholder="Type your full name as signature">
+                    <div class="sig-label">By typing your name above, you agree to the declarations and consent to blood
+                        donation.</div>
+                </div>
+                <div class="field-error" id="err-signature" style="margin-top:10px">Please enter your signature to
+                    complete the form.</div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="goToStep(3)">← Back</button>
+                <button class="btn btn-primary btn-submit" onclick="submitForm()">Submit & Verify Email ✉️</button>
+            </div>
+        </div>
+
+        <!-- ===== SUCCESS ===== -->
+        <div class="form-step" id="step-success">
+            <div class="success-icon">✓</div>
+            <h2>Registration Complete!</h2>
+            <p>Thank you for registering as a blood donor. Your details have been securely saved.<br>A confirmation has
+                been sent to your email.</p>
+            <div class="donor-id-box">
+                <small>Your Donor ID</small>
+                <strong id="donorIdDisplay"></strong>
+            </div>
+            <p style="color:var(--mid);font-size:0.85rem;max-width:440px;margin:0 auto">Our team will contact you with
+                upcoming blood donation camps near you. Your contribution can save up to 3 lives. 🩸</p>
+            <div style="margin-top:32px">
+                <button class="btn btn-secondary" onclick="location.reload()">Register Another Donor</button>
+            </div>
+        </div>
+
+    </main>
+    <footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <div class="logo-drop"></div>
+        LifeGive
+      </div>
+      <p>Connecting donors with those in need. Every drop counts — your donation can save up to 3 lives.</p>
+      <div class="footer-badges">
+        <span>🔒 Secure & Confidential</span>
+        <span>🏥 Medically Verified</span>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#">Register as Donor</a></li>
+        <li><a href="#">Find Donation Camp</a></li>
+        <li><a href="#">Check Eligibility</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#" onclick="openModal('about')">About Us</a></li>
+        <li><a href="#" onclick="openModal('privacy')">Privacy Policy</a></li>
+        <li><a href="#" onclick="openModal('terms')">Terms & Conditions</a></li>
+        <li><a href="#" onclick="openModal('disclaimer')">Medical Disclaimer</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li>📧 info@lifegive.org</li>
+        <li>📞 1800-XXX-XXXX</li>
+        <li>🕐 Mon–Sat, 9am–6pm</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2026 LifeGive Blood Donation. All rights reserved.</span>
+    <span>Made with ❤️ to save lives</span>
+  </div>
+</footer>
+
+<!-- ABOUT / PRIVACY MODALS -->
+<div class="modal-overlay" id="infoModal">
+  <div class="modal" style="max-width:600px;text-align:left;max-height:80vh;overflow-y:auto;">
+    <h2 id="infoModalTitle" style="font-family:'Playfair Display',serif;margin-bottom:16px;"></h2>
+    <div id="infoModalBody" style="font-size:0.9rem;line-height:1.8;color:#444;"></div>
+    <button class="btn btn-primary" style="margin-top:24px;width:100%;justify-content:center;" onclick="closeInfoModal()">Close</button>
+  </div>
+</div>
+
+    <script>
+        // ===== STATE =====
+        let currentStep = 1;
+        let generatedOTP = '';
+        let otpCountdownTimer = null;
+
+        // ===== STEP NAVIGATION =====
+        function goToStep(step) {
+            if (step > currentStep && !validateStep(currentStep)) return;
+
+            document.getElementById('step' + currentStep)?.classList.remove('active');
+            document.getElementById('step' + step)?.classList.add('active');
+
+            // Update progress
+            for (let i = 1; i <= 4; i++) {
+                const ps = document.getElementById('ps' + i);
+                if (!ps) continue;
+                ps.classList.remove('active', 'done');
+                if (i < step) ps.classList.add('done');
+                else if (i === step) ps.classList.add('active');
+            }
+
+            currentStep = step;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ===== VALIDATION =====
+        function showErr(id, show) {
+            const el = document.getElementById('err-' + id);
+            if (el) el.classList.toggle('show', show);
+        }
+
+        function markInvalid(id, invalid) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('invalid', invalid);
+        }
+
+        function validateStep(step) {
+            let valid = true;
+
+            if (step === 1) {
+                const name = document.getElementById('fullName').value.trim();
+                const dob = document.getElementById('dob').value;
+                const gender = document.getElementById('gender').value;
+                const phone = document.getElementById('phone').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const weight = parseFloat(document.getElementById('weight').value);
+
+                const nameOk = name.length >= 2;
+                showErr('fullName', !nameOk); markInvalid('fullName', !nameOk);
+                if (!nameOk) valid = false;
+
+                const dobOk = dob && window._ageOk;
+                showErr('dob', !dobOk); markInvalid('dob', !dobOk);
+                if (!dobOk) valid = false;
+
+                const genderOk = gender !== '';
+                showErr('gender', !genderOk); markInvalid('gender', !genderOk);
+                if (!genderOk) valid = false;
+
+                const phoneOk = /^[+\d\s\-]{7,15}$/.test(phone);
+                showErr('phone', !phoneOk); markInvalid('phone', !phoneOk);
+                if (!phoneOk) valid = false;
+
+                const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+                showErr('email', !emailOk); markInvalid('email', !emailOk);
+                if (!emailOk) valid = false;
+
+                const weightOk = !isNaN(weight) && weight >= 50;
+                showErr('weight', !weightOk); markInvalid('weight', !weightOk);
+                if (!weightOk) valid = false;
+            }
+
+            if (step === 2) {
+                const donated = document.querySelector('input[name="donated"]:checked')?.value;
+                if (donated === 'yes') {
+                    const lastDon = document.getElementById('lastDonation').value;
+                    const gap = lastDon ? Math.floor((new Date() - new Date(lastDon)) / 86400000) : 0;
+                    const gapOk = lastDon && gap >= 90;
+                    showErr('lastDonation', !gapOk); markInvalid('lastDonation', !gapOk);
+                    if (!gapOk) valid = false;
+                }
+            }
+
+            if (step === 4) {
+                const c1 = document.getElementById('consent1').checked;
+                const c2 = document.getElementById('consent2').checked;
+                const c3 = document.getElementById('consent3').checked;
+                const sig = document.getElementById('signature').value.trim();
+
+                const consentOk = c1 && c2 && c3;
+                showErr('consent', !consentOk);
+                if (!consentOk) valid = false;
+
+                const sigOk = sig.length >= 2;
+                showErr('signature', !sigOk); markInvalid('signature', !sigOk);
+                if (!sigOk) valid = false;
+            }
+
+            return valid;
+        }
+
+        // ===== AGE CALCULATION =====
+        window._ageOk = false;
+
+        function calcAge() {
+            const dob = document.getElementById('dob').value;
+            const badge = document.getElementById('ageBadge');
+            if (!dob) { badge.style.display = 'none'; return; }
+
+            const today = new Date();
+            const birthDate = new Date(dob);
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+
+            badge.style.display = 'inline-block';
+
+            if (age >= 18 && age <= 65) {
+                badge.textContent = `Age: ${age} years — ✓ Eligible`;
+                badge.className = 'age-badge ok';
+                window._ageOk = true;
+                showErr('dob', false);
+            } else {
+                badge.textContent = `Age: ${age} years — ✗ Must be 18–65`;
+                badge.className = 'age-badge fail';
+                window._ageOk = false;
+            }
+        }
+
+        // ===== DONATION GAP =====
+        function checkDonationGap() {
+            const lastDon = document.getElementById('lastDonation').value;
+            if (!lastDon) return;
+            const gap = Math.floor((new Date() - new Date(lastDon)) / 86400000);
+            const ok = gap >= 90;
+            showErr('lastDonation', !ok);
+            markInvalid('lastDonation', !ok);
+        }
+
+        // ===== DYNAMIC SHOW/HIDE =====
+        document.querySelectorAll('input[name="surgery"]').forEach(r => {
+            r.addEventListener('change', () => {
+                document.getElementById('surgeryDetailWrap').style.display = r.value === 'yes' ? 'block' : 'none';
+            });
+        });
+
+        document.querySelectorAll('input[name="donated"]').forEach(r => {
+            r.addEventListener('change', () => {
+                document.getElementById('lastDonationWrap').style.display = r.value === 'yes' ? 'block' : 'none';
+            });
+        });
+
+        document.querySelectorAll('input[name="vaccine"]').forEach(r => {
+            r.addEventListener('change', () => {
+                document.getElementById('vaccineDetailWrap').style.display = r.value === 'yes' ? 'block' : 'none';
+            });
+        });
+
+        document.querySelectorAll('input[name="travel"]').forEach(r => {
+            r.addEventListener('change', () => {
+                document.getElementById('travelDetailWrap').style.display = r.value === 'yes' ? 'block' : 'none';
+            });
+        });
+
+        // ===== OTP SYSTEM =====
+        function generateOTP() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').classList.add('show');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('show');
+        }
+
+        async function submitForm() {
+            if (!validateStep(4)) return;
+
+            const email = document.getElementById('email').value.trim();
+            generatedOTP = generateOTP();
+
+            showLoading('Sending verification code to ' + email + '...');
+
+            // Simulate OTP send (replace with real EmailJS or backend call)
+            try {
+                await emailjs.send("service_rtz3gos", "template_knuts6s", {
+                    to_email: email,
+                    otp_code: generatedOTP,
+                    donor_name: document.getElementById('fullName').value
+                });
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                alert('Email error: ' + JSON.stringify(error));
+                console.error('EmailJS error:', error);
+                return;
+            }
+
+            hideLoading();
+
+            // Show OTP in console for demo purposes
+            console.log('🔑 Demo OTP:', generatedOTP);
+
+
+
+            // Open modal
+            document.getElementById('otpEmail').textContent = email;
+            document.getElementById('otpModal').classList.add('open');
+            document.getElementById('otpError').classList.remove('show');
+            clearOTPInputs();
+
+            startResendCountdown(60);
+            setTimeout(() => document.querySelector('.otp-digit').focus(), 100);
+        }
+
+        function clearOTPInputs() {
+            document.querySelectorAll('.otp-digit').forEach(i => i.value = '');
+        }
+
+        function verifyOTP() {
+            const entered = Array.from(document.querySelectorAll('.otp-digit')).map(i => i.value).join('');
+            if (entered.length < 6) {
+                document.getElementById('otpError').textContent = '⚠️ Please enter all 6 digits.';
+                document.getElementById('otpError').classList.add('show');
+                return;
+            }
+            if (entered === generatedOTP) {
+                document.getElementById('otpModal').classList.remove('open');
+                saveAndShowSuccess();
+            } else {
+                document.getElementById('otpError').textContent = '❌ Incorrect code. Please try again.';
+                document.getElementById('otpError').classList.add('show');
+                clearOTPInputs();
+                document.querySelector('.otp-digit').focus();
+            }
+        }
+
+        function resendOTP() {
+            generatedOTP = generateOTP();
+            console.log('🔑 New Demo OTP:', generatedOTP);
+
+            const demoNote = document.createElement('div');
+            demoNote.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1A1A1A;color:white;padding:12px 20px;border-radius:12px;font-size:0.9rem;z-index:9999;font-family:monospace;';
+            demoNote.innerHTML = `🔑 New OTP: <strong>${generatedOTP}</strong>`;
+            document.body.appendChild(demoNote);
+            setTimeout(() => demoNote.remove(), 10000);
+
+            clearOTPInputs();
+            document.getElementById('otpError').classList.remove('show');
+            startResendCountdown(60);
+        }
+
+        function startResendCountdown(seconds) {
+            if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+            const el = document.getElementById('resendCountdown');
+            const link = document.querySelector('.otp-resend a');
+            link.style.pointerEvents = 'none';
+            link.style.opacity = '0.4';
+            let s = seconds;
+            el.textContent = `(${s}s)`;
+            otpCountdownTimer = setInterval(() => {
+                s--;
+                if (s <= 0) {
+                    clearInterval(otpCountdownTimer);
+                    el.textContent = '';
+                    link.style.pointerEvents = '';
+                    link.style.opacity = '';
+                } else {
+                    el.textContent = `(${s}s)`;
+                }
+            }, 1000);
+        }
+
+        // OTP digit auto-advance
+        document.querySelectorAll('.otp-digit').forEach((input, index, inputs) => {
+            input.addEventListener('input', () => {
+                input.value = input.value.replace(/\D/, '');
+                if (input.value && index < inputs.length - 1) inputs[index + 1].focus();
+            });
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Backspace' && !input.value && index > 0) inputs[index - 1].focus();
+                if (e.key === 'Enter') verifyOTP();
+            });
+        });
+
+        // Close modal on overlay click
+        document.getElementById('otpModal').addEventListener('click', function (e) {
+            if (e.target === this) this.classList.remove('open');
+        });
+
+        // ===== SUCCESS =====
+        function generateDonorID() {
+            const prefix = 'LG';
+            const year = new Date().getFullYear().toString().slice(2);
+            const rand = Math.random().toString(36).substring(2, 8).toUpperCase();
+            return `${prefix}${year}-${rand}`;
+        }
+
+        function saveAndShowSuccess() {
+            const formData = {
+                donorId: generateDonorID(),
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                dob: document.getElementById('dob').value,
+                gender: document.getElementById('gender').value,
+                bloodGroup: document.getElementById('bloodGroup').value,
+                weight: document.getElementById('weight').value,
+                address: document.getElementById('address').value,
+                registeredAt: new Date().toISOString()
+            };
+
+            // Show success immediately — don't wait for sheet
+            hideLoading();
+            document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+            document.querySelector('.progress-wrap').style.display = 'none';
+            document.getElementById('step-success').classList.add('active');
+            document.getElementById('donorIdDisplay').textContent = formData.donorId;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Save to sheet silently in background
+            fetch("https://script.google.com/macros/s/AKfycbyhUD43nF2fL0NKAX0QYg9ITpb5ra3Win0-RpWUOlJkE5ssGe8jiLKmg5watqGfrOJLUw/exec", {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            }).catch(err => console.log('Sheet save error:', err));
+        }
+        // ===== REAL EMAIL INTEGRATION GUIDE =====
+
+        //   To enable real OTP emails, integrate EmailJS:
+
+        //   1. Include in <head>:
+        //      <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js   emailjs.init("YOUR_PUBLIC_KEY");
+
+
+
+    </script>
+</body>
+
+</html>
