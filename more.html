@@ -1,190 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR NETWORK HOUSE |ALL PROJECTS</title>
-    <style>
-        :root {
-            --primary-color: #2563eb;
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --transition: all 0.3s ease;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AR NETWORK HOUSE | ALL PROJECTS</title>
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+<style>
+:root{
+    --primary:#2563eb;
+    --dark:#0f172a;
+    --light:#f1f5f9;
+    --card:#ffffff;
+    --radius:14px;
+    --transition:0.3s ease;
+}
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
 
-        /* Header & Logo */
-        header {
-            background: var(--card-bg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+body{
+    display:flex;
+    background:linear-gradient(135deg,#e0f2fe,#f8fafc);
+    min-height:100vh;
+}
 
-        .logo-container img {
-            max-height: 80px;
-            width: auto;
-            border-radius: 8px;
-            transition: var(--transition);
-        }
+/* SIDEBAR */
+.sidebar{
+    width:240px;
+    background:var(--dark);
+    color:white;
+    padding:2rem 1rem;
+    position:fixed;
+    height:100%;
+}
 
-        .logo-container img:hover {
-            transform: scale(1.05);
-        }
+.sidebar h2{
+    text-align:center;
+    margin-bottom:2rem;
+    font-size:1.2rem;
+    letter-spacing:2px;
+}
 
-        /* Main Content */
-        main {
-            flex: 1;
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
-            width: 100%;
-        }
+.sidebar a{
+    display:block;
+    color:#cbd5e1;
+    text-decoration:none;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:10px;
+    transition:var(--transition);
+}
 
-        section {
-            margin-bottom: 3rem;
-        }
+.sidebar a:hover{
+    background:var(--primary);
+    color:white;
+    transform:translateX(5px);
+}
 
-        h2 {
-            font-size: 1.25rem;
-            letter-spacing: 0.1rem;
-            color: var(--text-muted);
-            margin-bottom: 1.5rem;
-            border-left: 4px solid var(--primary-color);
-            padding-left: 1rem;
-            text-transform: uppercase;
-        }
+/* STATIC HOME BUTTON */
+.home-btn{
+    position:fixed;
+    bottom:20px;
+    left:20px;
+    background:var(--primary);
+    color:white;
+    padding:12px 20px;
+    border-radius:50px;
+    text-decoration:none;
+    font-weight:bold;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
+    transition:var(--transition);
+}
 
-        /* Grid Layout */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
+.home-btn:hover{
+    background:#1d4ed8;
+    transform:scale(1.05);
+}
 
-        /* Card Component */
-        .app-card {
-            background: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            text-decoration: none;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-weight: 700;
-            letter-spacing: 0.05rem;
-            transition: var(--transition);
-            border: 1px solid rgba(0,0,0,0.05);
-            min-height: 80px;
-        }
+/* MAIN CONTENT */
+.main{
+    margin-left:260px;
+    padding:2rem;
+    width:100%;
+}
 
-        .app-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
+header{
+    text-align:center;
+    margin-bottom:2rem;
+}
 
-        .app-card:active {
-            transform: scale(0.98);
-        }
+header img{
+    max-height:90px;
+    border-radius:10px;
+    margin-bottom:1rem;
+}
 
-        /* Footer */
-        footer {
-            background: #ffffff;
-            padding: 2rem;
-            text-align: center;
-            border-top: 1px solid #e2e8f0;
-            margin-top: auto;
-        }
+header h1{
+    font-size:2rem;
+    color:#1e293b;
+}
 
-        footer a {
-            text-decoration: none;
-            color: inherit;
-            font-weight: 600;
-            transition: var(--transition);
-        }
+/* SECTION */
+section{
+    margin-bottom:3rem;
+}
 
-        footer a:hover {
-            color: var(--primary-color);
-        }
+section h3{
+    margin-bottom:1rem;
+    border-left:5px solid var(--primary);
+    padding-left:10px;
+    color:#334155;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
 
-        /* Responsive Adjustments */
-        @media (max-width: 640px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-            .logo-container img {
-                max-height: 60px;
-            }
-        }
-    </style>
+/* GRID */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:1.5rem;
+}
+
+/* CARD */
+.card{
+    background:var(--card);
+    padding:1.5rem;
+    border-radius:var(--radius);
+    text-align:center;
+    font-weight:bold;
+    text-decoration:none;
+    color:#1e293b;
+    box-shadow:0 6px 15px rgba(0,0,0,0.08);
+    transition:var(--transition);
+}
+
+.card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 15px 25px rgba(0,0,0,0.15);
+    color:var(--primary);
+}
+
+footer{
+    text-align:center;
+    margin-top:3rem;
+    padding-top:2rem;
+    border-top:1px solid #cbd5e1;
+    color:#64748b;
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+    .sidebar{
+        width:180px;
+    }
+    .main{
+        margin-left:190px;
+    }
+}
+
+@media(max-width:600px){
+    .sidebar{
+        position:relative;
+        width:100%;
+        height:auto;
+    }
+    .main{
+        margin-left:0;
+    }
+    .home-btn{
+        left:auto;
+        right:20px;
+    }
+}
+</style>
 </head>
+
 <body>
 
-    <header>
-        
-        <div class="logo-container">
-            <img src="https://github.com/arnetworkhouse-oss/ar-network-house/blob/main/ar%20logo.jpg?raw=true" alt="AR NETWORK HOUSE Logo">
-        </div>
-        <h1>AR NETWORK HOUSE</h1>
-    </header>
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>LIBRARY</h2>
+    <a href="#education">Education Sector</a>
+    <a href="#games">Games Sector</a>
+    <a href="#tools">Tools Sector</a>
+</div>
 
-    <main>
-        <section>
-            <h2>Education Sector</h2>
-            <div class="grid">
-                <a href="https://duyare-physics.github.io/turbo/home.html" class="app-card" target="_blank">DUYARE PHYSICS</a>
-                <a href="https://arnetworkhouse-oss.github.io/Solar-System/" class="app-card" target="_blank">SOLAR SYSTEM</a>
-            </div>
-        </section>
+<!-- HOME BUTTON -->
+<!-- <a href="home.html" class="home-btn">🏠 Home</a> -->
 
-        <section>
-            <h2>Games Sector</h2>
-            <div class="grid">
-                <a href="https://arnetworkhouse-oss.github.io/aura/" class="app-card" target="_blank">AURA GAME</a>
-                <a href="https://arnetworkhouse-oss.github.io/snake-game/" class="app-card" target="_blank">SNAKE GAME</a>
-                <a href="https://arnetworkhouse-oss.github.io/tic_tac_toe/" class="app-card" target="_blank">TIC TAC TOE</a>
-                <a href="https://arnetworkhouse-oss.github.io/ar-network-house/poke_match.html" class="app-card" target="_blank">POKE MATCH</a>
-            </div>
-        </section>
+<!-- MAIN -->
+<div class="main">
 
-        <section>
-            <h2>Tools Sector</h2>
-            <div class="grid">
-                <a href="https://arnetworkhouse-oss.github.io/ar-network-house/weather.html" class="app-card" target="_blank">INDRODOOT (WEATHER TOOL)</a>
-            </div>
-        </section>
-    </main>
+<header>
+    <img src="https://github.com/arnetworkhouse-oss/ar-network-house/blob/main/ar%20logo.jpg?raw=true">
+    <h1>AR NETWORK HOUSE</h1>
+</header>
 
-    <footer>
-        <p>&copy; 2026 <a href="https://arnetworkhouse.in/">AR NETWORK HOUSE</a></p>
-    </footer>
+<section id="education">
+    <h3>Education Sector</h3>
+    <div class="grid">
+        <a href="https://duyare-physics.github.io/turbo/home.html" target="_blank" class="card">DUYARE PHYSICS</a>
+        <a href="https://arnetworkhouse-oss.github.io/Solar-System/" target="_blank" class="card">SOLAR SYSTEM</a>
+    </div>
+</section>
+
+<section id="games">
+    <h3>Games Sector</h3>
+    <div class="grid">
+        <a href="https://arnetworkhouse-oss.github.io/aura/" target="_blank" class="card">AURA GAME</a>
+        <a href="https://arnetworkhouse-oss.github.io/snake-game/" target="_blank" class="card">SNAKE GAME</a>
+        <a href="https://arnetworkhouse-oss.github.io/tic_tac_toe/" target="_blank" class="card">TIC TAC TOE</a>
+        <a href="https://arnetworkhouse-oss.github.io/ar-network-house/poke_match.html" target="_blank" class="card">POKE MATCH</a>
+    </div>
+</section>
+
+<section id="tools">
+    <h3>Tools Sector</h3>
+    <div class="grid">
+        <a href="https://arnetworkhouse-oss.github.io/ar-network-house/weather.html" target="_blank" class="card">INDRODOOT (WEATHER TOOL)</a>
+        <a href="https://arnetworkhouse-oss.github.io/ar-network-house/QR_code_generetor.html" target="_blank" class="card">QR CODE GENERATOR </a>
+        <a href="https://arnetworkhouse-oss.github.io/ar-network-house/code_compiler.html" target="_blank" class="card">CODE COMPILER</a>
+    </div>
+</section>
+
+<footer>
+    © 2026 <a href="https://arnetworkhouse.in/"> AR NETWORK HOUSE</a>
+</footer>
+
+</div>
 
 </body>
 </html>
