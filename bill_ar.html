@@ -290,12 +290,76 @@
             border-radius: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
+
+  .watermark-main img, 
+.watermark-corner img {
+    width: 100%;
+    height: auto;
+    display: block;
+   
+}
+
+/* Central Big Watermark */
+.watermark-main {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px; /* Large size for the middle */
+    opacity: 0.025; /* Very faint so text is readable */
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Corner Watermarks */
+.watermark-corner {
+    position: absolute;
+    width: 120px; /* Smaller size for corners */
+    opacity: 0.28; /* Slightly darker than the middle one */
+    pointer-events: none;
+    z-index: -1;
+}
+
+.top-right {
+    top: 10px;
+    right: 10px;
+}
+
+.bottom-left {
+    bottom: 70px; /* Placed above the footer area */
+    left: 10px;
+}
+
+/* Dark Mode Adjustment */
+.dark .watermark-main, 
+.dark .watermark-corner {
+    opacity: 0.03;
+}
+/* Ensure the card container stays as the reference */
+#invoiceCard {
+    position: relative;
+    z-index: 1; /* Creates a new stacking context */
+    overflow: hidden; /* Keeps the big watermark inside the card edges */
+}
     </style>
 </head>
 
 <body>
     <div class="wrap">
-        <div class="card" id="invoiceCard">
+        
+          <div class="card" id="invoiceCard">
+    <div class="watermark-main">
+        <img src="https://raw.githubusercontent.com/arnetworkhouse-oss/ar-network-house/main/ar_no_bg.png">
+    </div>
+
+    <div class="watermark-corner top-right">
+        <img src="https://raw.githubusercontent.com/arnetworkhouse-oss/ar-network-house/main/design_top.png">
+    </div>
+    <div class="watermark-corner bottom-left">
+        <img src="https://raw.githubusercontent.com/arnetworkhouse-oss/ar-network-house/main/design_bottom.png">
+    </div>
+    
+        ...
             <header>
                 <div class="brand">
                     <div class="logo" id="logoHolder">
@@ -425,7 +489,9 @@
             </div>
 
             <footer style="margin-top:18px; text-align:center">
+                <hr color="orange">
                 <p>Thank you very much for trusting AR NETWORK HOUSE!</p>
+                <hr style="border:  1px solid #90ee90;">
             </footer>
         </div>
 
@@ -605,7 +671,7 @@
                 });
 
                 const msg = document.getElementById("syncMsg"); 
-                msg.innerText = "✔ Data Secured In Our Database";
+                msg.innerText = "✔ Data Secured In Sheet";
                 msg.style.display = "block";
                 setTimeout(() => msg.style.display = "none", 2000);
             } catch (e) { console.error("Sync Error:", e); }
@@ -642,7 +708,7 @@
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jspdf.jsPDF('p', 'pt', 'a4');
             pdf.addImage(imgData, 'PNG', 0, 0, 595, (canvas.height * 595) / canvas.width);
-            pdf.save(`${invId}.pdf`);
+            pdf.save(`invoice_${invId}_${clientName}.pdf`);
             document.body.classList.remove('for-pdf');
             btn.innerText = "Download PDF";
         });
