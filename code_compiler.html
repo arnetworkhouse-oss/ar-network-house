@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AR Online Compiler</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Segoe UI,sans-serif}
+
+/* 🔑 Allow document-level scrolling */
+html,body{
+  height:100%;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+body{
+  display:flex;
+  flex-direction:column;
+  background:#1e1e1e;
+  color:#fff;
+}
+
+header{
+  background:#252526;
+  padding:10px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid #333;
+}
+
+.logo{font-weight:bold;color:#4ec9b0}
+.controls select,.controls button{padding:8px 12px;border-radius:4px;border:none}
+#run-btn{background:#28a745;color:#fff;font-weight:bold;cursor:pointer}
+
+/* 🔑 main is now scroll-aware */
+main{
+  flex:1;
+  display:flex;
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+
+.editor-container{flex:1;border-right:2px solid #333}
+
+.output-container{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  background:#000;
+}
+
+.output-header{
+  background:#333;
+  padding:6px 15px;
+  font-size:13px;
+  color:#aaa;
+}
+
+.output-area{
+  flex:1;
+  padding:15px;
+  font-family:Consolas,monospace;
+  color:#0f0;
+  white-space:pre-wrap;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+#stdin-input{
+  height:90px;
+  width:100%;
+  background:#111;
+  color:#fff;
+  border:none;
+  padding:10px;
+  font-family:Consolas,monospace;
+}
+
+#web-preview{display:none;width:100%;height:100%;border:none;background:#fff}
+
+footer{
+  background:#252526;
+  padding:10px;
+  text-align:center;
+  border-top:1px solid #333;
+}
+
+footer a{color:#3794ff;text-decoration:none}
+
+/* CodeMirror stability */
+.CodeMirror{
+  height:100%!important;
+  font-size:15px;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* 📱 Mobile-specific behavior */
+@media(max-width:768px){
+  main{
+    flex-direction:column;
+  }
+  .editor-container{
+    border-right:none;
+    border-bottom:2px solid #333;
+    min-height:45vh;
+  }
+  .CodeMirror{
+    font-size:14px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">AR NETWORK HOUSE – IDE</div>
+  <div class="controls">
+    <select id="language-select">
+      <option value="html">HTML / CSS / JS</option>
+      <option value="50">C (GCC)</option>
+      <option value="54">C++ (GCC)</option>
+      <option value="71">Python</option>
+      <option value="62">Java</option>
+      <option value="63">JavaScript (Node.js)</option>
+    </select>
+    <button id="run-btn">RUN CODE</button>
+  </div>
+</header>
+
+<main>
+  <div class="editor-container">
+    <textarea id="code-editor"></textarea>
+  </div>
+
+  <div class="output-container">
+    <div class="output-header">INPUT SECTION</div>
+    <textarea id="stdin-input" placeholder="value 1
+value 2
+value 3
+(press ENTER after each value)"></textarea>
+
+    <div class="output-header">OUTPUT / CONSOLE</div>
+    <div id="console-output" class="output-area">Ready...</div>
+
+    <iframe id="web-preview"></iframe>
+  </div>
+</main>
+
+<footer>
+<p>Site maintained by <a href="https://arnetworkhouse.in/" target="_blank" style="color:#78d7ff;text-decoration:underline;">AR NETWORK HOUSE</a> |</p>
+<p>| <a href="https://arnetworkhouse-oss.github.io/ar-network-house/more.html" target="_blank" style="color:#78d7ff;text-decoration:underline;">MORE GAMES</a> |
+<a href="https://arnetworkhouse-oss.github.io/ar-network-house/feedback_game.html" target="_blank" style="color:#78d7ff;text-decoration:underline;">RATE US</a> |</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+
+<script>
+const JUDGE0_ENDPOINT = "https://ce.judge0.com/submissions?wait=true";
+
+const editor = CodeMirror.fromTextArea(
+  document.getElementById("code-editor"), {
+    lineNumbers:true,
+    theme:"dracula",
+    mode:"text/x-csrc",
+    lineWrapping:true,
+    viewportMargin:Infinity,
+    inputStyle:"textarea"
+});
+
+const modeMap={
+  html:"xml",
+  50:"text/x-csrc",
+  54:"text/x-c++src",
+  71:"python",
+  62:"text/x-java",
+  63:"javascript"
+};
+
+document.getElementById("language-select").addEventListener("change",e=>{
+  editor.setOption("mode",modeMap[e.target.value]||"javascript");
+});
+
+document.getElementById("run-btn").addEventListener("click",async()=>{
+  const lang=document.getElementById("language-select").value;
+  const code=editor.getValue();
+  const stdin=document.getElementById("stdin-input").value;
+  const out=document.getElementById("console-output");
+  const iframe=document.getElementById("web-preview");
+
+  if(lang==="html"){
+    iframe.style.display="block";
+    out.style.display="none";
+    iframe.srcdoc=code;
+    return;
+  }
+
+  iframe.style.display="none";
+  out.style.display="block";
+  out.textContent="Executing…";
+
+  try{
+    const res=await fetch(JUDGE0_ENDPOINT,{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({
+        language_id:Number(lang),
+        source_code:code,
+        stdin:stdin
+      })
+    });
+
+    const data=await res.json();
+
+    if(data.stdout){
+      const stdinLines=stdin.split(/\r?\n/).filter(v=>v.trim()!=="");
+      let i=0;
+      out.textContent=data.stdout
+        .split(/\r?\n/)
+        .map(line=>{
+          if(line.trim().endsWith(":")&&stdinLines[i]!==undefined){
+            return line+" "+stdinLines[i++];
+          }
+          return line;
+        }).join("\n");
+    }else if(data.stderr){
+      out.textContent=data.stderr;
+    }else if(data.compile_output){
+      out.textContent=data.compile_output;
+    }else{
+      out.textContent="No output returned.";
+    }
+  }catch{
+    out.textContent="Execution failed: Compiler unavailable.";
+  }
+});
+</script>
+
+</body>
+</html>

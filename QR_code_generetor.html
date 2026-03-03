@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QRify | Enterprise QR Studio</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+body { background:#020617; color:#f1f5f9; font-family:Inter,sans-serif }
+.glass { background:rgba(30,41,59,.7); backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,.08) }
+.neon { color:#22d3ee; text-shadow:0 0 14px rgba(34,211,238,.55) }
+.active { background:#1e293b; border-color:#22d3ee; color:#22d3ee }
+input:focus, textarea:focus { border-color:#22d3ee; box-shadow:0 0 18px rgba(34,211,238,.25) }
+.global-footer {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+</style>
+</head>
+
+<body class="min-h-screen p-6 md:p-12">
+
+<header class="text-center mb-12">
+<h1 class="text-5xl font-black neon uppercase italic tracking-tight">
+QRify Pro
+</h1>
+<p class="text-slate-500 mt-2">
+Universal QR Automation Platform
+</p>
+</header>
+
+<main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+<!-- SIDEBAR -->
+<nav class="lg:col-span-3 space-y-2">
+<button onclick="switchMode('text')" id="btn-text" class="w-full p-4 glass rounded-xl text-left active border">📝 Normal Text</button>
+<button onclick="switchMode('file')" id="btn-file" class="w-full p-4 glass rounded-xl text-left border">📄 PDF / Image / Music / File</button>
+<button onclick="switchMode('whatsapp')" id="btn-whatsapp" class="w-full p-4 glass rounded-xl text-left border">💬 WhatsApp</button>
+<button onclick="switchMode('facebook')" id="btn-facebook" class="w-full p-4 glass rounded-xl text-left border">📘 Facebook</button>
+<button onclick="switchMode('instagram')" id="btn-instagram" class="w-full p-4 glass rounded-xl text-left border">📸 Instagram</button>
+<button onclick="switchMode('linkedin')" id="btn-linkedin" class="w-full p-4 glass rounded-xl text-left border">💼 LinkedIn</button>
+<button onclick="switchMode('url')" id="btn-url" class="w-full p-4 glass rounded-xl text-left border">🔗 Website URL</button>
+<button onclick="switchMode('wifi')" id="btn-wifi" class="w-full p-4 glass rounded-xl text-left border">📶 Wi-Fi</button>
+</nav>
+
+<!-- INPUT PANEL -->
+<section class="lg:col-span-5 glass p-8 rounded-3xl">
+<h2 id="title" class="text-2xl font-bold mb-6">NORMAL TEXT QR</h2>
+
+<!-- TEXT -->
+<div id="panel-text">
+<textarea id="textInput" rows="5" placeholder="Type any text here..."
+class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl outline-none resize-none"></textarea>
+</div>
+
+<!-- FILE -->
+<div id="panel-file" class="hidden space-y-4">
+<p class="text-sm text-slate-400 leading-relaxed">
+Please upload your file (PDF, image, audio, or any document) to <strong>Google Drive</strong>,
+set the file access to <strong>Public / Anyone with the link</strong>,
+and paste the shareable link below.
+</p>
+<input id="fileLink" placeholder="Paste public Google Drive link here"
+class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl outline-none">
+</div>
+
+<!-- WHATSAPP -->
+<div id="panel-whatsapp" class="hidden">
+<input id="wa" type="tel" placeholder="CountryCode + Number"
+class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl outline-none">
+</div>
+
+<!-- FACEBOOK -->
+<div id="panel-facebook" class="hidden">
+<input id="fb" placeholder="Facebook Username"
+class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl outline-none">
+</div>
+
+<!-- INSTAGRAM -->
+<div id="panel-instagram" class="hidden">
+<input id="ig" placeholder="Instagram Username"
+class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl outline-none">
+</div>
+
+<!-- LINKEDIN -->
+<div id="panel-linkedin" class="hidden">
+<input id="li" placeholder="LinkedIn Username"
+class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl outline-none">
+</div>
+
+<!-- URL -->
+<div id="panel-url" class="hidden">
+<input id="url" placeholder="https://example.com"
+class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl outline-none">
+</div>
+
+<!-- WIFI -->
+<div id="panel-wifi" class="hidden space-y-4">
+<input id="ssid" placeholder="WiFi Name"
+class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl outline-none">
+<input id="pass" type="password" placeholder="Password"
+class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl outline-none">
+</div>
+
+<button onclick="generateQR()"
+class="w-full mt-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 font-black rounded-xl uppercase tracking-wider shadow-lg hover:opacity-90">
+Generate QR
+</button>
+</section>
+
+<!-- QR OUTPUT -->
+<section class="lg:col-span-4 glass p-8 rounded-3xl flex flex-col items-center">
+<div id="qrcode" class="bg-white p-4 rounded-xl shadow-2xl mb-6"></div>
+<p id="status" class="text-xs text-slate-500 uppercase tracking-widest mb-6">
+Awaiting Input
+</p>
+<button onclick="downloadQR()"
+class="w-full py-3 border border-slate-600 rounded-xl hover:bg-slate-800 font-bold">
+Download PNG
+</button>
+</section>
+
+</main>
+
+<script>
+let mode = 'text'
+
+const qr = new QRCode(document.getElementById("qrcode"), {
+text:"QRify",
+width:220,
+height:220,
+correctLevel:QRCode.CorrectLevel.H
+})
+
+function switchMode(m){
+mode=m
+document.querySelectorAll('[id^=panel]').forEach(p=>p.classList.add('hidden'))
+document.querySelectorAll('[id^=btn]').forEach(b=>b.classList.remove('active'))
+document.getElementById(`panel-${m}`).classList.remove('hidden')
+document.getElementById(`btn-${m}`).classList.add('active')
+document.getElementById('title').innerText = m.toUpperCase()+" QR"
+}
+
+function generateQR(){
+let data=""
+if(mode==='text') data=textInput.value
+if(mode==='file') data=fileLink.value
+if(mode==='whatsapp') data=`https://wa.me/${wa.value}`
+if(mode==='facebook') data=`https://facebook.com/${fb.value}`
+if(mode==='instagram') data=`https://instagram.com/${ig.value}`
+if(mode==='linkedin') data=`https://linkedin.com/in/${li.value}`
+if(mode==='url') data=url.value
+if(mode==='wifi') data=`WIFI:T:WPA;S:${ssid.value};P:${pass.value};;`
+
+if(!data) return alert("Input is required")
+
+qr.makeCode(data)
+status.innerText="QR Code Generated Successfully"
+}
+
+function downloadQR(){
+const img=document.querySelector('#qrcode img')
+if(!img) return
+const a=document.createElement('a')
+a.href=img.src
+a.download='QRify.png'
+a.click()
+}
+</script>
+<footer class="global-footer">
+        <p>Site maintained by <a href="https://arnetworkhouse.in/" target="_blank" style="color:#78d7ff;text-decoration:underline;">AR NETWORK HOUSE</a> |</p>
+        <p>|  <a href="https://arnetworkhouse-oss.github.io/ar-network-house/more.html" target="_blank" style="color:#78d7ff;text-decoration:underline;">MORE GAMES </a>  | <a href="https://arnetworkhouse-oss.github.io/ar-network-house/feedback_game.html" target="_blank" style="color:#78d7ff;text-decoration:underline;">RATE US</a>  |</p>
+        </footer>
+
+</body>
+</html>
