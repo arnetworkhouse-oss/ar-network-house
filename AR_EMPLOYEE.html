@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AR Network House — Employee Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:       #080f1e;
+  --navy-mid:   #0c1a35;
+  --navy-card:  rgba(10,20,45,0.75);
+  --sky:        #0ea5e9;
+  --sky-bright: #38bdf8;
+  --sky-pale:   #bae6fd;
+  --accent:     #06d6a0;
+  --gold:       #f59e0b;
+  --purple:     #818cf8;
+  --danger:     #f43f5e;
+  --white:      #ffffff;
+  --text-muted: rgba(255,255,255,0.45);
+  --text-dim:   rgba(255,255,255,0.65);
+  --border:     rgba(255,255,255,0.09);
+  --border-sky: rgba(14,165,233,0.3);
+  --glow-sky:   rgba(14,165,233,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Outfit',sans-serif;background:var(--navy);color:var(--white);min-height:100vh;overflow-x:hidden;}
+
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 55% at 5% 15%, rgba(14,165,233,0.16) 0%,transparent 65%),
+    radial-gradient(ellipse 55% 45% at 95% 85%,rgba(6,214,160,0.09) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 35% at 80% 10%,rgba(129,140,248,0.07) 0%,transparent 55%),
+    linear-gradient(170deg,#080f1e 0%,#0c1a35 55%,#06101f 100%);}
+.bg::after{content:'';position:absolute;inset:0;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 47px,rgba(14,165,233,0.03) 48px),
+    repeating-linear-gradient(90deg,transparent,transparent 47px,rgba(14,165,233,0.03) 48px);}
+
+.page{position:relative;z-index:1;}
+.hidden{display:none!important;}
+
+/* LOADER */
+.loader-overlay{position:fixed;inset:0;z-index:9999;background:rgba(8,15,30,0.92);
+  display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;
+  backdrop-filter:blur(10px);}
+.loader-ring{width:64px;height:64px;border:3px solid rgba(14,165,233,0.18);
+  border-top:3px solid var(--sky);border-radius:50%;animation:spin 0.75s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loader-label{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--sky-pale);}
+
+/* LOGIN */
+#loginPage{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-wrap{display:flex;max-width:860px;width:100%;border-radius:22px;overflow:hidden;
+  box-shadow:0 40px 100px rgba(0,0,0,0.55),0 0 0 1px var(--border);
+  animation:fadeUp 0.55s cubic-bezier(.22,1,.36,1) both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
+
+.login-panel{width:280px;flex-shrink:0;
+  background:linear-gradient(145deg,#0d6fa8 0%,#0a4a80 40%,#071d3b 100%);
+  padding:48px 32px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;position:relative;overflow:hidden;}
+.login-panel::before{content:'';position:absolute;width:260px;height:260px;
+  background:rgba(255,255,255,0.05);border-radius:50%;top:-80px;left:-80px;}
+.login-panel::after{content:'';position:absolute;width:180px;height:180px;
+  background:rgba(255,255,255,0.04);border-radius:50%;bottom:-60px;right:-60px;}
+.panel-logo{width:84px;height:84px;border-radius:50%;object-fit:cover;
+  border:3px solid rgba(255,255,255,0.25);box-shadow:0 8px 28px rgba(0,0,0,0.35);
+  margin-bottom:18px;position:relative;z-index:1;}
+.panel-title{font-size:20px;font-weight:800;position:relative;z-index:1;line-height:1.2;}
+.panel-sub{font-size:12px;opacity:0.7;margin-top:8px;line-height:1.6;position:relative;z-index:1;}
+.panel-chip{margin-top:24px;padding:6px 18px;background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.18);border-radius:100px;font-size:11px;
+  font-weight:700;letter-spacing:0.8px;text-transform:uppercase;position:relative;
+  z-index:1;display:flex;align-items:center;gap:6px;}
+
+.login-form{flex:1;padding:48px 40px;background:rgba(8,15,30,0.96);
+  display:flex;flex-direction:column;justify-content:center;}
+.form-title{font-size:22px;font-weight:700;margin-bottom:4px;}
+.form-hint{font-size:13px;color:var(--text-dim);margin-bottom:30px;}
+
+.field{margin-bottom:16px;}
+.field-lbl{display:block;font-size:11px;font-weight:700;letter-spacing:0.7px;
+  text-transform:uppercase;color:var(--sky-pale);margin-bottom:7px;}
+.field-inp{width:100%;padding:12px 15px;background:rgba(255,255,255,0.05);
+  border:1px solid var(--border);border-radius:10px;color:var(--white);
+  font-family:'Outfit',sans-serif;font-size:14px;outline:none;
+  transition:border .2s,background .2s;}
+.field-inp:focus{border-color:var(--sky);background:var(--glow-sky);}
+.field-inp::placeholder{color:var(--text-muted);}
+
+.pass-row{display:flex;gap:8px;}
+.pass-row .field-inp{flex:1;}
+.eye-btn{width:44px;flex-shrink:0;background:rgba(255,255,255,0.05);
+  border:1px solid var(--border);border-radius:10px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.eye-btn:hover{background:var(--glow-sky);border-color:var(--border-sky);}
+.eye-btn svg{width:18px;height:18px;stroke:var(--sky-pale);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* Error box */
+.err-box{display:none;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.3);
+  border-radius:10px;padding:11px 15px;margin-bottom:14px;font-size:13px;color:#fb7185;}
+
+.btn-login{width:100%;padding:13px;margin-top:8px;
+  background:linear-gradient(135deg,var(--sky) 0%,#0369a1 100%);
+  border:none;border-radius:10px;color:#fff;font-family:'Outfit',sans-serif;
+  font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.2px;
+  box-shadow:0 4px 20px rgba(14,165,233,0.3);
+  transition:transform .15s,box-shadow .15s;display:flex;align-items:center;
+  justify-content:center;gap:8px;}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(14,165,233,0.42);}
+.btn-login:active{transform:scale(0.99);}
+.btn-login:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+.btn-login svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+.forgot{text-align:center;margin-top:14px;font-size:13px;color:var(--text-dim);}
+.forgot a{color:var(--sky-bright);text-decoration:none;}
+.forgot a:hover{text-decoration:underline;}
+
+/* DASHBOARD */
+#dashPage{min-height:100vh;padding-bottom:48px;}
+.topnav{background:rgba(8,15,30,0.88);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);height:62px;padding:0 26px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;}
+.nav-brand{display:flex;align-items:center;gap:11px;}
+.nav-logo{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--sky);}
+.nav-co{font-size:15px;font-weight:800;letter-spacing:-.3px;}
+.nav-tag{font-size:11px;color:var(--sky);font-weight:500;}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.nav-clock{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);
+  background:rgba(255,255,255,0.04);padding:5px 11px;border-radius:6px;border:1px solid var(--border);}
+.btn-logout{display:flex;align-items:center;gap:7px;padding:7px 16px;
+  background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.28);
+  border-radius:8px;color:#fb7185;font-family:'Outfit',sans-serif;
+  font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-logout:hover{background:rgba(244,63,94,0.2);}
+.btn-logout svg{width:15px;height:15px;stroke:#fb7185;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+.dash{max-width:1080px;margin:0 auto;padding:28px 22px;}
+
+/* Hero — bigger profile picture */
+.hero{background:linear-gradient(135deg,rgba(14,165,233,0.13) 0%,rgba(10,20,45,0.5) 50%,rgba(6,214,160,0.06) 100%);
+  border:1px solid var(--border-sky);border-radius:20px;padding:32px 36px;
+  display:flex;align-items:center;gap:30px;margin-bottom:22px;
+  animation:fadeUp .5s ease both;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;width:220px;height:220px;
+  background:radial-gradient(circle,rgba(14,165,233,0.1) 0%,transparent 70%);
+  right:60px;top:-60px;pointer-events:none;}
+.hero-av-wrap{position:relative;flex-shrink:0;}
+
+/* ── BIGGER AVATAR ── */
+.hero-av{width:120px;height:120px;border-radius:50%;object-fit:cover;
+  border:4px solid var(--sky);box-shadow:0 0 0 7px rgba(14,165,233,0.16),0 12px 36px rgba(0,0,0,0.45);}
+.av-init{width:120px;height:120px;border-radius:50%;
+  background:linear-gradient(135deg,#1a3a6e,var(--sky));
+  border:4px solid var(--sky);box-shadow:0 0 0 7px rgba(14,165,233,0.16),0 12px 36px rgba(0,0,0,0.45);
+  display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:800;}
+.av-dot{position:absolute;bottom:6px;right:6px;width:18px;height:18px;
+  background:var(--accent);border-radius:50%;border:3px solid var(--navy);
+  box-shadow:0 0 8px rgba(6,214,160,0.6);}
+
+.hero-info{flex:1;min-width:0;}
+.hero-name{font-size:26px;font-weight:800;letter-spacing:-.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hero-desig{font-size:14px;color:var(--sky-bright);font-weight:500;margin-top:3px;}
+.hero-badges{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;}
+.badge{padding:3px 11px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;}
+.b-sky{background:rgba(14,165,233,.13);color:var(--sky-bright);border:1px solid rgba(14,165,233,.3);}
+.b-gold{background:rgba(245,158,11,.1);color:var(--gold);border:1px solid rgba(245,158,11,.25);}
+.b-green{background:rgba(6,214,160,.1);color:var(--accent);border:1px solid rgba(6,214,160,.25);}
+.hero-id{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:8px;}
+
+/* Cards */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.card{background:var(--navy-card);border:1px solid var(--border);border-radius:16px;
+  padding:20px 22px;backdrop-filter:blur(10px);transition:border-color .2s,transform .2s;
+  animation:fadeUp .5s ease both;}
+.card:hover{border-color:var(--border-sky);transform:translateY(-2px);}
+.card-hd{display:flex;align-items:center;gap:10px;margin-bottom:16px;
+  padding-bottom:13px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.card-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.card-ico svg{width:17px;height:17px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.ico-sky{background:rgba(14,165,233,.14);}  .ico-sky svg{stroke:var(--sky-bright);}
+.ico-green{background:rgba(6,214,160,.12);} .ico-green svg{stroke:var(--accent);}
+.ico-gold{background:rgba(245,158,11,.12);} .ico-gold svg{stroke:var(--gold);}
+.ico-purple{background:rgba(129,140,248,.12);}.ico-purple svg{stroke:var(--purple);}
+.ico-pink{background:rgba(244,63,94,.1);}   .ico-pink svg{stroke:#fb7185;}
+.card-title{font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--sky-pale);}
+
+/* Rows */
+.rows{display:flex;flex-direction:column;gap:9px;}
+.row{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;
+  background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.05);border-radius:8px;}
+.row-lbl{font-size:12px;color:var(--text-muted);font-weight:500;}
+.row-val{font-size:13px;font-weight:700;text-align:right;max-width:58%;word-break:break-word;}
+.mono{font-family:'JetBrains Mono',monospace;font-size:12px;}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;}
+.kpi{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);
+  border-radius:12px;padding:16px 14px;text-align:center;transition:all .2s;}
+.kpi:hover{background:var(--glow-sky);border-color:var(--border-sky);}
+.kpi-lbl{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:7px;}
+.kpi-val{font-size:17px;font-weight:800;font-family:'JetBrains Mono',monospace;}
+.kv-sky{color:var(--sky-bright);} .kv-green{color:var(--accent);} .kv-gold{color:var(--gold);} .kv-white{color:var(--white);}
+
+/* Progress */
+.prog-wrap{margin-top:16px;}
+.prog-top{display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-bottom:7px;}
+.prog-bar{height:6px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--sky),var(--accent));
+  transition:width 1.2s cubic-bezier(.22,1,.36,1);}
+
+/* Timeline */
+.timeline{display:flex;align-items:center;gap:12px;}
+.tl-item{flex:1;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);
+  border-radius:10px;padding:13px 14px;text-align:center;}
+.tl-lbl{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+.tl-val{font-size:13px;font-weight:700;}
+.tl-arrow{font-size:18px;color:var(--sky);flex-shrink:0;font-weight:300;}
+
+@media(max-width:700px){
+  .login-panel{display:none;} .login-form{padding:36px 26px;}
+  .grid-2{grid-template-columns:1fr;}
+  .hero{flex-direction:column;text-align:center;padding:28px 20px;}
+  .hero-badges{justify-content:center;} .hero-id{text-align:center;}
+  .nav-clock{display:none;} .topnav{padding:0 14px;}
+}
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<!-- LOADER -->
+<div class="loader-overlay" id="loader">
+  <div class="loader-ring"></div>
+  <div class="loader-label" id="loaderTxt">Authenticating... 0%</div>
+</div>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="page">
+  <div class="login-wrap">
+
+    <div class="login-panel">
+      <img class="panel-logo"
+           src="https://github.com/arnetworkhouse-oss/ar-network-house/blob/main/ar%20logo.jpg?raw=true"
+           alt="AR Network House"
+           onerror="this.style.display='none'">
+      <div class="panel-title">AR Network House</div>
+      <div class="panel-sub">Your secure gateway to the employee management portal</div>
+      <div class="panel-chip">
+        <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        Secure Access
+      </div>
+    </div>
+
+    <div class="login-form">
+      <div class="form-title">Welcome Back</div>
+      <div class="form-hint">Sign in to access your employee dashboard</div>
+
+      <div class="err-box" id="errBox">Invalid Employee ID or Password. Please try again.</div>
+
+      <div class="field">
+        <label class="field-lbl">Employee ID</label>
+        <input class="field-inp" id="userId" type="text" placeholder="Enter your Employee ID" autocomplete="username">
+      </div>
+
+      <div class="field">
+        <label class="field-lbl">Password</label>
+        <div class="pass-row">
+          <input class="field-inp" id="password" type="password" placeholder="Enter your password" autocomplete="current-password">
+          <button class="eye-btn" type="button" onclick="togglePwd()" id="eyeBtn">
+            <svg id="eyeOpen" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg id="eyeClosed" viewBox="0 0 24 24" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn-login" id="loginBtn" onclick="login()">
+        <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Login to Portal
+      </button>
+
+      <div class="forgot">
+        <a href="https://arnetworkhouse-oss.github.io/ar-network-house/forgot_password.html">Forgot Password?</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DASHBOARD PAGE -->
+<div id="dashPage" class="page hidden">
+
+  <nav class="topnav">
+    <div class="nav-brand">
+      <img class="nav-logo"
+           src="https://github.com/arnetworkhouse-oss/ar-network-house/blob/main/ar%20logo.jpg?raw=true"
+           alt="AR"
+           onerror="this.style.display='none'">
+      <div>
+        <div class="nav-co">AR Network House</div>
+        <div class="nav-tag">Employee Portal</div>
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="nav-clock" id="clock">--:-- --</div>
+      <button class="btn-logout" onclick="logout()">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </nav>
+
+  <div class="dash">
+
+    <!-- Profile Hero -->
+    <div class="hero">
+      <div class="hero-av-wrap">
+        <img id="heroImg" class="hero-av hidden" src="" alt="Profile"
+             onerror="this.classList.add('hidden');document.getElementById('heroInit').classList.remove('hidden')">
+        <div id="heroInit" class="av-init">?</div>
+        <span class="av-dot"></span>
+      </div>
+      <div class="hero-info">
+        <div class="hero-name"  id="hName">—</div>
+        <div class="hero-desig" id="hDesig">—</div>
+        <div class="hero-badges">
+          <span class="badge b-sky"  id="hDept">—</span>
+          <span class="badge b-gold" id="hPctBadge" style="display:none"></span>
+          <span class="badge b-green">Active</span>
+        </div>
+        <div class="hero-id" id="hId">ID: —</div>
+      </div>
+    </div>
+
+    <!-- Row 1: Official + Personal -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-ico ico-sky">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div class="card-title">Official Details</div>
+        </div>
+        <div class="rows">
+          <div class="row"><span class="row-lbl">Name</span>        <span class="row-val" id="dName">—</span></div>
+          <div class="row"><span class="row-lbl">Employee ID</span> <span class="row-val mono" id="dId">—</span></div>
+          <div class="row"><span class="row-lbl">Designation</span> <span class="row-val" id="dDesig">—</span></div>
+          <div class="row"><span class="row-lbl">Department</span>  <span class="row-val" id="dDept">—</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-ico ico-purple">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="card-title">Personal Details</div>
+        </div>
+        <div class="rows">
+          <div class="row"><span class="row-lbl">Email ID</span>   <span class="row-val" style="font-size:12px" id="dEmail">—</span></div>
+          <div class="row"><span class="row-lbl">Contact No</span> <span class="row-val" id="dContact">—</span></div>
+          <div class="row"><span class="row-lbl">Report To</span>  <span class="row-val" id="dReportTo">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Share + Sales Performance -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-ico ico-gold">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="card-title">Share Details</div>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="kpi-lbl">Percentage</div>   <div class="kpi-val kv-white" id="dPct">—</div></div>
+          <div class="kpi"><div class="kpi-lbl">Share Amount</div> <div class="kpi-val kv-gold"  id="dShareAmt">—</div></div>
+        </div>
+      </div>
+
+      <!-- Sales Performance (moved here, next to Share) -->
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-ico ico-green">
+            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="card-title">Sales Performance</div>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="kpi-lbl">Product Sells</div>  <div class="kpi-val kv-sky"   id="dProdSells">—</div></div>
+          <div class="kpi"><div class="kpi-lbl">Sell Amount</div>    <div class="kpi-val kv-gold"  id="dSellAmt">—</div></div>
+          <div class="kpi"><div class="kpi-lbl">Total by Agent</div> <div class="kpi-val kv-white" id="dTotalProfit">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Timeline (full width, before Targets) -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-hd">
+        <div class="card-ico ico-sky">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="card-title">Timeline</div>
+      </div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-lbl">Start Date</div><div class="tl-val" id="dStart">—</div></div>
+        <div class="tl-arrow">&#8594;</div>
+        <div class="tl-item"><div class="tl-lbl">End Date</div>  <div class="tl-val" id="dEnd">—</div></div>
+      </div>
+    </div>
+
+    <!-- Row 4: Targets & Performance (last) -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ico ico-pink">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        </div>
+        <div class="card-title">Targets &amp; Performance</div>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="kpi-lbl">Profit Target</div>   <div class="kpi-val kv-sky"   id="dTarget">—</div></div>
+        <div class="kpi"><div class="kpi-lbl">Profit Achieved</div> <div class="kpi-val kv-green" id="dAchieved">—</div></div>
+        <div class="kpi"><div class="kpi-lbl">DEW Amount</div>      <div class="kpi-val kv-gold"  id="dDew">—</div></div>
+      </div>
+      <div class="prog-wrap" id="progWrap" style="display:none">
+        <div class="prog-top">
+          <span>Achievement vs Target</span>
+          <span id="progPct">0%</span>
+        </div>
+        <div class="prog-bar">
+          <div class="prog-fill" id="progFill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────
+const API = "https://script.google.com/macros/s/AKfycbwP2KYUt6WxI2KP7oLHO09BPLiaGiWbcu9-fjsUcoVhw79do0NkQ1KW5LTJhjj3ac_m5w/exec";
+
+// ── UTILS ─────────────────────────────────────────────────────
+function fmt(d) {
+  if (!d) return "—";
+  const dt = new Date(d);
+  if (isNaN(dt)) return d;
+  return dt.toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" });
+}
+function inr(n) {
+  const num = Number(n);
+  if (n === "" || n === null || n === undefined || isNaN(num)) return "—";
+  return new Intl.NumberFormat("en-IN", { style:"currency", currency:"INR", maximumFractionDigits:2 }).format(num);
+}
+function set(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = (val !== undefined && val !== null && String(val).trim() !== "") ? val : "—";
+}
+function showLoader(v) {
+  document.getElementById("loader").style.display = v ? "flex" : "none";
+}
+function showErr(msg) {
+  const b = document.getElementById("errBox");
+  b.textContent = msg || "Invalid Employee ID or Password.";
+  b.style.display = "block";
+}
+function hideErr() {
+  document.getElementById("errBox").style.display = "none";
+}
+
+// ── TOGGLE PASSWORD ───────────────────────────────────────────
+function togglePwd() {
+  const p = document.getElementById("password");
+  const open = document.getElementById("eyeOpen");
+  const closed = document.getElementById("eyeClosed");
+  if (p.type === "password") {
+    p.type = "text";
+    open.style.display = "none";
+    closed.style.display = "block";
+  } else {
+    p.type = "password";
+    open.style.display = "block";
+    closed.style.display = "none";
+  }
+}
+
+// ── CLOCK ─────────────────────────────────────────────────────
+function startClock() {
+  const tick = () => {
+    document.getElementById("clock").textContent =
+      new Date().toLocaleTimeString("en-IN", { hour12: true });
+  };
+  tick();
+  setInterval(tick, 1000);
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────
+function login() {
+  const userId   = document.getElementById("userId").value.trim();
+  const password = document.getElementById("password").value.trim();
+  hideErr();
+
+  if (!userId || !password) {
+    showErr("Please enter Employee ID and Password.");
+    return;
+  }
+
+  const btn = document.getElementById("loginBtn");
+  btn.disabled = true;
+  showLoader(true);
+
+  let pct = 0;
+  const txt = document.getElementById("loaderTxt");
+  const iv = setInterval(() => {
+    if (pct < 90) { pct += 3; txt.textContent = "Authenticating... " + pct + "%"; }
+  }, 50);
+
+  fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ action: "login", userId: userId, password: password })
+  })
+  .then(r => {
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return r.text();
+  })
+  .then(raw => {
+    clearInterval(iv);
+    txt.textContent = "Authenticating... 100%";
+
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch(e) {
+      throw new Error("Invalid response from server. Raw: " + raw.substring(0, 100));
+    }
+
+    setTimeout(() => {
+      showLoader(false);
+      btn.disabled = false;
+      if (data.status === "success" && data.user) {
+        localStorage.setItem("arUser", JSON.stringify(data.user));
+        sessionStorage.setItem("arSession", "1");
+        history.pushState({ loggedIn: true }, "");
+        showDash(data.user);
+      } else {
+        showErr(data.message || "Invalid credentials. Please try again.");
+      }
+    }, 350);
+  })
+  .catch(err => {
+    clearInterval(iv);
+    showLoader(false);
+    btn.disabled = false;
+    console.error("Login error:", err);
+    showErr("Network error. Please check your connection and try again.");
+  });
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !document.getElementById("loginPage").classList.contains("hidden")) {
+    login();
+  }
+});
+
+// ── SHOW DASHBOARD ────────────────────────────────────────────
+function showDash(u) {
+  document.getElementById("loginPage").classList.add("hidden");
+  document.getElementById("dashPage").classList.remove("hidden");
+
+  // Profile picture
+  if (u.profilePic && u.profilePic.trim() !== "") {
+    const img = document.getElementById("heroImg");
+    img.src = u.profilePic;
+    img.classList.remove("hidden");
+    document.getElementById("heroInit").classList.add("hidden");
+  } else {
+    const initials = (u.name || "?")
+      .split(" ")
+      .map(w => w[0] || "")
+      .join("")
+      .substring(0, 2)
+      .toUpperCase();
+    document.getElementById("heroInit").textContent = initials || "?";
+    document.getElementById("heroInit").classList.remove("hidden");
+    document.getElementById("heroImg").classList.add("hidden");
+  }
+
+  // Hero section
+  set("hName",  u.name);
+  set("hDesig", u.designation);
+  set("hDept",  u.department);
+  set("hId",    "ID: " + (u.userId || "—"));
+
+  if (u.percentage && Number(u.percentage) > 0) {
+    const pb = document.getElementById("hPctBadge");
+    pb.textContent   = u.percentage + "% Share";
+    pb.style.display = "inline-block";
+  }
+
+  // Official details
+  set("dName",  u.name);
+  set("dId",    u.userId);
+  set("dDesig", u.designation);
+  set("dDept",  u.department);
+
+  // Personal details
+  set("dEmail",    u.email);
+  set("dContact",  u.contact);
+  set("dReportTo", u.reportTo);
+
+  // Share details
+  document.getElementById("dPct").textContent      = (u.percentage && Number(u.percentage) > 0) ? u.percentage + "%" : "—";
+  document.getElementById("dShareAmt").textContent = inr(u.shareAmount);
+
+  // Timeline
+  set("dStart", fmt(u.startDate));
+  set("dEnd",   fmt(u.endDate));
+
+  // Sales
+  document.getElementById("dProdSells").textContent   = u.productSells || "—";
+  document.getElementById("dSellAmt").textContent     = inr(u.sellAmount);
+  document.getElementById("dTotalProfit").textContent = inr(u.totalProfit);
+
+  // Targets
+  document.getElementById("dTarget").textContent   = inr(u.profitTarget);
+  document.getElementById("dAchieved").textContent = inr(u.profitAchieved);
+  document.getElementById("dDew").textContent      = inr(u.dewAmount);
+
+  // Progress bar
+  const target = Number(u.profitTarget);
+  const done   = Number(u.profitAchieved);
+  if (target > 0 && !isNaN(done)) {
+    const pct = Math.min(100, Math.round((done / target) * 100));
+    document.getElementById("progWrap").style.display = "block";
+    document.getElementById("progPct").textContent    = pct + "%";
+    setTimeout(() => {
+      document.getElementById("progFill").style.width = pct + "%";
+    }, 300);
+  }
+
+  startClock();
+}
+
+// ── LOGOUT ────────────────────────────────────────────────────
+function logout() {
+  localStorage.removeItem("arUser");
+  sessionStorage.removeItem("arSession");
+  // Replace history so back button can't return to dashboard
+  history.replaceState(null, "", location.href);
+  document.getElementById("dashPage").classList.add("hidden");
+  document.getElementById("loginPage").classList.remove("hidden");
+  document.getElementById("userId").value   = "";
+  document.getElementById("password").value = "";
+  hideErr();
+}
+
+// ── BACK BUTTON GUARD ─────────────────────────────────────────
+window.addEventListener("popstate", function() {
+  if (!sessionStorage.getItem("arSession")) {
+    document.getElementById("dashPage").classList.add("hidden");
+    document.getElementById("loginPage").classList.remove("hidden");
+  }
+});
+
+// ── AUTO-LOGIN (session restore) ──────────────────────────────
+(function () {
+  const saved = localStorage.getItem("arUser");
+  const sess  = sessionStorage.getItem("arSession");
+  // Require BOTH localStorage token AND sessionStorage flag
+  // sessionStorage clears on tab close / refresh, so refresh = re-login
+  if (saved && sess) {
+    try { showDash(JSON.parse(saved)); }
+    catch (e) { localStorage.removeItem("arUser"); sessionStorage.removeItem("arSession"); }
+  } else {
+    // Clear stale token if session expired
+    localStorage.removeItem("arUser");
+    sessionStorage.removeItem("arSession");
+  }
+})();
+</script>
+
+</body>
+</html>
