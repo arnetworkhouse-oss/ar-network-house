@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AR Network House — Employee Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root {
   --navy:       #080f1e;
@@ -68,6 +69,11 @@ body{font-family:'Outfit',sans-serif;background:var(--navy);color:var(--white);m
 .panel-logo{width:84px;height:84px;border-radius:50%;object-fit:cover;
   border:3px solid rgba(255,255,255,0.25);box-shadow:0 8px 28px rgba(0,0,0,0.35);
   margin-bottom:18px;position:relative;z-index:1;}
+.panel-logo-fallback{width:84px;height:84px;border-radius:50%;
+  background:linear-gradient(135deg,rgba(255,255,255,0.2),rgba(255,255,255,0.05));
+  border:3px solid rgba(255,255,255,0.25);box-shadow:0 8px 28px rgba(0,0,0,0.35);
+  margin-bottom:18px;position:relative;z-index:1;display:none;
+  align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;}
 .panel-title{font-size:20px;font-weight:800;position:relative;z-index:1;line-height:1.2;}
 .panel-sub{font-size:12px;opacity:0.7;margin-top:8px;line-height:1.6;position:relative;z-index:1;}
 .panel-chip{margin-top:24px;padding:6px 18px;background:rgba(255,255,255,0.1);
@@ -98,7 +104,6 @@ body{font-family:'Outfit',sans-serif;background:var(--navy);color:var(--white);m
 .eye-btn:hover{background:var(--glow-sky);border-color:var(--border-sky);}
 .eye-btn svg{width:18px;height:18px;stroke:var(--sky-pale);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 
-/* Error box */
 .err-box{display:none;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.3);
   border-radius:10px;padding:11px 15px;margin-bottom:14px;font-size:13px;color:#fb7185;}
 
@@ -140,7 +145,7 @@ body{font-family:'Outfit',sans-serif;background:var(--navy);color:var(--white);m
 
 .dash{max-width:1080px;margin:0 auto;padding:28px 22px;}
 
-/* Hero — bigger profile picture */
+/* Hero */
 .hero{background:linear-gradient(135deg,rgba(14,165,233,0.13) 0%,rgba(10,20,45,0.5) 50%,rgba(6,214,160,0.06) 100%);
   border:1px solid var(--border-sky);border-radius:20px;padding:32px 36px;
   display:flex;align-items:center;gap:30px;margin-bottom:22px;
@@ -149,8 +154,6 @@ body{font-family:'Outfit',sans-serif;background:var(--navy);color:var(--white);m
   background:radial-gradient(circle,rgba(14,165,233,0.1) 0%,transparent 70%);
   right:60px;top:-60px;pointer-events:none;}
 .hero-av-wrap{position:relative;flex-shrink:0;}
-
-/* ── BIGGER AVATAR ── */
 .hero-av{width:120px;height:120px;border-radius:50%;object-fit:cover;
   border:4px solid var(--sky);box-shadow:0 0 0 7px rgba(14,165,233,0.16),0 12px 36px rgba(0,0,0,0.45);}
 .av-init{width:120px;height:120px;border-radius:50%;
@@ -220,12 +223,101 @@ body{font-family:'Outfit',sans-serif;background:var(--navy);color:var(--white);m
 .tl-val{font-size:13px;font-weight:700;}
 .tl-arrow{font-size:18px;color:var(--sky);flex-shrink:0;font-weight:300;}
 
+/* QR CARD */
+.qr-card{margin-top:16px;background:var(--navy-card);border:1px solid var(--border);
+  border-radius:16px;padding:24px 28px;backdrop-filter:blur(10px);
+  display:flex;align-items:center;gap:32px;
+  animation:fadeUp .5s ease both;transition:border-color .2s,transform .2s;}
+.qr-card:hover{border-color:var(--border-sky);transform:translateY(-2px);}
+
+.qr-left{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.qr-box{width:172px;height:172px;border-radius:14px;
+  background:#ffffff;padding:10px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 1px rgba(14,165,233,0.3),0 0 32px rgba(14,165,233,0.12);
+  position:relative;}
+.qr-corner{position:absolute;width:20px;height:20px;border-color:var(--sky);border-style:solid;}
+.qr-corner.tl{top:-1px;left:-1px;border-width:3px 0 0 3px;border-radius:4px 0 0 0;}
+.qr-corner.tr{top:-1px;right:-1px;border-width:3px 3px 0 0;border-radius:0 4px 0 0;}
+.qr-corner.bl{bottom:-1px;left:-1px;border-width:0 0 3px 3px;border-radius:0 0 0 4px;}
+.qr-corner.br{bottom:-1px;right:-1px;border-width:0 3px 3px 0;border-radius:0 0 4px 0;}
+#qrContainer{width:152px;height:152px;display:flex;align-items:center;justify-content:center;}
+#qrContainer img,#qrContainer canvas{width:152px!important;height:152px!important;}
+
+.qr-id-label{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;
+  color:var(--sky-bright);background:rgba(14,165,233,0.1);
+  border:1px solid rgba(14,165,233,0.25);border-radius:8px;
+  padding:6px 16px;letter-spacing:1px;text-align:center;}
+
+.qr-right{flex:1;min-width:0;}
+.qr-title-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;
+  padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.qr-right .card-title{margin:0;}
+.qr-desc{font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:18px;}
+.qr-meta{display:flex;flex-direction:column;gap:8px;}
+.qr-meta .row{margin:0;}
+
+.btn-download-qr{margin-top:18px;display:inline-flex;align-items:center;gap:8px;
+  padding:10px 22px;background:linear-gradient(135deg,rgba(14,165,233,0.2),rgba(6,214,160,0.1));
+  border:1px solid rgba(14,165,233,0.35);border-radius:10px;
+  color:var(--sky-bright);font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s;text-decoration:none;}
+.btn-download-qr:hover{background:linear-gradient(135deg,rgba(14,165,233,0.35),rgba(6,214,160,0.2));
+  box-shadow:0 4px 18px rgba(14,165,233,0.2);}
+.btn-download-qr svg{width:15px;height:15px;stroke:var(--sky-bright);fill:none;
+  stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* SESSION MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:10000;background:rgba(8,15,30,0.88);
+  display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(14px);padding:20px;}
+.modal-overlay.active{display:flex;}
+.modal-box{background:linear-gradient(145deg,#0c1a35,#080f1e);
+  border:1px solid rgba(244,63,94,0.35);border-radius:20px;
+  padding:36px 32px;max-width:400px;width:100%;text-align:center;
+  box-shadow:0 40px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(244,63,94,0.15);
+  animation:fadeUp .3s cubic-bezier(.22,1,.36,1) both;}
+.modal-icon{width:56px;height:56px;border-radius:50%;
+  background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.3);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 18px;}
+.modal-icon svg{width:26px;height:26px;stroke:#fb7185;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:8px;}
+.modal-msg{font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:26px;}
+.modal-msg span{color:#fb7185;font-weight:700;}
+.modal-btn{width:100%;padding:13px;background:linear-gradient(135deg,#dc2626,#b91c1c);
+  border:none;border-radius:10px;color:#fff;font-family:'Outfit',sans-serif;
+  font-size:14px;font-weight:700;cursor:pointer;
+  box-shadow:0 4px 18px rgba(244,63,94,0.3);transition:all .2s;}
+.modal-btn:hover{box-shadow:0 6px 24px rgba(244,63,94,0.45);}
+
+/* Session timer bar */
+.session-bar{position:fixed;top:0;left:0;height:3px;z-index:200;
+  background:linear-gradient(90deg,var(--sky),var(--accent));
+  transition:width linear;pointer-events:none;}
+
+/* MOBILE */
 @media(max-width:700px){
-  .login-panel{display:none;} .login-form{padding:36px 26px;}
+  .login-wrap{flex-direction:column;max-width:420px;border-radius:18px;}
+  .login-panel{width:100%;padding:32px 24px 28px;flex-direction:row;
+    justify-content:flex-start;gap:16px;text-align:left;border-radius:0;}
+  .login-panel::before{width:180px;height:180px;top:-60px;left:-40px;}
+  .login-panel::after{width:120px;height:120px;bottom:-40px;right:-30px;}
+  .panel-logo{width:60px;height:60px;margin-bottom:0;flex-shrink:0;}
+  .panel-logo-fallback{width:60px;height:60px;margin-bottom:0;flex-shrink:0;font-size:20px;}
+  .panel-info{flex:1;}
+  .panel-title{font-size:17px;}
+  .panel-sub{font-size:11px;margin-top:4px;}
+  .panel-chip{margin-top:10px;font-size:10px;padding:5px 12px;}
+  .login-form{padding:28px 22px;}
   .grid-2{grid-template-columns:1fr;}
-  .hero{flex-direction:column;text-align:center;padding:28px 20px;}
-  .hero-badges{justify-content:center;} .hero-id{text-align:center;}
-  .nav-clock{display:none;} .topnav{padding:0 14px;}
+  .hero{flex-direction:column;text-align:center;padding:24px 18px;}
+  .hero-badges{justify-content:center;}
+  .hero-id{text-align:center;}
+  .nav-clock{display:none;}
+  .topnav{padding:0 14px;}
+  .qr-card{flex-direction:column;text-align:center;padding:22px 18px;gap:20px;}
+  .qr-right{width:100%;}
+  .qr-meta .row{text-align:left;}
+  .btn-download-qr{width:100%;justify-content:center;}
 }
 </style>
 </head>
@@ -242,34 +334,34 @@ body{font-family:'Outfit',sans-serif;background:var(--navy);color:var(--white);m
 <!-- LOGIN PAGE -->
 <div id="loginPage" class="page">
   <div class="login-wrap">
-
     <div class="login-panel">
       <img class="panel-logo"
            src="https://github.com/arnetworkhouse-oss/ar-network-house/blob/main/ar%20logo.jpg?raw=true"
            alt="AR Network House"
-           onerror="this.style.display='none'">
-      <div class="panel-title">AR Network House</div>
-      <div class="panel-sub">Your secure gateway to the employee management portal</div>
-      <div class="panel-chip">
-        <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round">
-          <rect x="3" y="11" width="18" height="11" rx="2"/>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-        </svg>
-        Secure Access
+           id="panelLogoImg"
+           onerror="this.style.display='none';document.getElementById('panelLogoFallback').style.display='flex';">
+      <div class="panel-logo-fallback" id="panelLogoFallback">AR</div>
+      <div class="panel-info">
+        <div class="panel-title">AR Network House</div>
+        <div class="panel-sub">Your secure gateway to the employee management portal</div>
+        <div class="panel-chip">
+          <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Secure Access
+        </div>
       </div>
     </div>
 
     <div class="login-form">
       <div class="form-title">Welcome Back</div>
       <div class="form-hint">Sign in to access your employee dashboard</div>
-
       <div class="err-box" id="errBox">Invalid Employee ID or Password. Please try again.</div>
-
       <div class="field">
         <label class="field-lbl">Employee ID</label>
         <input class="field-inp" id="userId" type="text" placeholder="Enter your Employee ID" autocomplete="username">
       </div>
-
       <div class="field">
         <label class="field-lbl">Password</label>
         <div class="pass-row">
@@ -280,17 +372,14 @@ body{font-family:'Outfit',sans-serif;background:var(--navy);color:var(--white);m
           </button>
         </div>
       </div>
-
       <button class="btn-login" id="loginBtn" onclick="login()">
         <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
         Login to Portal
       </button>
-
       <div class="forgot">
         <a href="https://arnetworkhouse-oss.github.io/ar-network-house/forgot_password.html">Forgot Password?</a>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -310,7 +399,7 @@ body{font-family:'Outfit',sans-serif;background:var(--navy);color:var(--white);m
     </div>
     <div class="nav-right">
       <div class="nav-clock" id="clock">--:-- --</div>
-      <button class="btn-logout" onclick="logout()">
+      <button class="btn-logout" onclick="confirmLogout()">
         <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Logout
       </button>
@@ -386,7 +475,6 @@ body{font-family:'Outfit',sans-serif;background:var(--navy);color:var(--white);m
         </div>
       </div>
 
-      <!-- Sales Performance (moved here, next to Share) -->
       <div class="card">
         <div class="card-hd">
           <div class="card-ico ico-green">
@@ -402,7 +490,7 @@ body{font-family:'Outfit',sans-serif;background:var(--navy);color:var(--white);m
       </div>
     </div>
 
-    <!-- Row 3: Timeline (full width, before Targets) -->
+    <!-- Row 3: Timeline -->
     <div class="card" style="margin-bottom:16px">
       <div class="card-hd">
         <div class="card-ico ico-sky">
@@ -417,8 +505,8 @@ body{font-family:'Outfit',sans-serif;background:var(--navy);color:var(--white);m
       </div>
     </div>
 
-    <!-- Row 4: Targets & Performance (last) -->
-    <div class="card">
+    <!-- Row 4: Targets & Performance -->
+    <div class="card" style="margin-bottom:16px">
       <div class="card-hd">
         <div class="card-ico ico-pink">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
@@ -441,252 +529,368 @@ body{font-family:'Outfit',sans-serif;background:var(--navy);color:var(--white);m
       </div>
     </div>
 
+    <!-- QR Card -->
+    <div class="qr-card" id="qrCard">
+      <div class="qr-left">
+        <div class="qr-box">
+          <div class="qr-corner tl"></div>
+          <div class="qr-corner tr"></div>
+          <div class="qr-corner bl"></div>
+          <div class="qr-corner br"></div>
+          <div id="qrContainer"></div>
+        </div>
+        <div class="qr-id-label" id="qrIdLabel">—</div>
+      </div>
+      <div class="qr-right">
+        <div class="qr-title-row">
+          <div class="card-ico ico-sky" style="flex-shrink:0;">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3m0 4h4v-4m-4 0h4"/></svg>
+          </div>
+          <div class="card-title">Employee QR Code</div>
+        </div>
+        <p class="qr-desc">This QR code contains your Employee ID. Scan it with any QR scanner to instantly verify your identity.</p>
+        <div class="qr-meta rows">
+          <div class="row"><span class="row-lbl">Employee ID</span><span class="row-val mono" id="qrEmpId">—</span></div>
+          <div class="row"><span class="row-lbl">Name</span><span class="row-val" id="qrName">—</span></div>
+          <div class="row"><span class="row-lbl">Department</span><span class="row-val" id="qrDept">—</span></div>
+        </div>
+        <button class="btn-download-qr" onclick="downloadQR()">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download QR Code
+        </button>
+      </div>
+    </div>
+
   </div>
 </div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="sessionModal">
+  <div class="modal-box">
+    <div class="modal-icon">
+      <svg id="modalIconSvg" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <div class="modal-title" id="modalTitle">Logout</div>
+    <div class="modal-msg"  id="modalMsg">Are you sure you want to logout?</div>
+    <div style="display:flex;gap:10px;" id="modalBtns">
+      <button class="modal-btn" id="modalConfirmBtn" style="flex:1;" onclick="doLogout()">Logout</button>
+      <button class="modal-btn" id="modalCancelBtn"
+        style="flex:1;background:rgba(255,255,255,0.07);border:1px solid var(--border);box-shadow:none;"
+        onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Session timer bar -->
+<div class="session-bar" id="sessionBar" style="width:100%;display:none;"></div>
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────
 const API = "https://script.google.com/macros/s/AKfycbwP2KYUt6WxI2KP7oLHO09BPLiaGiWbcu9-fjsUcoVhw79do0NkQ1KW5LTJhjj3ac_m5w/exec";
+const SESSION_DURATION = 5 * 60 * 1000;
 
 // ── UTILS ─────────────────────────────────────────────────────
-function fmt(d) {
-  if (!d) return "—";
-  const dt = new Date(d);
-  if (isNaN(dt)) return d;
-  return dt.toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" });
-}
-function inr(n) {
-  const num = Number(n);
-  if (n === "" || n === null || n === undefined || isNaN(num)) return "—";
-  return new Intl.NumberFormat("en-IN", { style:"currency", currency:"INR", maximumFractionDigits:2 }).format(num);
-}
-function set(id, val) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = (val !== undefined && val !== null && String(val).trim() !== "") ? val : "—";
-}
-function showLoader(v) {
-  document.getElementById("loader").style.display = v ? "flex" : "none";
-}
-function showErr(msg) {
-  const b = document.getElementById("errBox");
-  b.textContent = msg || "Invalid Employee ID or Password.";
-  b.style.display = "block";
-}
-function hideErr() {
-  document.getElementById("errBox").style.display = "none";
+function fmt(d){if(!d)return"—";const dt=new Date(d);if(isNaN(dt))return d;return dt.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});}
+function inr(n){const num=Number(n);if(n===""||n===null||n===undefined||isNaN(num))return"—";return new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(num);}
+function set(id,val){const el=document.getElementById(id);if(el)el.textContent=(val!==undefined&&val!==null&&String(val).trim()!=="")? val:"—";}
+function showLoader(v){document.getElementById("loader").style.display=v?"flex":"none";}
+function showErr(msg){const b=document.getElementById("errBox");b.textContent=msg||"Invalid Employee ID or Password.";b.style.display="block";}
+function hideErr(){document.getElementById("errBox").style.display="none";}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function showModal(mode){
+  const title=document.getElementById("modalTitle");
+  const msg=document.getElementById("modalMsg");
+  const confirmBtn=document.getElementById("modalConfirmBtn");
+  const cancelBtn=document.getElementById("modalCancelBtn");
+
+  if(mode==="logout"){
+    title.textContent="Confirm Logout";
+    msg.innerHTML="Are you sure you want to <span>logout</span> from the portal?";
+    confirmBtn.textContent="Logout";
+    confirmBtn.onclick=doLogout;
+    cancelBtn.style.display="block";
+  } else if(mode==="expired"){
+    title.textContent="Session Expired";
+    msg.innerHTML="Your session has expired after <span>5 minutes</span>. Please log in again.";
+    confirmBtn.textContent="Go to Login";
+    confirmBtn.onclick=goToLogin;
+    cancelBtn.style.display="none";
+  } else if(mode==="back"){
+    // ── FIX 2: Back click → directly logout, no "Stay Here"
+    title.textContent="Logged Out";
+    msg.innerHTML="You pressed <span>Back</span>. You have been logged out for security.";
+    confirmBtn.textContent="Go to Login";
+    confirmBtn.onclick=goToLogin;
+    cancelBtn.style.display="none";
+    // Immediately clear session
+    clearSessionTimer();
+    sessionStorage.removeItem("arUser");
+    sessionStorage.removeItem("arSession");
+    sessionStorage.removeItem("arLoginTime");
+  }
+  document.getElementById("sessionModal").classList.add("active");
 }
 
-// ── TOGGLE PASSWORD ───────────────────────────────────────────
-function togglePwd() {
-  const p = document.getElementById("password");
-  const open = document.getElementById("eyeOpen");
-  const closed = document.getElementById("eyeClosed");
-  if (p.type === "password") {
-    p.type = "text";
-    open.style.display = "none";
-    closed.style.display = "block";
-  } else {
-    p.type = "password";
-    open.style.display = "block";
-    closed.style.display = "none";
-  }
+function closeModal(){
+  document.getElementById("sessionModal").classList.remove("active");
+}
+
+function goToLogin(){
+  closeModal();
+  clearSessionTimer();
+  sessionStorage.removeItem("arUser");
+  sessionStorage.removeItem("arSession");
+  sessionStorage.removeItem("arLoginTime");
+  history.replaceState(null,"",location.href);
+  document.getElementById("dashPage").classList.add("hidden");
+  document.getElementById("loginPage").classList.remove("hidden");
+  document.getElementById("userId").value="";
+  document.getElementById("password").value="";
+  hideErr();
+}
+
+function confirmLogout(){showModal("logout");}
+
+function doLogout(){
+  clearSessionTimer();
+  sessionStorage.removeItem("arUser");
+  sessionStorage.removeItem("arSession");
+  sessionStorage.removeItem("arLoginTime");
+  history.replaceState(null,"",location.href);
+  closeModal();
+  document.getElementById("dashPage").classList.add("hidden");
+  document.getElementById("loginPage").classList.remove("hidden");
+  document.getElementById("userId").value="";
+  document.getElementById("password").value="";
+  hideErr();
+}
+
+// ── SESSION TIMER ─────────────────────────────────────────────
+let _sessionTimer=null;
+function startSessionTimer(){
+  clearSessionTimer();
+  sessionStorage.setItem("arLoginTime",Date.now());
+  const bar=document.getElementById("sessionBar");
+  bar.style.display="block";bar.style.transition="none";bar.style.width="100%";
+  setTimeout(()=>{bar.style.transition="width "+SESSION_DURATION+"ms linear";bar.style.width="0%";},100);
+  _sessionTimer=setTimeout(()=>{
+    sessionStorage.removeItem("arSession");
+    showModal("expired");
+  },SESSION_DURATION);
+}
+function clearSessionTimer(){
+  if(_sessionTimer){clearTimeout(_sessionTimer);_sessionTimer=null;}
+  const bar=document.getElementById("sessionBar");
+  if(bar){bar.style.display="none";bar.style.width="100%";}
+}
+function isSessionValid(){
+  const t=sessionStorage.getItem("arLoginTime");
+  return t&&(Date.now()-Number(t))<SESSION_DURATION;
+}
+function resumeSessionTimer(){
+  const loginTime=Number(sessionStorage.getItem("arLoginTime")||0);
+  const elapsed=Date.now()-loginTime;
+  const remaining=SESSION_DURATION-elapsed;
+  if(remaining<=0)return;
+  const bar=document.getElementById("sessionBar");
+  bar.style.display="block";
+  const pct=(remaining/SESSION_DURATION)*100;
+  bar.style.transition="none";bar.style.width=pct+"%";
+  setTimeout(()=>{bar.style.transition="width "+remaining+"ms linear";bar.style.width="0%";},100);
+  _sessionTimer=setTimeout(()=>{
+    sessionStorage.removeItem("arSession");
+    showModal("expired");
+  },remaining);
+}
+
+// ── PASSWORD TOGGLE ───────────────────────────────────────────
+function togglePwd(){
+  const p=document.getElementById("password");
+  const open=document.getElementById("eyeOpen");
+  const closed=document.getElementById("eyeClosed");
+  if(p.type==="password"){p.type="text";open.style.display="none";closed.style.display="block";}
+  else{p.type="password";open.style.display="block";closed.style.display="none";}
 }
 
 // ── CLOCK ─────────────────────────────────────────────────────
-function startClock() {
-  const tick = () => {
-    document.getElementById("clock").textContent =
-      new Date().toLocaleTimeString("en-IN", { hour12: true });
-  };
-  tick();
-  setInterval(tick, 1000);
+function startClock(){
+  const tick=()=>{document.getElementById("clock").textContent=new Date().toLocaleTimeString("en-IN",{hour12:true});};
+  tick();setInterval(tick,1000);
 }
 
 // ── LOGIN ─────────────────────────────────────────────────────
-function login() {
-  const userId   = document.getElementById("userId").value.trim();
-  const password = document.getElementById("password").value.trim();
+function login(){
+  const userId=document.getElementById("userId").value.trim();
+  const password=document.getElementById("password").value.trim();
   hideErr();
-
-  if (!userId || !password) {
-    showErr("Please enter Employee ID and Password.");
-    return;
-  }
-
-  const btn = document.getElementById("loginBtn");
-  btn.disabled = true;
-  showLoader(true);
-
-  let pct = 0;
-  const txt = document.getElementById("loaderTxt");
-  const iv = setInterval(() => {
-    if (pct < 90) { pct += 3; txt.textContent = "Authenticating... " + pct + "%"; }
-  }, 50);
-
-  fetch(API, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify({ action: "login", userId: userId, password: password })
-  })
-  .then(r => {
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    return r.text();
-  })
-  .then(raw => {
-    clearInterval(iv);
-    txt.textContent = "Authenticating... 100%";
-
-    let data;
-    try {
-      data = JSON.parse(raw);
-    } catch(e) {
-      throw new Error("Invalid response from server. Raw: " + raw.substring(0, 100));
-    }
-
-    setTimeout(() => {
-      showLoader(false);
-      btn.disabled = false;
-      if (data.status === "success" && data.user) {
-        localStorage.setItem("arUser", JSON.stringify(data.user));
-        sessionStorage.setItem("arSession", "1");
-        history.pushState({ loggedIn: true }, "");
+  if(!userId||!password){showErr("Please enter Employee ID and Password.");return;}
+  const btn=document.getElementById("loginBtn");
+  btn.disabled=true;showLoader(true);
+  let pct=0;
+  const txt=document.getElementById("loaderTxt");
+  const iv=setInterval(()=>{if(pct<90){pct+=3;txt.textContent="Authenticating... "+pct+"%";}},50);
+  fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"login",userId:userId,password:password})})
+  .then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.text();})
+  .then(raw=>{
+    clearInterval(iv);txt.textContent="Authenticating... 100%";
+    let data;try{data=JSON.parse(raw);}catch(e){throw new Error("Invalid response: "+raw.substring(0,100));}
+    setTimeout(()=>{
+      showLoader(false);btn.disabled=false;
+      if(data.status==="success"&&data.user){
+        sessionStorage.setItem("arUser",JSON.stringify(data.user));
+        sessionStorage.setItem("arSession","1");
+        history.pushState({loggedIn:true},"");
+        startSessionTimer();
         showDash(data.user);
-      } else {
-        showErr(data.message || "Invalid credentials. Please try again.");
-      }
-    }, 350);
+      } else{showErr(data.message||"Invalid credentials. Please try again.");}
+    },350);
   })
-  .catch(err => {
-    clearInterval(iv);
-    showLoader(false);
-    btn.disabled = false;
-    console.error("Login error:", err);
+  .catch(err=>{
+    clearInterval(iv);showLoader(false);btn.disabled=false;
+    console.error("Login error:",err);
     showErr("Network error. Please check your connection and try again.");
   });
 }
 
-document.addEventListener("keydown", e => {
-  if (e.key === "Enter" && !document.getElementById("loginPage").classList.contains("hidden")) {
-    login();
-  }
+document.addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&!document.getElementById("loginPage").classList.contains("hidden"))login();
 });
 
 // ── SHOW DASHBOARD ────────────────────────────────────────────
-function showDash(u) {
+function showDash(u){
   document.getElementById("loginPage").classList.add("hidden");
   document.getElementById("dashPage").classList.remove("hidden");
-
-  // Profile picture
-  if (u.profilePic && u.profilePic.trim() !== "") {
-    const img = document.getElementById("heroImg");
-    img.src = u.profilePic;
-    img.classList.remove("hidden");
+  if(u.profilePic&&u.profilePic.trim()!==""){
+    const img=document.getElementById("heroImg");
+    img.src=u.profilePic;img.classList.remove("hidden");
     document.getElementById("heroInit").classList.add("hidden");
   } else {
-    const initials = (u.name || "?")
-      .split(" ")
-      .map(w => w[0] || "")
-      .join("")
-      .substring(0, 2)
-      .toUpperCase();
-    document.getElementById("heroInit").textContent = initials || "?";
+    const initials=(u.name||"?").split(" ").map(w=>w[0]||"").join("").substring(0,2).toUpperCase();
+    document.getElementById("heroInit").textContent=initials||"?";
     document.getElementById("heroInit").classList.remove("hidden");
     document.getElementById("heroImg").classList.add("hidden");
   }
-
-  // Hero section
-  set("hName",  u.name);
-  set("hDesig", u.designation);
-  set("hDept",  u.department);
-  set("hId",    "ID: " + (u.userId || "—"));
-
-  if (u.percentage && Number(u.percentage) > 0) {
-    const pb = document.getElementById("hPctBadge");
-    pb.textContent   = u.percentage + "% Share";
-    pb.style.display = "inline-block";
+  set("hName",u.name);set("hDesig",u.designation);set("hDept",u.department);
+  set("hId","ID: "+(u.userId||"—"));
+  if(u.percentage&&Number(u.percentage)>0){
+    const pb=document.getElementById("hPctBadge");pb.textContent=u.percentage+"% Share";pb.style.display="inline-block";
   }
-
-  // Official details
-  set("dName",  u.name);
-  set("dId",    u.userId);
-  set("dDesig", u.designation);
-  set("dDept",  u.department);
-
-  // Personal details
-  set("dEmail",    u.email);
-  set("dContact",  u.contact);
-  set("dReportTo", u.reportTo);
-
-  // Share details
-  document.getElementById("dPct").textContent      = (u.percentage && Number(u.percentage) > 0) ? u.percentage + "%" : "—";
-  document.getElementById("dShareAmt").textContent = inr(u.shareAmount);
-
-  // Timeline
-  set("dStart", fmt(u.startDate));
-  set("dEnd",   fmt(u.endDate));
-
-  // Sales
-  document.getElementById("dProdSells").textContent   = u.productSells || "—";
-  document.getElementById("dSellAmt").textContent     = inr(u.sellAmount);
-  document.getElementById("dTotalProfit").textContent = inr(u.totalProfit);
-
-  // Targets
-  document.getElementById("dTarget").textContent   = inr(u.profitTarget);
-  document.getElementById("dAchieved").textContent = inr(u.profitAchieved);
-  document.getElementById("dDew").textContent      = inr(u.dewAmount);
-
-  // Progress bar
-  const target = Number(u.profitTarget);
-  const done   = Number(u.profitAchieved);
-  if (target > 0 && !isNaN(done)) {
-    const pct = Math.min(100, Math.round((done / target) * 100));
-    document.getElementById("progWrap").style.display = "block";
-    document.getElementById("progPct").textContent    = pct + "%";
-    setTimeout(() => {
-      document.getElementById("progFill").style.width = pct + "%";
-    }, 300);
+  set("dName",u.name);set("dId",u.userId);set("dDesig",u.designation);set("dDept",u.department);
+  set("dEmail",u.email);set("dContact",u.contact);set("dReportTo",u.reportTo);
+  document.getElementById("dPct").textContent=(u.percentage&&Number(u.percentage)>0)?u.percentage+"%":"—";
+  document.getElementById("dShareAmt").textContent=inr(u.shareAmount);
+  set("dStart",fmt(u.startDate));set("dEnd",fmt(u.endDate));
+  document.getElementById("dProdSells").textContent=u.productSells||"—";
+  document.getElementById("dSellAmt").textContent=inr(u.sellAmount);
+  document.getElementById("dTotalProfit").textContent=inr(u.totalProfit);
+  document.getElementById("dTarget").textContent=inr(u.profitTarget);
+  document.getElementById("dAchieved").textContent=inr(u.profitAchieved);
+  document.getElementById("dDew").textContent=inr(u.dewAmount);
+  const target=Number(u.profitTarget);const done=Number(u.profitAchieved);
+  if(target>0&&!isNaN(done)){
+    const pct=Math.min(100,Math.round((done/target)*100));
+    document.getElementById("progWrap").style.display="block";
+    document.getElementById("progPct").textContent=pct+"%";
+    setTimeout(()=>{document.getElementById("progFill").style.width=pct+"%";},300);
   }
-
   startClock();
+  setTimeout(()=>{generateQR(u.userId,u.name,u.department);},400);
 }
 
-// ── LOGOUT ────────────────────────────────────────────────────
-function logout() {
-  localStorage.removeItem("arUser");
-  sessionStorage.removeItem("arSession");
-  // Replace history so back button can't return to dashboard
-  history.replaceState(null, "", location.href);
-  document.getElementById("dashPage").classList.add("hidden");
-  document.getElementById("loginPage").classList.remove("hidden");
-  document.getElementById("userId").value   = "";
-  document.getElementById("password").value = "";
-  hideErr();
-}
+// ── FIX 2: BACK BUTTON → LOGOUT ──────────────────────────────
+window.addEventListener("popstate",function(){
+  if(sessionStorage.getItem("arSession")){
+    // User is logged in and pressed back → logout them
+    showModal("back");
+    // Push state again so the URL doesn't change
+    history.pushState({loggedIn:true},"");
+  }
+  // If no session, do nothing (normal browser back)
+});
 
-// ── BACK BUTTON GUARD ─────────────────────────────────────────
-window.addEventListener("popstate", function() {
-  if (!sessionStorage.getItem("arSession")) {
+// ── FIX 3: REFRESH → SILENT LOGOUT (no dialog box) ───────────
+// Remove beforeunload listener entirely — no browser dialog
+// On page load, if session flag exists it means a refresh happened → clear and show login
+window.addEventListener("load",function(){
+  // If session exists on load, it's a page refresh → silently clear and show login
+  if(sessionStorage.getItem("arSession")){
+    sessionStorage.removeItem("arUser");
+    sessionStorage.removeItem("arSession");
+    sessionStorage.removeItem("arLoginTime");
     document.getElementById("dashPage").classList.add("hidden");
     document.getElementById("loginPage").classList.remove("hidden");
   }
 });
 
-// ── AUTO-LOGIN (session restore) ──────────────────────────────
-(function () {
-  const saved = localStorage.getItem("arUser");
-  const sess  = sessionStorage.getItem("arSession");
-  // Require BOTH localStorage token AND sessionStorage flag
-  // sessionStorage clears on tab close / refresh, so refresh = re-login
-  if (saved && sess) {
-    try { showDash(JSON.parse(saved)); }
-    catch (e) { localStorage.removeItem("arUser"); sessionStorage.removeItem("arSession"); }
-  } else {
-    // Clear stale token if session expired
-    localStorage.removeItem("arUser");
-    sessionStorage.removeItem("arSession");
-  }
-})();
-</script>
+// ── FIX 1: QR CODE using qrcodejs library ────────────────────
+var _qrInstance = null;
 
+function generateQR(userId, name, dept){
+  const container = document.getElementById("qrContainer");
+  if(!container) return;
+
+  // Clear previous QR
+  container.innerHTML = "";
+  _qrInstance = null;
+
+  const qrText = String(userId || "N/A");
+
+  try {
+    _qrInstance = new QRCode(container, {
+      text: qrText,
+      width: 152,
+      height: 152,
+      colorDark: "#080f1e",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } catch(e) {
+    console.error("QR generation error:", e);
+    container.innerHTML = '<div style="color:#999;font-size:11px;text-align:center;">QR Error</div>';
+  }
+
+  document.getElementById("qrIdLabel").textContent = userId || "—";
+  document.getElementById("qrEmpId").textContent   = userId || "—";
+  document.getElementById("qrName").textContent    = name   || "—";
+  document.getElementById("qrDept").textContent    = dept   || "—";
+}
+
+function downloadQR(){
+  const container = document.getElementById("qrContainer");
+  if(!container) return;
+
+  // qrcodejs generates either a canvas or an img tag
+  const canvas = container.querySelector("canvas");
+  const img    = container.querySelector("img");
+
+  if(canvas){
+    const link = document.createElement("a");
+    link.download = "employee_qr_" + (document.getElementById("qrIdLabel").textContent) + ".png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } else if(img){
+    // Draw img to a temp canvas and download
+    const tmpCanvas = document.createElement("canvas");
+    tmpCanvas.width  = 152;
+    tmpCanvas.height = 152;
+    const ctx = tmpCanvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, 152, 152);
+    const link = document.createElement("a");
+    link.download = "employee_qr_" + (document.getElementById("qrIdLabel").textContent) + ".png";
+    link.href = tmpCanvas.toDataURL("image/png");
+    link.click();
+  }
+}
+
+// ── AUTO-LOGIN CHECK (on direct page load without refresh) ───
+// Note: the "load" listener above handles refresh → clears session
+// This IIFE runs before "load" fires for sessionStorage check
+// We use DOMContentLoaded instead so it runs before full load
+document.addEventListener("DOMContentLoaded", function(){
+  // "load" event will fire after this and clear the session on refresh
+  // So we don't restore from session here — the load event handles it
+});
+</script>
 </body>
 </html>
