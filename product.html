@@ -113,6 +113,8 @@ nav{position:sticky;top:0;z-index:200;background:var(--ink);padding:0 2.5rem;dis
 .btn-add-cart{background:var(--ink);color:#fff;border:none;padding:13px;border-radius:6px;width:100%;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:0.04em;transition:background 0.2s;}
 .btn-add-cart:hover{background:#2E2B24;}
 .btn-add-cart.added{background:var(--success);}
+.btn-buy-now{background:var(--accent2);color:#fff;border:none;padding:13px;border-radius:6px;width:100%;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:0.04em;transition:background 0.2s;margin-top:6px;}
+.btn-buy-now:hover{background:var(--accent);}
 
 /* CART MODAL */
 .cart-modal{background:var(--bg2);border-radius:10px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(28,26,22,0.25);}
@@ -216,8 +218,8 @@ nav{position:sticky;top:0;z-index:200;background:var(--ink);padding:0 2.5rem;dis
 // ============================================================
 const CONFIG = {
   APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzcgCmi5F1yQx_hih7i2N3-AO7dAlMpi3ZsXWyj3V9EYF8LRxs1vkjL7hui5VVrsT--/exec",
-  RAZORPAY_KEY: "YOUR_RAZORPAY_KEY_ID_HERE",
-  STORE_NAME: "A Amon Ache",
+  RAZORPAY_KEY: "rzp_live_SkTTh4xm7YBlQ1",
+  STORE_NAME: "ROCK",
   CURRENCY: "INR",
   SYMBOL: "₹"
 };
@@ -263,7 +265,7 @@ async function loadProducts(){
     products = parseRows(json.rows||[]);
     renderCatalog();
   } catch(e){
-    grid.innerHTML = `<div class="error-box" style="grid-column:1/-1;">Products load হয়নি। APPS_SCRIPT_URL চেক করুন।<br><small>${e.message}</small></div>`;
+    grid.innerHTML = `<div class="error-box" style="grid-column:1/-1;">Failed to load products. Please check APPS_SCRIPT_URL.<br><small>${e.message}</small></div>`;
   }
 }
 
@@ -286,7 +288,7 @@ function renderCatalog(){
   const count = document.getElementById('product-count');
   count.textContent = products.length + ' items';
   if(!products.length){
-    grid.innerHTML='<div class="error-box" style="grid-column:1/-1;">কোনো product পাওয়া যায়নি। Sheet চেক করুন।</div>';
+    grid.innerHTML='<div class="error-box" style="grid-column:1/-1;">No products found. Please check your Sheet.</div>';
     return;
   }
   grid.innerHTML = products.map(p=>{
@@ -362,7 +364,7 @@ function openProductModal(id){
           <span class="modal-price">${CONFIG.SYMBOL}${fmt(price)}</span>
           ${p.discount>0?`<span class="modal-mrp">${CONFIG.SYMBOL}${fmt(p.price)}</span><span class="modal-disc-pill">${p.discount}% OFF</span>`:''}
         </div>
-        ${sav>0?`<div class="savings-txt">আপনি ${CONFIG.SYMBOL}${fmt(sav)} সাশ্রয় করছেন!</div>`:''}
+        ${sav>0?`<div class="savings-txt">You save ${CONFIG.SYMBOL}${fmt(sav)}!</div>`:''}
         ${p.description?`<div><div class="sec-label">Description</div><div class="modal-desc">${p.description.replace(/\n/g,'<br>')}</div></div>`:''}
         ${specsHtml}
         <div class="select-section">
@@ -376,6 +378,7 @@ function openProductModal(id){
           </div>
           <div class="total-line">Total: <span id="detail-total">${CONFIG.SYMBOL}${fmt(price)}</span></div>
           <button class="btn-add-cart" id="add-cart-btn" onclick="addToCart()">Add to Cart</button>
+          <button class="btn-buy-now" id="buy-now-btn" onclick="buyNow()">Buy Now →</button>
         </div>
       </div>
     </div>`;
@@ -407,7 +410,7 @@ function openCartModal(){
   backdrop.onclick = e=>{ if(e.target===backdrop) backdrop.remove(); };
 
   const itemsHtml = cart.length===0
-    ? '<div class="cart-empty">🛒 Cart খালি আছে</div>'
+    ? '<div class="cart-empty">🛒 Your cart is empty</div>'
     : cart.map((item,idx)=>{
         const p = item.product;
         return `<div class="cart-item">
@@ -471,10 +474,13 @@ function openCheckout(){
           ${summaryRows}
           <div class="sum-row total"><span>Total</span><span>${CONFIG.SYMBOL}${fmt(totalCartPrice())}</span></div>
         </div>
-        <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="c-name" placeholder="আপনার নাম"></div>
+        <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="c-name" placeholder="Your full name"></div>
         <div class="form-group"><label class="form-label">Email *</label><input class="form-input" id="c-email" type="email" placeholder="email@example.com"></div>
         <div class="form-group"><label class="form-label">Phone *</label><input class="form-input" id="c-phone" type="tel" placeholder="+91 98765 43210"></div>
-        <div class="form-group"><label class="form-label">Shipping Address *</label><textarea class="form-input" id="c-address" rows="3" placeholder="বাড়ি নং, রাস্তা, শহর, রাজ্য, PIN"></textarea></div>
+        <div class="form-group"><label class="form-label">House / Flat No. *</label><input class="form-input" id="c-house" placeholder="e.g. 12B, Ground Floor"></div>
+        <div class="form-group"><label class="form-label">Street / Area *</label><input class="form-input" id="c-street" placeholder="e.g. Park Street, Ballygunge"></div>
+        <div class="form-group"><label class="form-label">City *</label><input class="form-input" id="c-city" placeholder="e.g. Kolkata"></div>
+        <div class="form-group"><label class="form-label">State *</label><input class="form-input" id="c-state" placeholder="e.g. West Bengal"></div>
         <div class="form-group"><label class="form-label">Pincode *</label><input class="form-input" id="c-pin" placeholder="700001"></div>
         <button class="btn-pay" id="pay-btn" onclick="initiatePayment()">Pay with Razorpay</button>
         <button class="btn-back-cart" onclick="openCartModal()">← Back to Cart</button>
@@ -488,9 +494,13 @@ async function initiatePayment(){
   const name = document.getElementById('c-name')?.value.trim();
   const email = document.getElementById('c-email')?.value.trim();
   const phone = document.getElementById('c-phone')?.value.trim();
-  const address = document.getElementById('c-address')?.value.trim();
+  const house = document.getElementById('c-house')?.value.trim();
+  const street = document.getElementById('c-street')?.value.trim();
+  const city = document.getElementById('c-city')?.value.trim();
+  const state = document.getElementById('c-state')?.value.trim();
+  const address = [house,street,city,state].filter(Boolean).join(', ');
   const pin = document.getElementById('c-pin')?.value.trim();
-  if(!name||!email||!phone||!address||!pin){ alert('সব field পূরণ করুন।'); return; }
+  if(!name||!email||!phone||!house||!street||!city||!state||!pin){ alert('Please fill in all required fields.'); return; }
 
   const total = totalCartPrice();
   const orderId = 'ORD-'+Date.now();
@@ -515,7 +525,7 @@ async function initiatePayment(){
     prefill: { name, email, contact: phone },
     theme: { color: '#B8945A' },
     handler: async function(response){
-      showLoading('Order confirm হচ্ছে...');
+      showLoading('Confirming your order...');
       orderData.razorpayPaymentId = response.razorpay_payment_id || '';
       orderData.razorpayOrderId = response.razorpay_order_id || '';
       await logOrder(orderData);
@@ -529,6 +539,18 @@ async function initiatePayment(){
 
   const rzp = new Razorpay(options);
   rzp.open();
+}
+
+
+// ---- BUY NOW ----
+function buyNow(){
+  if(!currentProduct) return;
+  // Add to cart (or update qty), then go straight to checkout
+  const existing = cart.find(i=>i.product.id===currentProduct.id);
+  if(existing){ existing.qty += detailQty; }
+  else { cart.push({product:currentProduct, qty:detailQty}); }
+  updateCartBadge();
+  openCheckout();
 }
 
 async function logOrder(d){
@@ -549,8 +571,8 @@ function showSuccess(d){
   backdrop.innerHTML = `
     <div class="success-modal">
       <div class="success-icon">✓</div>
-      <div class="success-title">Order হয়ে গেছে!</div>
-      <div class="success-sub">ধন্যবাদ! আপনার order confirm হয়েছে। শীঘ্রই delivery হবে।</div>
+      <div class="success-title">Order Placed!</div>
+      <div class="success-sub">Thank you! Your order has been confirmed. Delivery will be arranged shortly.</div>
       <div class="order-info-box">
         <div class="info-row"><span>Order ID</span><span>${d.orderId}</span></div>
         <div class="info-row"><span>Payment ID</span><span>${d.razorpayPaymentId||'—'}</span></div>
@@ -566,11 +588,11 @@ function showSuccess(d){
 
 <!--
 ============================================================
-BACKEND Apps Script এ doPost এ এই columns সাথে মিলিয়ে নিন:
+Match these columns in your Apps Script doPost:
 Orders sheet headers:
 Order ID | Date | Name | Email | Phone | Items | Total | Payment ID | Address | Pincode | Cart JSON
 
-doPost এ এভাবে save করুন:
+Save in doPost like this:
 sheet.appendRow([d.orderId, d.date, d.name, d.email, d.phone, d.items, d.total, d.razorpayPaymentId, d.address, d.pin, d.cartJSON]);
 ============================================================
 -->
