@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AR Smart Kart</title>
+<title>AR Smart Kart — Amon Ache Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -173,15 +173,53 @@ nav{
   box-shadow:0 12px 40px rgba(59,125,216,0.15);
   transform:translateY(-4px);
 }
+
+/* ===== CARD IMAGE SLIDESHOW ===== */
 .pcard-img{
   width:100%;height:180px;background:var(--bg3);
   overflow:hidden;position:relative;cursor:pointer;flex-shrink:0;
 }
-.pcard-img img{
-  width:100%;height:100%;object-fit:cover;display:block;
-  transition:transform .4s ease;
+/* slideshow wrapper — holds all slides absolutely stacked */
+.slide-wrap{
+  position:relative;width:100%;height:100%;
 }
-.pcard:hover .pcard-img img{transform:scale(1.07);}
+.slide-item{
+  position:absolute;inset:0;
+  opacity:0;
+  transition:opacity 0.6s ease;
+  pointer-events:none;
+}
+.slide-item.active{
+  opacity:1;
+  pointer-events:auto;
+}
+.slide-item img{
+  width:100%;height:100%;
+  object-fit:cover;display:block;
+}
+/* scale on card hover — target the active slide's img */
+.pcard:hover .slide-item.active img{
+  transform:scale(1.07);
+  transition:transform 0.4s ease, opacity 0.6s ease;
+}
+.slide-item img{transition:transform 0.4s ease;}
+
+/* dots indicator */
+.slide-dots{
+  position:absolute;bottom:7px;left:50%;transform:translateX(-50%);
+  display:flex;gap:4px;z-index:3;pointer-events:none;
+}
+.slide-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:rgba(255,255,255,0.35);
+  transition:background 0.3s,transform 0.3s;
+}
+.slide-dot.active{
+  background:#fff;
+  transform:scale(1.25);
+}
+
+/* placeholder when no images */
 .pcard-img-ph{
   width:100%;height:100%;
   display:flex;align-items:center;justify-content:center;color:var(--ink4);
@@ -279,8 +317,6 @@ nav{
 .pmodal-gallery{
   width:100%;background:var(--bg3);flex-shrink:0;position:relative;
 }
-
-/* Main big image */
 .gallery-main{
   width:100%;height:280px;overflow:hidden;position:relative;cursor:zoom-in;
 }
@@ -293,8 +329,6 @@ nav{
   width:100%;height:100%;
   display:flex;align-items:center;justify-content:center;color:var(--ink4);
 }
-
-/* Thumbnails strip */
 .gallery-thumbs{
   display:flex;gap:6px;padding:8px 10px;
   overflow-x:auto;scrollbar-width:none;background:var(--bg3);
@@ -309,8 +343,6 @@ nav{
 .gallery-thumb:hover{border-color:var(--blue3);transform:scale(1.05);}
 .gallery-thumb.active{border-color:var(--blue);}
 .gallery-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-
-/* Image count badge */
 .gallery-count{
   position:absolute;bottom:10px;right:10px;
   background:rgba(7,12,24,0.80);backdrop-filter:blur(6px);
@@ -515,6 +547,67 @@ nav{
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* ===== FOOTER ===== */
+footer{
+  position:relative;z-index:1;
+  border-top:1px solid var(--bdr);
+  background:rgba(7,12,24,0.95);
+  backdrop-filter:blur(16px);
+  padding:0;
+}
+.footer-inner{
+  max-width:1480px;margin:0 auto;
+  padding:1.6rem 2.5rem;
+  display:flex;flex-direction:column;gap:1rem;
+}
+.footer-brand{
+  display:flex;align-items:center;gap:12px;
+}
+.footer-logo{
+  width:36px;height:36px;border-radius:50%;
+  overflow:hidden;border:1.5px solid var(--bdr2);
+  background:var(--bg3);flex-shrink:0;
+  box-shadow:0 0 10px rgba(59,125,216,0.18);
+}
+.footer-logo img{width:100%;height:100%;object-fit:cover;display:block;}
+.footer-brand-name{
+  font-family:'Outfit',sans-serif;font-size:0.95rem;font-weight:700;
+  color:var(--ink);letter-spacing:0.06em;text-transform:uppercase;line-height:1;
+}
+.footer-brand-name em{color:var(--blue3);font-style:normal;}
+.footer-brand-sub{
+  font-family:'Cormorant',serif;font-size:0.72rem;
+  color:var(--ink3);letter-spacing:0.12em;text-transform:uppercase;
+  margin-top:2px;
+}
+.footer-divider{
+  height:1px;background:var(--bdr4);width:100%;
+}
+.footer-meta{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:8px;
+}
+.footer-copy{
+  font-family:'DM Mono',monospace;font-size:11px;
+  color:var(--ink4);letter-spacing:0.04em;
+}
+.footer-maintained{
+  font-family:'Outfit',sans-serif;font-size:11.5px;
+  color:var(--ink3);display:flex;align-items:center;gap:5px;
+}
+.footer-link{
+  display:inline-flex;align-items:center;gap:4px;
+  color:var(--blue3);font-weight:600;font-size:11.5px;
+  text-decoration:none;letter-spacing:0.05em;
+  border-bottom:1px solid rgba(91,154,232,0.3);
+  padding-bottom:1px;
+  transition:color .18s, border-color .18s;
+}
+.footer-link:hover{
+  color:var(--ink);border-color:var(--ink3);
+}
+.footer-link svg{opacity:0.7;flex-shrink:0;}
+
 /* ===== RESPONSIVE ===== */
 @media(max-width:600px){
   nav{padding:0 1.2rem;}
@@ -524,6 +617,8 @@ nav{
   .hero{padding:2.5rem 1.2rem 2rem;}
   .pmodal{max-width:100%;}
   .gallery-main{height:220px;}
+  .footer-inner{padding:1.4rem 1.2rem;}
+  .footer-meta{flex-direction:column;align-items:flex-start;gap:6px;}
 }
 </style>
 </head>
@@ -537,7 +632,7 @@ nav{
     </div>
     <div class="brand-text">
       <div class="brand-main">AR <em>Smart</em> Kart</div>
-      <div class="brand-sub">AR NETWORK HOUSE Online Store</div>
+      <div class="brand-sub">Amon Ache Store</div>
     </div>
   </div>
   <button class="cart-pill" onclick="openCart()">
@@ -594,6 +689,32 @@ nav{
 
 <div class="loading-overlay" id="loader" style="display:none;"><div class="spin"></div></div>
 
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <img src="https://raw.githubusercontent.com/arnetworkhouse-oss/ar-network-house/refs/heads/main/ar%20logo.jpg" alt="AR Logo" onerror="this.style.display='none'">
+      </div>
+      <div>
+        <div class="footer-brand-name">AR <em>Smart</em> Kart</div>
+        <div class="footer-brand-sub">Amon Ache Store</div>
+      </div>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-meta">
+      <span class="footer-copy">&copy; <script>document.write(new Date().getFullYear())</script> AR Smart Kart. All rights reserved.</span>
+      <span class="footer-maintained">
+        Maintained by&nbsp;
+        <a href="https://arnetworkhouse.in" target="_blank" rel="noopener" class="footer-link">
+          AR NETWORK HOUSE
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </span>
+    </div>
+  </div>
+</footer>
+
 <script>
 /* ===== CONFIG ===== */
 const CFG = {
@@ -605,18 +726,23 @@ const C = {id:0,img:1,name:2,specs:3,price:4,disc:5,desc:6,cat:7};
 
 let ALL=[], FILT=[], CART=[];
 let CUR=null, QTY=1;
-let VIEW_IMGS=[], VIEW_IDX=0; // for fullscreen viewer
+let VIEW_IMGS=[], VIEW_IDX=0;
 
-const fmt  = n => new Intl.NumberFormat('en-IN').format(n);
-const rupee = n => '₹' + fmt(n);   // ← always use this for prices
-const sale = p => p.disc>0 ? Math.round(p.price*(1-p.disc/100)) : p.price;
-const sav  = p => p.price - sale(p);
-const ttlC = () => CART.reduce((s,i)=>s+i.qty,0);
-const ttlP = () => CART.reduce((s,i)=>s+sale(i.p)*i.qty,0);
+/* per-card slideshow state: cardId -> { timer, idx } */
+const SLIDE_STATE = {};
+const SLIDE_INTERVAL = 2800; // ms between slides
+
+const fmt   = n => new Intl.NumberFormat('en-IN').format(n);
+const rupee = n => '₹' + fmt(n);
+const sale  = p => p.disc>0 ? Math.round(p.price*(1-p.disc/100)) : p.price;
+const sav   = p => p.price - sale(p);
+const ttlC  = () => CART.reduce((s,i)=>s+i.qty,0);
+const ttlP  = () => CART.reduce((s,i)=>s+sale(i.p)*i.qty,0);
 const setBadge = () => { document.getElementById('cart-count').textContent = ttlC(); };
+
+/* Close all modals WITHOUT touching browser history */
 const closeAll = () => document.querySelectorAll('.modal-backdrop').forEach(m=>m.remove());
 
-/* Parse multiple image URLs from a cell (newline or comma separated) */
 function parseImgs(raw){
   if(!raw) return [];
   return raw.split(/[\n,]+/).map(s=>s.trim()).filter(s=>s.startsWith('http'));
@@ -625,11 +751,27 @@ function parseImgs(raw){
 const WA_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>';
 const PH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
 
+/* ===== BACK BUTTON: intercept popstate so modal closes instead of navigating ===== */
+window.addEventListener('popstate', function(e){
+  var open = document.querySelectorAll('.modal-backdrop');
+  if(open.length > 0){
+    e.preventDefault();
+    closeAll();
+    /* push state again so the page stays */
+    history.pushState(null, '', location.href);
+  }
+});
+
+/* Push a dummy state when a modal opens so back can be caught */
+function pushModalState(){
+  history.pushState({modal:true}, '', location.href);
+}
+
 /* WhatsApp */
 function waText(items){
-  let m = CFG.NAME + ' — Order Request\n\n';
+  var m = CFG.NAME + ' — Order Request\n\n';
   items.forEach(function(x){
-    var p=x.p,q=x.qty;
+    var p=x.p, q=x.qty;
     m += 'Product: '+p.name+'\nID: '+p.id+'\n';
     if(p.cat) m += 'Category: '+p.cat+'\n';
     m += 'Qty: '+q+'\nPrice: ₹'+fmt(sale(p))+'\nSubtotal: ₹'+fmt(sale(p)*q)+'\n\n';
@@ -691,6 +833,7 @@ function parseRows(rows){
 
 /* ===== FILTER ===== */
 function filterCat(btn, cat){
+  stopAllSlideshows();
   document.querySelectorAll('.cat-btn').forEach(function(b){b.classList.remove('active');});
   btn.classList.add('active');
   FILT = cat==='ALL' ? ALL : ALL.filter(function(p){return p.cat===cat;});
@@ -698,45 +841,97 @@ function filterCat(btn, cat){
   renderGrid();
 }
 
+/* ===== SLIDESHOW HELPERS ===== */
+function stopAllSlideshows(){
+  Object.keys(SLIDE_STATE).forEach(function(id){
+    clearInterval(SLIDE_STATE[id].timer);
+    delete SLIDE_STATE[id];
+  });
+}
+
+function startSlideshow(cardId, imgCount){
+  if(imgCount < 2) return;
+  if(SLIDE_STATE[cardId]) return; // already running
+  var idx = 0;
+  var timer = setInterval(function(){
+    var wrap = document.getElementById('sw-'+cardId);
+    var dots = document.getElementById('sd-'+cardId);
+    if(!wrap){ clearInterval(timer); delete SLIDE_STATE[cardId]; return; }
+    /* deactivate current */
+    var cur = wrap.querySelector('.slide-item.active');
+    if(cur) cur.classList.remove('active');
+    /* advance */
+    idx = (idx + 1) % imgCount;
+    var next = wrap.querySelector('.slide-item[data-i="'+idx+'"]');
+    if(next) next.classList.add('active');
+    /* dots */
+    if(dots){
+      var dotEls = dots.querySelectorAll('.slide-dot');
+      dotEls.forEach(function(d,i){ d.classList.toggle('active', i===idx); });
+    }
+  }, SLIDE_INTERVAL);
+  SLIDE_STATE[cardId] = { timer: timer, idx: 0 };
+}
+
 /* ===== RENDER CARDS ===== */
 function renderGrid(){
+  stopAllSlideshows();
   var g = document.getElementById('grid');
   document.getElementById('prod-count').textContent = FILT.length+' items';
   if(!FILT.length){
     g.innerHTML = '<div class="err" style="grid-column:1/-1">No products found.</div>';
     return;
   }
+
   var html = '';
   FILT.forEach(function(p){
     var imgs = parseImgs(p.img);
-    var firstImg = imgs[0] || '';
     var price = sale(p);
 
+    /* --- price row --- */
     var prRow = '<span class="pcard-price">'+rupee(price)+'</span>';
     if(p.disc>0){
       prRow += ' <span class="pcard-orig">'+rupee(p.price)+'</span>'
              + ' <span class="pcard-disc">'+p.disc+'% off</span>';
     }
 
-    var imgContent;
-    if(firstImg){
-      imgContent = '<img src="'+firstImg+'" alt="'+p.name+'" loading="lazy" '
-                 + 'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
-                 + '<div class="pcard-img-ph" style="display:none;">'+PH+'</div>';
+    /* --- image area --- */
+    var imgAreaHtml = '';
+    if(imgs.length === 0){
+      imgAreaHtml = '<div class="pcard-img-ph">'+PH+'</div>';
     } else {
-      imgContent = '<div class="pcard-img-ph">'+PH+'</div>';
+      /* slide-wrap: all images stacked, first one active */
+      var slides = '';
+      imgs.forEach(function(url, i){
+        slides += '<div class="slide-item'+(i===0?' active':'')+'" data-i="'+i+'">'
+                + '<img src="'+url+'" alt="'+p.name+'" loading="lazy">'
+                + '</div>';
+      });
+      /* dots — only if multiple images */
+      var dotsHtml = '';
+      if(imgs.length > 1){
+        var dotItems = '';
+        imgs.forEach(function(_,i){ dotItems += '<div class="slide-dot'+(i===0?' active':'')+'" ></div>'; });
+        dotsHtml = '<div class="slide-dots" id="sd-'+p.id+'">'+dotItems+'</div>';
+      }
+      imgAreaHtml = '<div class="slide-wrap" id="sw-'+p.id+'">'+slides+dotsHtml+'</div>';
     }
 
     var badge = p.cat ? '<div class="cat-badge">'+p.cat+'</div>' : '';
-    var multiTag = imgs.length>1 ? '<div style="position:absolute;bottom:8px;right:8px;background:rgba(7,12,24,.80);border:1px solid rgba(59,125,216,0.25);border-radius:20px;padding:2px 8px;font-size:10px;font-family:\'DM Mono\',monospace;color:var(--blue3);">'+imgs.length+' photos</div>' : '';
 
     html += '<div class="pcard">';
-    html += '  <div class="pcard-img" onclick="openModal(\''+p.id+'\')">'+imgContent+badge+multiTag+'</div>';
+    html += '  <div class="pcard-img" onclick="openModal(\''+p.id+'\')">'+imgAreaHtml+badge+'</div>';
     html += '  <div class="pcard-details" onclick="openModal(\''+p.id+'\')"><div class="pcard-id">'+p.id+'</div><div class="pcard-name">'+p.name+'</div><div class="pcard-prices">'+prRow+'</div></div>';
     html += '  <button class="pcard-btn" onclick="quickOrder(\''+p.id+'\')">'+WA_SVG+' Order via WhatsApp</button>';
     html += '</div>';
   });
   g.innerHTML = html;
+
+  /* start slideshows after DOM is set */
+  FILT.forEach(function(p){
+    var imgs = parseImgs(p.img);
+    if(imgs.length > 1) startSlideshow(p.id, imgs.length);
+  });
 }
 
 function quickOrder(id){
@@ -752,7 +947,6 @@ function openViewer(imgs, idx){
   VIEW_IDX  = idx;
   var existing = document.getElementById('img-viewer');
   if(existing) existing.remove();
-
   var v = document.createElement('div');
   v.className = 'img-viewer-backdrop';
   v.id = 'img-viewer';
@@ -769,7 +963,6 @@ function viewerNav(dir){
   VIEW_IDX = (VIEW_IDX + dir + VIEW_IMGS.length) % VIEW_IMGS.length;
   var img = document.getElementById('viewer-img');
   if(img){ img.src = VIEW_IMGS[VIEW_IDX]; }
-  /* also sync modal thumbnails */
   document.querySelectorAll('.gallery-thumb').forEach(function(t,i){ t.classList.toggle('active', i===VIEW_IDX); });
   var main = document.getElementById('gallery-main-img');
   if(main) main.src = VIEW_IMGS[VIEW_IDX];
@@ -781,9 +974,10 @@ function openModal(id){
   if(!CUR) return;
   QTY = 1;
   closeAll();
+  pushModalState(); /* so browser back closes modal, not navigates */
 
   var p     = CUR;
-  var imgs  = parseImgs(p.img);    // array of image URLs
+  var imgs  = parseImgs(p.img);
   var price = sale(p);
 
   /* --- IMAGE GALLERY HTML --- */
@@ -791,12 +985,10 @@ function openModal(id){
   if(imgs.length===0){
     galleryHtml = '<div class="gallery-main"><div class="gallery-main-ph">'+PH+'</div></div>';
   } else {
-    /* main image */
     galleryHtml += '<div class="gallery-main" onclick="openViewer(MODAL_IMGS,MODAL_IDX)">'
                  + '<img id="gallery-main-img" src="'+imgs[0]+'" alt="'+p.name+'">'
                  + (imgs.length>1 ? '<div class="gallery-count">'+imgs.length+' photos</div>' : '')
                  + '</div>';
-    /* thumbnails — only if multiple */
     if(imgs.length>1){
       galleryHtml += '<div class="gallery-thumbs">';
       imgs.forEach(function(url,i){
@@ -830,16 +1022,19 @@ function openModal(id){
 
   var bd = document.createElement('div');
   bd.className = 'modal-backdrop';
-  bd.addEventListener('click', function(e){ if(e.target===bd) bd.remove(); });
+  /* click backdrop to close — but DON'T go back in history, just pop state */
+  bd.addEventListener('click', function(e){
+    if(e.target===bd){
+      bd.remove();
+      /* pop the dummy state we pushed */
+      history.back();
+    }
+  });
 
   bd.innerHTML =
     '<div class="pmodal">'
-    + '<button class="pmodal-close" onclick="this.closest(\'.modal-backdrop\').remove()">&#x2715;</button>'
-
-    /* GALLERY */
+    + '<button class="pmodal-close" onclick="closeModalBtn(this)">&#x2715;</button>'
     + '<div class="pmodal-gallery">'+galleryHtml+'</div>'
-
-    /* BODY */
     + '<div class="pmodal-body">'
       + '<div>'
         + '<div class="pmodal-id">ID: '+p.id+'</div>'
@@ -873,12 +1068,16 @@ function openModal(id){
 
   document.body.appendChild(bd);
 
-  /* expose to thumb/viewer clicks */
   window.MODAL_IMGS = imgs;
   window.MODAL_IDX  = 0;
 }
 
-/* Thumbnail click: swap main image */
+/* Close button on modal — remove modal AND pop the dummy history state */
+function closeModalBtn(btn){
+  btn.closest('.modal-backdrop').remove();
+  history.back();
+}
+
 function thumbClick(idx){
   window.MODAL_IDX = idx;
   var mainImg = document.getElementById('gallery-main-img');
@@ -891,7 +1090,6 @@ function thumbClick(idx){
 function chQty(d){
   QTY = Math.max(1, QTY+d);
   document.getElementById('qv').textContent = QTY;
-  /* FIX: use text node, not innerHTML with CFG.SYM — no more broken rupee sign */
   document.getElementById('dtot').textContent = rupee(sale(CUR)*QTY);
 }
 
@@ -913,9 +1111,13 @@ function addCart(){
 /* ===== CART MODAL ===== */
 function openCart(){
   closeAll();
+  pushModalState();
+
   var bd = document.createElement('div');
   bd.className = 'modal-backdrop';
-  bd.addEventListener('click', function(e){ if(e.target===bd) bd.remove(); });
+  bd.addEventListener('click', function(e){
+    if(e.target===bd){ bd.remove(); history.back(); }
+  });
 
   var items = '';
   if(CART.length===0){
@@ -945,13 +1147,14 @@ function openCart(){
     footer = '<div class="cart-footer">'
            + '  <div class="cart-total"><span>Total</span><span>'+rupee(ttlP())+'</span></div>'
            + '  <button class="btn-wa-lg" onclick="cartOrder()">'+WA_SVG+' Order All via WhatsApp</button>'
-           + '  <button class="btn-sec" style="margin-top:8px" onclick="this.closest(\'.modal-backdrop\').remove()">Continue Shopping</button>'
+           + '  <button class="btn-sec" style="margin-top:8px" onclick="closeCartBtn(this)">Continue Shopping</button>'
            + '</div>';
   }
 
   bd.innerHTML =
     '<div class="cart-modal">'
-    + '<div class="cart-header"><div class="cart-title">Your Cart</div><button class="icon-btn" onclick="this.closest(\'.modal-backdrop\').remove()">&#x2715;</button></div>'
+    + '<div class="cart-header"><div class="cart-title">Your Cart</div>'
+    + '<button class="icon-btn" onclick="closeCartBtn(this)">&#x2715;</button></div>'
     + '<div class="cart-body">'+items+'</div>'
     + footer
     + '</div>';
@@ -959,14 +1162,24 @@ function openCart(){
   document.body.appendChild(bd);
 }
 
-function removeCart(i){
-  CART.splice(i,1); setBadge(); openCart();
+function closeCartBtn(btn){
+  btn.closest('.modal-backdrop').remove();
+  history.back();
 }
+
+function removeCart(i){
+  CART.splice(i,1); setBadge();
+  /* re-open cart in place — pop old state first then push new */
+  history.back();
+  setTimeout(openCart, 50);
+}
+
 function cartOrder(){
   if(!CART.length) return;
   logOrd({source:'cart',items:CART.map(function(i){return i.p.id+' x'+i.qty;}).join(', '),total:ttlP(),date:new Date().toLocaleString('en-IN')});
   goWA(CART);
   CART=[]; setBadge(); closeAll();
+  history.back();
 }
 </script>
 </body>
