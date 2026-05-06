@@ -3,263 +3,612 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AR Network House Feedback</title>
-
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-body {
-  margin: 0;
-  font-family: Segoe UI, sans-serif;
-  background: #eef2f7;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 12px;
-}
+  :root {
+    --navy: #0d1f3c;
+    --navy-mid: #1a365d;
+    --gold: #c9a84c;
+    --gold-light: #e8c96b;
+    --cream: #fdf8ef;
+    --white: #ffffff;
+    --shadow: 0 32px 80px rgba(13,31,60,0.22);
+  }
 
-.card {
-  background: #ffffff;
-  max-width: 420px;
-  width: 100%;
-  padding: 26px;
-  border-radius: 16px;
-  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-.brand-logo {
-  width: 90px;
-  display: block;
-  margin: 0 auto 14px;
-  border-radius: 12px;
-}
+  body {
+    min-height: 100vh;
+    background: var(--navy);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px 16px;
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    position: relative;
+  }
 
-h2 {
-  text-align: center;
-  color: #1a365d;
-  margin: 6px 0;
-}
+  /* ── Animated background particles ── */
+  .bg-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.18;
+    animation: drift 14s ease-in-out infinite alternate;
+  }
+  .orb-1 { width: 520px; height: 520px; background: #1a4a8a; top: -180px; left: -120px; animation-duration: 16s; }
+  .orb-2 { width: 380px; height: 380px; background: var(--gold); top: 40%; right: -100px; animation-duration: 12s; animation-delay: -4s; }
+  .orb-3 { width: 300px; height: 300px; background: #0a3060; bottom: -80px; left: 20%; animation-duration: 18s; animation-delay: -8s; }
 
-p {
-  text-align: center;
-  color: #333;
-  font-size: 14px;
-  margin-bottom: 18px;
-}
+  @keyframes drift {
+    0%   { transform: translate(0,0) scale(1); }
+    100% { transform: translate(40px,30px) scale(1.08); }
+  }
 
-label {
-  font-weight: 600;
-  margin-top: 14px;
-  display: block;
-}
+  /* Floating particles */
+  .particle {
+    position: fixed;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0;
+    animation: float-up linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-input, textarea {
-  width: 95%;
-  padding: 14px;
-  margin-top: 6px;
-  border-radius: 10px;
-  border: 1px solid #dcdcdc;
-  font-size: 15px;
-}
+  @keyframes float-up {
+    0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.3; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+  }
 
-.stars {
-  display: flex;
-  flex-direction: row-reverse;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
-}
+  /* ── Card ── */
+  .card {
+    position: relative;
+    z-index: 1;
+    background: rgba(253,248,239,0.97);
+    max-width: 460px;
+    width: 100%;
+    border-radius: 28px;
+    padding: 40px 36px 36px;
+    box-shadow: var(--shadow), 0 0 0 1px rgba(201,168,76,0.25);
+    animation: card-in 0.9s cubic-bezier(0.22,1,0.36,1) both;
+    backdrop-filter: blur(12px);
+  }
 
-.stars input {
-  display: none;
-}
+  @keyframes card-in {
+    from { opacity: 0; transform: translateY(48px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
 
-.stars label {
-  font-size: 38px;
-  color: #ddd;
-  cursor: pointer;
-}
+  /* Gold decorative top bar */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 40px; right: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+    border-radius: 0 0 4px 4px;
+    animation: shimmer 3s linear infinite;
+    background-size: 200% 100%;
+  }
 
-.stars input:checked ~ label,
-.stars label:hover,
-.stars label:hover ~ label {
-  color: #f6ad55;
-}
+  @keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
 
-button {
-  width: 100%;
-  margin-top: 22px;
-  padding: 16px;
-  font-size: 16px;
-  font-weight: 700;
-  border: none;
-  border-radius: 12px;
-  background: #1a365d;
-  color: white;
-  cursor: pointer;
-}
+  /* Corner ornaments */
+  .ornament {
+    position: absolute;
+    width: 44px; height: 44px;
+    opacity: 0.18;
+  }
+  .ornament svg { width: 100%; height: 100%; }
+  .ornament-tl { top: 14px; left: 14px; }
+  .ornament-tr { top: 14px; right: 14px; transform: scaleX(-1); }
+  .ornament-bl { bottom: 14px; left: 14px; transform: scaleY(-1); }
+  .ornament-br { bottom: 14px; right: 14px; transform: scale(-1); }
 
-/* SUCCESS CARD */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+    animation: fade-up 0.7s 0.2s both;
+  }
 
-.success-card {
-  background: #ffffff;
-  max-width: 360px;
-  width: 100%;
-  padding: 26px;
-  border-radius: 16px;
-  text-align: center;
-  box-shadow: 0 14px 30px rgba(0,0,0,0.2);
-}
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-.success-card h3 {
-  margin-top: 10px;
-  color: #1a365d;
-}
+  .logo-wrap {
+    width: 80px; height: 80px;
+    margin: 0 auto 14px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(13,31,60,0.2), 0 0 0 2px var(--gold);
+    animation: logo-pop 0.8s 0.1s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes logo-pop {
+    from { opacity: 0; transform: scale(0.6); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .logo-wrap img { width: 100%; height: 100%; object-fit: cover; }
 
-.success-card p {
-  font-size: 14px;
-  margin-top: 8px;
-  color: #333;
-}
+  h2 {
+    font-family: 'Playfair Display', serif;
+    color: var(--navy);
+    font-size: 24px;
+    letter-spacing: 0.02em;
+  }
+  .tagline {
+    color: #5a6a80;
+    font-size: 13px;
+    margin-top: 4px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+  }
 
-.success-card button {
-  margin-top: 18px;
-  background: #1a365d;
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: 10px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-}
+  /* Divider */
+  .divider {
+    display: flex; align-items: center; gap: 10px;
+    margin: 0 0 22px;
+    opacity: 0.4;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--navy));
+  }
+  .divider::after { background: linear-gradient(90deg, var(--navy), transparent); }
+  .divider span { font-size: 10px; letter-spacing: 0.3em; color: var(--navy); text-transform: uppercase; }
 
-.emoji {
-  font-size: 42px;
-}
+  /* ── Fields ── */
+  .field {
+    margin-bottom: 18px;
+    animation: fade-up 0.6s both;
+  }
+  .field:nth-child(1) { animation-delay: 0.3s; }
+  .field:nth-child(2) { animation-delay: 0.4s; }
+  .field:nth-child(3) { animation-delay: 0.5s; }
+  .field:nth-child(4) { animation-delay: 0.6s; }
+
+  label.field-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--navy-mid);
+    margin-bottom: 7px;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 12px;
+    border: 1.5px solid #dde3ec;
+    background: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--navy);
+    outline: none;
+    transition: border-color 0.25s, box-shadow 0.25s, transform 0.15s;
+  }
+  input::placeholder, textarea::placeholder { color: #aab4c4; }
+
+  input:focus, textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.18);
+    transform: translateY(-1px);
+  }
+
+  textarea { resize: vertical; min-height: 90px; }
+
+  /* ── Star Rating ── */
+  .stars-wrap {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 0;
+  }
+  .stars-wrap input { display: none; }
+  .stars-wrap label {
+    font-size: 40px;
+    color: #d8dfe8;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+    display: inline-block;
+    line-height: 1;
+  }
+  .stars-wrap label:hover { transform: scale(1.25) rotate(-5deg); }
+  .stars-wrap input:checked ~ label,
+  .stars-wrap label:hover,
+  .stars-wrap label:hover ~ label {
+    color: var(--gold);
+    text-shadow: 0 0 12px rgba(201,168,76,0.55);
+  }
+
+  /* ── Submit Button ── */
+  .btn-wrap {
+    margin-top: 24px;
+    animation: fade-up 0.6s 0.7s both;
+  }
+
+  button.submit-btn {
+    width: 100%;
+    padding: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--navy-mid) 0%, #0d1f3c 100%);
+    color: var(--white);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 8px 24px rgba(13,31,60,0.32);
+  }
+
+  button.submit-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.25) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  button.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(13,31,60,0.4); }
+  button.submit-btn:hover::before { opacity: 1; }
+  button.submit-btn:active { transform: scale(0.98); }
+
+  /* Button shine sweep */
+  button.submit-btn::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    animation: btn-shine 3.5s linear infinite;
+  }
+  @keyframes btn-shine {
+    0%   { left: -100%; }
+    40%  { left: 120%; }
+    100% { left: 120%; }
+  }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 11px;
+    color: #8a96a8;
+    letter-spacing: 0.03em;
+    animation: fade-up 0.5s 0.9s both;
+  }
+  footer a { color: var(--gold); text-decoration: none; font-weight: 600; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ── Success Overlay ── */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5,15,35,0.75);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    backdrop-filter: blur(6px);
+  }
+  .overlay.active { display: flex; }
+
+  .success-card {
+    background: var(--cream);
+    max-width: 360px; width: 90%;
+    padding: 40px 32px;
+    border-radius: 24px;
+    text-align: center;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.35), 0 0 0 1.5px rgba(201,168,76,0.3);
+    animation: pop-in 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+    position: relative;
+    overflow: hidden;
+  }
+  @keyframes pop-in {
+    from { opacity: 0; transform: scale(0.7); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .success-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 30px; right: 30px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .success-emoji {
+    font-size: 56px;
+    margin-bottom: 12px;
+    display: block;
+    animation: bounce 0.8s 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes bounce {
+    from { opacity: 0; transform: scale(0.3) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .success-card h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--navy);
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+  .success-card p {
+    color: #4a5568;
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+  .success-note {
+    font-size: 11px !important;
+    color: #8a96a8 !important;
+    margin-top: 10px !important;
+  }
+  .success-card .close-btn {
+    margin-top: 22px;
+    background: linear-gradient(135deg, var(--navy-mid), #0d1f3c);
+    color: var(--white);
+    border: none;
+    padding: 13px 36px;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 6px 18px rgba(13,31,60,0.3);
+  }
+  .success-card .close-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(13,31,60,0.4); }
+
+  /* Stars confetti on success */
+  .confetti-star {
+    position: fixed;
+    pointer-events: none;
+    font-size: 18px;
+    z-index: 1000;
+    animation: fall 2.5s ease-in forwards;
+    opacity: 1;
+  }
+  @keyframes fall {
+    0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
 </style>
 </head>
-
 <body>
 
+<!-- Background -->
+<div class="bg-canvas">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- Particles generated by JS -->
+
+<!-- Card -->
 <div class="card">
-  <img src="https://github.com/arnetworkhouse-oss/ar-network-house/blob/main/ar%20logo.jpg?raw=true"
-       class="brand-logo">
 
-  <h2>AR Network House</h2>
-  <p>Please rate your experience with our services.</p>
-
-  <label>Your Name *</label>
-  <input id="name" placeholder="Enter your name">
-
-  <label>Rating *</label>
-  <div class="stars">
-    <input type="radio" id="r5" name="rating" value="5"><label for="r5">★</label>
-    <input type="radio" id="r4" name="rating" value="4"><label for="r4">★</label>
-    <input type="radio" id="r3" name="rating" value="3"><label for="r3">★</label>
-    <input type="radio" id="r2" name="rating" value="2"><label for="r2">★</label>
-    <input type="radio" id="r1" name="rating" value="1"><label for="r1">★</label>
+  <!-- Corner ornaments -->
+  <div class="ornament ornament-tl">
+    <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 42 L2 8 Q2 2 8 2 L42 2" stroke="#0d1f3c" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="2" cy="2" r="2" fill="#c9a84c"/>
+      <circle cx="22" cy="2" r="1.5" fill="#0d1f3c" opacity="0.4"/>
+      <circle cx="2" cy="22" r="1.5" fill="#0d1f3c" opacity="0.4"/>
+    </svg>
+  </div>
+  <div class="ornament ornament-tr">
+    <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 42 L2 8 Q2 2 8 2 L42 2" stroke="#0d1f3c" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="2" cy="2" r="2" fill="#c9a84c"/>
+    </svg>
+  </div>
+  <div class="ornament ornament-bl">
+    <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 42 L2 8 Q2 2 8 2 L42 2" stroke="#0d1f3c" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="2" cy="2" r="2" fill="#c9a84c"/>
+    </svg>
+  </div>
+  <div class="ornament ornament-br">
+    <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 42 L2 8 Q2 2 8 2 L42 2" stroke="#0d1f3c" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="2" cy="2" r="2" fill="#c9a84c"/>
+    </svg>
   </div>
 
-  <label>Your Invoice No OR Project ID (Optional)</label>
-  <input id="pid" placeholder="Enter your 2k26_## or AR2k26_##" value="2k26_ or AR2k26_">
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-wrap">
+      <img src="https://github.com/arnetworkhouse-oss/ar-network-house/blob/main/ar%20logo.jpg?raw=true" alt="AR Network House">
+    </div>
+    <h2>AR Network House</h2>
+    <p class="tagline">Share your experience with us</p>
+  </div>
 
-  <label>Message (Optional)</label>
-  <textarea id="message" rows="4"></textarea>
+  <div class="divider"><span>✦ Feedback Form ✦</span></div>
 
-  <button onclick="submitFeedback()">Submit Feedback</button>
+  <!-- Name -->
+  <div class="field">
+    <label class="field-label">Your Name <span style="color:var(--gold)">*</span></label>
+    <input id="name" type="text" placeholder="Enter your full name">
+  </div>
 
-  <footer style="text-align:center;margin-top:20px;font-size:12px;opacity:.7;">
-    Feedback year <span id="year"></span> Contact us 
-    <a href="https://arnetworkhouse.in/"><strong>AR Network House</strong></a>
+  <!-- Rating -->
+  <div class="field">
+    <label class="field-label">Rate Your Experience <span style="color:var(--gold)">*</span></label>
+    <div class="stars-wrap">
+      <input type="radio" id="r5" name="rating" value="5"><label for="r5" title="Excellent">★</label>
+      <input type="radio" id="r4" name="rating" value="4"><label for="r4" title="Very Good">★</label>
+      <input type="radio" id="r3" name="rating" value="3"><label for="r3" title="Good">★</label>
+      <input type="radio" id="r2" name="rating" value="2"><label for="r2" title="Fair">★</label>
+      <input type="radio" id="r1" name="rating" value="1"><label for="r1" title="Poor">★</label>
+    </div>
+  </div>
+
+  <!-- Project ID -->
+  <div class="field">
+    <label class="field-label">Invoice / Project ID <span style="opacity:0.5;font-size:10px">(Optional)</span></label>
+    <input id="pid" type="text" placeholder="e.g. 2k26_## or AR2k26_##">
+  </div>
+
+  <!-- Message -->
+  <div class="field">
+    <label class="field-label">Message <span style="opacity:0.5;font-size:10px">(Optional)</span></label>
+    <textarea id="message" placeholder="Tell us about your experience…"></textarea>
+  </div>
+
+  <div class="btn-wrap">
+    <button class="submit-btn" onclick="submitFeedback()">✦ &nbsp;Submit Feedback</button>
+  </div>
+
+  <footer>
+    &copy; <span id="year"></span> &nbsp;·&nbsp;
+    <a href="https://arnetworkhouse.in/" target="_blank">AR Network House</a>
+    &nbsp;·&nbsp; All rights reserved
   </footer>
 </div>
 
-<!-- SUCCESS OVERLAY -->
+<!-- Success Overlay -->
 <div class="overlay" id="successOverlay">
   <div class="success-card">
-    <div class="emoji" id="successEmoji"></div>
+    <span class="success-emoji" id="successEmoji"></span>
     <h3 id="successTitle"></h3>
     <p id="successMessage"></p>
-    <p id="successFooter" style="font-size:12px;opacity:0.7;margin-top:6px;">
-      Your feedback process has been successfully completed. Thank you for your time.
-    </p>
-    <button onclick="location.reload()">Close</button>
+    <p class="success-note">Your feedback has been successfully recorded. Thank you for your time — AR Network House Team</p>
+    <button class="close-btn" onclick="closeSuccess()">Close</button>
   </div>
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyxn2Od9q_p6JOyJmrEPeXsbRAkwVK57PKtej0s7ay0wcoeCZBCn3Q_80ux3yxn43JW7Q/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbyxn2Od9q_p6JOyJmrEPeXsbRAkwVK57PKtej0s7ay0wcoeCZBCn3Q_80ux3yxn43JW7Q/exec";
 
-function submitFeedback() {
-  const name = document.getElementById("name").value.trim();
-  const ratingEl = document.querySelector("input[name='rating']:checked");
-  const projectId = document.getElementById("pid").value.trim();
-  const message = document.getElementById("message").value;
+  // Generate floating particles
+  (function spawnParticles() {
+    for (let i = 0; i < 22; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.cssText = `
+        left: ${Math.random()*100}vw;
+        width: ${1.5 + Math.random()*3}px;
+        height: ${1.5 + Math.random()*3}px;
+        animation-duration: ${8 + Math.random()*14}s;
+        animation-delay: ${Math.random()*12}s;
+        opacity: 0;
+      `;
+      document.body.appendChild(p);
+    }
+  })();
 
-  if (!name || !ratingEl) {
-    alert("Name and rating are mandatory");
-    return;
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  function spawnConfetti(rating) {
+    if (rating < 4) return;
+    const emojis = rating === 5
+      ? ['⭐','✨','🌟','💛','🎉']
+      : ['⭐','✨','👍'];
+    for (let i = 0; i < 28; i++) {
+      const el = document.createElement('div');
+      el.className = 'confetti-star';
+      el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      el.style.cssText = `
+        left: ${Math.random()*100}vw;
+        top: -30px;
+        animation-duration: ${1.8+Math.random()*1.4}s;
+        animation-delay: ${Math.random()*0.8}s;
+        font-size: ${14+Math.random()*18}px;
+      `;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }
   }
 
-  const rating = Number(ratingEl.value);
+  function submitFeedback() {
+    const name = document.getElementById('name').value.trim();
+    const ratingEl = document.querySelector('input[name="rating"]:checked');
+    const projectId = document.getElementById('pid').value.trim();
+    const message = document.getElementById('message').value;
 
-  fetch(API_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: name,
-      rating: rating,
-      projectId: projectId,
-      message: message,
-      source: "Feedback Page"
-    })
-  });
+    if (!name || !ratingEl) {
+      // Shake the relevant fields
+      if (!name) shake(document.getElementById('name'));
+      if (!ratingEl) shake(document.querySelector('.stars-wrap'));
+      return;
+    }
 
-  const emoji = document.getElementById("successEmoji");
-  const title = document.getElementById("successTitle");
-  const msg = document.getElementById("successMessage");
-  const footer = document.getElementById("successFooter");
+    const rating = Number(ratingEl.value);
 
-  if (rating <= 2) {
-    emoji.innerText = "😔";
-    title.innerText = "We’re Sorry";
-    msg.innerText =
-      "We apologize for the inconvenience. Your feedback has been logged and corrective action will be taken.";
-  } 
-  else if (rating === 3) {
-    emoji.innerText = "🙂";
-    title.innerText = "Thank You";
-    msg.innerText =
-      "Thank you for your feedback. We value your input.";
-  } 
-  else if (rating === 4) {
-    emoji.innerText = "😊";
-    title.innerText = "Thank You So Much!";
-    msg.innerText =
-      "We’re pleased to hear about your positive experience.";
-  } 
-  else {
-    emoji.innerText = "😊😊😊😊😊";
-    title.innerText = "Huge Appreciation!";
-    msg.innerText =
-      "Thank you for your exceptional feedback. Your support is highly appreciated.";
+    fetch(API_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, rating, projectId, message, source: 'Feedback Page' })
+    });
+
+    const responses = {
+      1: { emoji: '😔', title: "We're Sorry", msg: "We apologize for the inconvenience. Your feedback has been logged and we'll take corrective action." },
+      2: { emoji: '😔', title: "We're Sorry", msg: "We apologize for the inconvenience. Your feedback has been logged and we'll take corrective action." },
+      3: { emoji: '🙂', title: "Thank You", msg: "We appreciate your honest feedback and will work to improve your experience." },
+      4: { emoji: '😊', title: "Thank You So Much!", msg: "We're really pleased to hear about your positive experience with our services." },
+      5: { emoji: '🌟', title: "Huge Appreciation!", msg: "Your exceptional feedback means the world to us. We're thrilled to have served you so well!" },
+    };
+
+    const r = responses[rating];
+    document.getElementById('successEmoji').textContent = r.emoji;
+    document.getElementById('successTitle').textContent = r.title;
+    document.getElementById('successMessage').textContent = r.msg;
+
+    spawnConfetti(rating);
+    document.getElementById('successOverlay').classList.add('active');
   }
 
-  footer.innerText = "Your feedback process has been successfully completed. Thank you for your time. — AR Network House Team";
+  function closeSuccess() {
+    location.reload();
+  }
 
-  document.getElementById("successOverlay").style.display = "flex";
-}
+  function shake(el) {
+    el.style.animation = 'shake 0.45s ease';
+    el.addEventListener('animationend', () => el.style.animation = '', { once: true });
+  }
 
-document.getElementById("year").textContent = new Date().getFullYear();
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-7px); }
+      40%      { transform: translateX(7px); }
+      60%      { transform: translateX(-5px); }
+      80%      { transform: translateX(5px); }
+    }
+  `;
+  document.head.appendChild(style);
 </script>
-
 </body>
 </html>
