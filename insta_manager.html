@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0c0e; --surface: #131316; --surface2: #1a1a1f;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #f0f0f5; --muted: #666680;
+    --accent: #e8673a; --accent2: #c44b23;
+    --green: #2ec88a; --green-bg: rgba(46,200,138,0.08);
+    --amber: #f5a623; --amber-bg: rgba(245,166,35,0.08);
+    --blue: #5b8dee; --blue-bg: rgba(91,141,238,0.08);
+    --radius: 14px; --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; overflow-x: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    background-size: 200px 200px; opacity: 0.4;
+  }
+  .shell { position: relative; z-index: 1; max-width: 820px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* SETUP */
+  .setup-screen {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 40px 24px; position: relative; z-index: 1;
+  }
+  .setup-logo {
+    width: 64px; height: 64px; border-radius: 20px;
+    background: linear-gradient(135deg, #f09433 0%, #dc2743 50%, #bc1888 100%);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 24px;
+  }
+  .setup-screen h1 {
+    font-size: 28px; font-weight: 800; margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--text) 0%, var(--muted) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .setup-screen p { font-size: 14px; color: var(--muted); margin-bottom: 32px; text-align: center; max-width: 380px; line-height: 1.6; font-weight: 400; }
+  .setup-box { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 28px; width: 100%; max-width: 460px; }
+  .setup-box label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .input-row { display: flex; gap: 8px; }
+  .url-input {
+    flex: 1; padding: 11px 16px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border2); background: var(--surface2); color: var(--text);
+    font-family: 'DM Mono', monospace; font-size: 12px; outline: none; transition: border-color 0.2s;
+  }
+  .url-input:focus { border-color: var(--accent); }
+  .url-input::placeholder { color: var(--muted); }
+  .btn-primary {
+    padding: 11px 20px; border-radius: var(--radius-sm); background: var(--accent);
+    color: #fff; border: none; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: background 0.2s, transform 0.1s; white-space: nowrap;
+  }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-primary:active { transform: scale(0.97); }
+
+  /* TOPBAR */
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand-icon { width: 42px; height: 42px; border-radius: 13px; background: linear-gradient(135deg, #f09433 0%, #dc2743 50%, #bc1888 100%); display: flex; align-items: center; justify-content: center; }
+  .brand-text h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+  .brand-text p { font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 1px; }
+  .topbar-actions { display: flex; gap: 8px; align-items: center; }
+  .btn-ghost {
+    padding: 8px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border2);
+    background: transparent; color: var(--muted); font-family: 'Syne', sans-serif;
+    font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s;
+  }
+  .btn-ghost:hover { color: var(--text); background: var(--surface2); }
+
+  /* STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 28px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; position: relative; overflow: hidden; }
+  .stat-card::after { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; border-radius: 0 2px 2px 0; }
+  .stat-card.total::after { background: var(--muted); }
+  .stat-card.done::after  { background: var(--green); }
+  .stat-card.pending::after { background: var(--amber); }
+  .stat-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .stat-num { font-size: 30px; font-weight: 800; font-family: 'DM Mono', monospace; letter-spacing: -0.02em; }
+  .stat-card.done .stat-num   { color: var(--green); }
+  .stat-card.pending .stat-num { color: var(--amber); }
+
+  /* AI BAR */
+  .ai-bar { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: var(--radius-sm); background: var(--blue-bg); border: 1px solid rgba(91,141,238,0.15); margin-bottom: 20px; font-size: 12px; color: var(--blue); font-weight: 600; }
+
+  /* CONTROLS */
+  .controls { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  .filter-pill { padding: 7px 14px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.15s; }
+  .filter-pill:hover { border-color: var(--border2); color: var(--text); }
+  .filter-pill.active { background: var(--surface2); border-color: var(--border2); color: var(--text); }
+  .filter-pill.active.f-done    { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+  .filter-pill.active.f-pending { border-color: var(--amber); color: var(--amber); background: var(--amber-bg); }
+  .search-wrap { margin-left: auto; position: relative; display: flex; align-items: center; }
+  .search-wrap svg { position: absolute; left: 11px; color: var(--muted); pointer-events: none; }
+  .search-wrap input {
+    padding: 7px 14px 7px 34px; border-radius: 100px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); font-family: 'Syne', sans-serif;
+    font-size: 12px; outline: none; width: 180px; transition: border-color 0.2s, width 0.2s;
+  }
+  .search-wrap input:focus { border-color: var(--border2); width: 220px; }
+  .search-wrap input::placeholder { color: var(--muted); }
+
+  /* LIST & CARD */
+  .list { display: flex; flex-direction: column; gap: 8px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px 20px; transition: border-color 0.15s; animation: slideIn 0.2s ease both;
+  }
+  @keyframes slideIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+  .card:hover { border-color: var(--border2); }
+  .card.is-done { background: rgba(46,200,138,0.03); border-color: rgba(46,200,138,0.15); }
+  .card.is-done:hover { border-color: rgba(46,200,138,0.25); }
+
+  .card-body { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+  .avatar {
+    width: 42px; height: 42px; border-radius: 13px; flex-shrink: 0;
+    background: linear-gradient(135deg, #f09433, #dc2743, #bc1888);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: white; letter-spacing: -0.03em;
+  }
+  .avatar.is-done { background: linear-gradient(135deg, #1a5a38, #0d8a55); }
+  .card-info { flex: 1; min-width: 0; }
+  .name { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+  .meta { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .type-pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(91,141,238,0.2); font-family: 'DM Mono', monospace; letter-spacing: 0.02em; }
+  .status { flex-shrink: 0; display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
+  .status.done    { background: var(--green-bg); color: var(--green); border: 1px solid rgba(46,200,138,0.2); }
+  .status.pending { background: rgba(255,255,255,0.04); color: var(--muted); border: 1px solid var(--border); }
+
+  /* MESSAGE BOX */
+  .msg-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 12px; color: var(--muted);
+    line-height: 1.6; font-weight: 400;
+    white-space: pre-wrap; word-break: break-word;
+    margin-bottom: 12px;
+    font-family: 'DM Mono', monospace;
+  }
+  .msg-box.empty { font-style: italic; opacity: 0.5; }
+
+  /* ACTIONS */
+  .card-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .btn-ig {
+    padding: 8px 16px; border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, #f09433 0%, #dc2743 50%, #bc1888 100%);
+    color: white; border: none; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    text-decoration: none; transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn-ig:hover { opacity: 0.85; }
+  .btn-ig:active { transform: scale(0.97); }
+  .btn-copy {
+    padding: 8px 16px; border-radius: var(--radius-sm); background: transparent;
+    color: var(--muted); border: 1px solid var(--border2); font-family: 'Syne', sans-serif;
+    font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s;
+  }
+  .btn-copy:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-bg); }
+  .btn-copy:active { transform: scale(0.97); }
+  .btn-copy.copied { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+  .btn-done {
+    padding: 8px 16px; border-radius: var(--radius-sm); background: transparent;
+    color: var(--muted); border: 1px solid var(--border2); font-family: 'Syne', sans-serif;
+    font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s;
+  }
+  .btn-done:hover { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+  .btn-done:active { transform: scale(0.97); }
+  .btn-done:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* STATES */
+  .loading-state, .empty-state, .error-state { text-align: center; padding: 72px 24px; color: var(--muted); font-size: 14px; }
+  .spinner-ring { width: 28px; height: 28px; border: 2px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .empty-icon { width: 48px; height: 48px; margin: 0 auto 16px; opacity: 0.3; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: var(--surface2); border: 1px solid var(--border2); color: var(--text);
+    padding: 10px 18px; border-radius: 100px; font-size: 13px; font-weight: 600;
+    opacity: 0; transition: all 0.25s; pointer-events: none; z-index: 999;
+    white-space: nowrap; display: flex; align-items: center; gap: 8px;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.ok  { border-color: rgba(46,200,138,0.4); color: var(--green); }
+  .toast.err { border-color: rgba(232,103,58,0.4); color: var(--accent); }
+
+  @media (max-width: 540px) {
+    .stats-row { gap: 8px; }
+    .stat-num { font-size: 24px; }
+    .controls { gap: 6px; }
+    .search-wrap { margin-left: 0; margin-top: 4px; width: 100%; }
+    .search-wrap input, .search-wrap input:focus { width: 100%; }
+    .card-actions { gap: 6px; }
+    .btn-ig, .btn-copy, .btn-done { padding: 7px 12px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="setup" class="setup-screen">
+  <div class="setup-logo">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/></svg>
+  </div>
+  <h1>Instagram Manager</h1>
+  <p>Connect your Google Apps Script to get started. This is a one-time setup.</p>
+  <div class="setup-box">
+    <label>Apps Script Web App URL</label>
+    <div class="input-row">
+      <input class="url-input" id="urlInput" type="url" placeholder="https://script.google.com/macros/s/…/exec" />
+      <button class="btn-primary" onclick="saveUrl()">Connect</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none">
+  <div class="shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/></svg>
+        </div>
+        <div class="brand-text">
+          <h1>Instagram Manager</h1>
+          <p>Selling team dashboard</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-ghost" onclick="loadData()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Refresh
+        </button>
+        <button class="btn-ghost" onclick="resetUrl()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07"/></svg>
+          Change URL
+        </button>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card total"><div class="stat-label">Total</div><div class="stat-num" id="statTotal">—</div></div>
+      <div class="stat-card done"><div class="stat-label">Done</div><div class="stat-num" id="statDone">—</div></div>
+      <div class="stat-card pending"><div class="stat-label">Pending</div><div class="stat-num" id="statPending">—</div></div>
+    </div>
+
+    <div class="ai-bar" id="aiBar" style="display:none">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      <span id="aiBarText">AI powered by Claude</span>
+    </div>
+
+    <div class="controls">
+      <button class="filter-pill active" id="pill-all" onclick="setFilter('all',this)">All</button>
+      <button class="filter-pill f-done" id="pill-done" onclick="setFilter('done',this)">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Done
+      </button>
+      <button class="filter-pill f-pending" id="pill-pending" onclick="setFilter('pending',this)">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pending
+      </button>
+      <div class="search-wrap">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Search accounts…" oninput="renderList()">
+      </div>
+    </div>
+
+    <div class="list" id="listContainer"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbzrI_N02uXKQIaVwpd6AkveG451SK31z0P5Wv17ZlyjABlVMM8uTeQ8vXJYr6Cqrq56hA/exec';
+  const STORAGE_KEY = 'igm_url_v2';
+  let storedUrl = localStorage.getItem(STORAGE_KEY) || DEFAULT_URL;
+  let allData = [];
+  let currentFilter = 'all';
+
+  function saveUrl() {
+    const val = document.getElementById('urlInput').value.trim();
+    if (!val.startsWith('https://')) { toast('Invalid URL', 'err'); return; }
+    storedUrl = val;
+    localStorage.setItem(STORAGE_KEY, storedUrl);
+    showApp(); loadData();
+  }
+
+  function resetUrl() {
+    localStorage.removeItem(STORAGE_KEY);
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('setup').style.display = 'flex';
+  }
+
+  function showApp() {
+    document.getElementById('setup').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  }
+
+  async function loadData() {
+    document.getElementById('listContainer').innerHTML = `<div class="loading-state"><div class="spinner-ring"></div>Loading accounts…</div>`;
+    try {
+      const res = await fetch(storedUrl + '?action=getData');
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Unknown error');
+      allData = json.data || [];
+      updateStats(); renderList(); enrichWithAI();
+    } catch(e) {
+      document.getElementById('listContainer').innerHTML = `<div class="error-state"><svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${e.message}</div>`;
+    }
+  }
+
+  async function markDone(rowIndex, btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<div style="width:12px;height:12px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite"></div>`;
+    try {
+      const res = await fetch(storedUrl, { method: 'POST', body: JSON.stringify({ action: 'markDone', rowIndex }) });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Failed');
+      const row = allData.find(r => r.rowIndex === rowIndex);
+      if (row) row.sts = 'done';
+      updateStats(); renderList(); toast('Marked as done', 'ok');
+    } catch(e) {
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Chat Done`;
+      toast(e.message, 'err');
+    }
+  }
+
+  function copyMessage(btn) {
+    // raw message stored in data-msg attribute — no HTML encoding issues
+    const msg = btn.closest('.card').querySelector('.msg-box').dataset.raw;
+    if (!msg || !msg.trim()) { toast('No message to copy', 'err'); return; }
+    navigator.clipboard.writeText(msg).then(() => {
+      btn.classList.add('copied');
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+      toast('Copied!', 'ok');
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+      }, 2000);
+    }).catch(() => toast('Copy failed', 'err'));
+  }
+
+  async function enrichWithAI() {
+    if (!allData.length) return;
+    document.getElementById('aiBar').style.display = 'flex';
+    document.getElementById('aiBarText').textContent = 'Claude is analyzing your accounts…';
+    try {
+      const summary = allData.slice(0,15).map(r => `${r.profileName} (${r.type}): ${r.sts||'pending'}`).join('\n');
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514', max_tokens: 1000,
+          messages: [{ role: 'user', content: `You are a sales dashboard assistant. Given this list of Instagram accounts to contact, give a short 1-sentence insight about the overall status and 1 quick recommendation. Be concise and actionable. Respond in plain text only, no markdown.\n\nAccounts:\n${summary}` }]
+        })
+      });
+      const data = await res.json();
+      const insight = data?.content?.[0]?.text || '';
+      if (insight) document.getElementById('aiBarText').textContent = insight;
+      else document.getElementById('aiBar').style.display = 'none';
+    } catch { document.getElementById('aiBar').style.display = 'none'; }
+  }
+
+  function updateStats() {
+    const done = allData.filter(r => (r.sts||'').toLowerCase() === 'done').length;
+    document.getElementById('statTotal').textContent   = allData.length;
+    document.getElementById('statDone').textContent    = done;
+    document.getElementById('statPending').textContent = allData.length - done;
+  }
+
+  function setFilter(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderList();
+  }
+
+  function renderList() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = allData.filter(row => {
+      const isDone = (row.sts||'').toLowerCase() === 'done';
+      if (currentFilter === 'done'    && !isDone) return false;
+      if (currentFilter === 'pending' &&  isDone) return false;
+      if (q) {
+        const hay = ((row.profileName||'')+(row.type||'')+(row.message||'')).toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    const c = document.getElementById('listContainer');
+    if (!filtered.length) {
+      c.innerHTML = `<div class="empty-state"><svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>No accounts found</div>`;
+      return;
+    }
+    c.innerHTML = filtered.map(buildCard).join('');
+  }
+
+  function buildCard(row) {
+    const isDone   = (row.sts||'').toLowerCase() === 'done';
+    const initials = (row.profileName||'?').slice(0,2).toUpperCase();
+    const msgText  = row.message || '';
+
+    const igBtn = row.link
+      ? `<a class="btn-ig" href="${esc(row.link)}" target="_blank"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/></svg>Open</a>`
+      : '';
+
+    const copyBtn = `<button class="btn-copy" onclick="copyMessage(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button>`;
+
+    const doneBtn = `<button class="btn-done" onclick="markDone(${row.rowIndex},this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat Done</button>`;
+
+    const statusBadge = isDone
+      ? `<div class="status done"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Done</div>`
+      : `<div class="status pending"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pending</div>`;
+
+    const msgBox = msgText
+      ? `<div class="msg-box" data-raw="${esc(msgText)}">${esc(msgText)}</div>`
+      : `<div class="msg-box empty" data-raw="">No message</div>`;
+
+    return `
+      <div class="card ${isDone?'is-done':''}">
+        <div class="card-body">
+          <div class="avatar ${isDone?'is-done':''}">${initials}</div>
+          <div class="card-info">
+            <div class="name">${esc(row.profileName||'(no name)')}</div>
+            <div class="meta"><span class="type-pill">${esc(row.type||'unknown')}</span></div>
+          </div>
+          ${statusBadge}
+        </div>
+        ${msgBox}
+        <div class="card-actions">${igBtn}${copyBtn}${doneBtn}</div>
+      </div>`;
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function toast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast show ${type||''}`;
+    setTimeout(() => t.className = 'toast', 2800);
+  }
+
+  if (storedUrl) { showApp(); loadData(); }
+</script>
+</body>
+</html>
