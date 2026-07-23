@@ -105,13 +105,35 @@ input:checked + .slider:before { transform: translateX(24px); }
 }
 
 .bill-header {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    text-align: left;
     border-bottom: 2px solid var(--border-color);
     padding-bottom: 20px;
     margin-bottom: 20px;
 }
 
-.bill-header h1 { margin: 0; font-size: 32px }
+.bill-header h1 {
+    margin: 0 0 6px;
+    font-size: 30px;
+    letter-spacing: 1px;
+    text-align: left;
+    color: var(--primary-color);
+    line-height: 1.1;
+}
+
+.header-text { flex: 1; }
+.header-text p { margin: 4px 0; font-size: 15px; color: #444; }
+.header-text .tagline { font-style: italic; color: #777; margin-bottom: 10px; }
+
+.bill-logo {
+    width: 110px;
+    height: 110px;
+    object-fit: contain;
+    flex-shrink: 0;
+    display: block;
+}
 
 .bill-meta {
     display: flex;
@@ -257,11 +279,14 @@ input:checked + .slider:before { transform: translateX(24px); }
 
 <div id="invoice">
 <div class="bill-header">
+<img id="shopLogo" class="bill-logo" src="https://raw.githubusercontent.com/arnetworkhouse-oss/ar-network-house/main/mobile_bill_logo.png" alt="Shop Logo" onerror="this.style.display='none'">
+<div class="header-text">
 <h1 id="shopName">---</h1>
-<p><i>"Your Trusted Mobile Partner"</i></p>
+<p class="tagline"><i>"Your Trusted Mobile Partner"</i></p>
 <p id="shopAddress">---</p>
 <p id="shopContact">Contact: ---</p>
 <p id="shopGstDisplay">GSTIN: ---</p>
+</div>
 </div>
 
 <div class="bill-meta">
