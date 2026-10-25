@@ -75,6 +75,12 @@ input[type=range]{width:100%;accent-color:var(--amber);}
 .gen{margin:18px 20px 14px;padding:16px;background:var(--amber);color:#0d0f0c;border:none;font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;width:calc(100% - 40px);display:flex;align-items:center;justify-content:center;gap:10px;}
 .gen:disabled{background:var(--line);color:#7d7259;cursor:not-allowed;}
 .gen.save{background:var(--ink);color:var(--paper);margin-top:0;}
+.gen.alt{background:transparent;color:var(--ink);border:1.5px solid var(--ink);margin-top:0;}
+.prebtn{border:1px solid var(--line);background:var(--panel);color:#8a7a5c;font-family:var(--mono);font-size:10.5px;padding:8px 4px;cursor:pointer;text-transform:uppercase;}
+.prebtn.active{border-color:var(--amber);color:var(--amber);background:rgba(193,115,43,.08);}
+.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;}
+.chk{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:11.5px;cursor:pointer;}
+.chk input{accent-color:var(--amber);width:16px;height:16px;}
 .progress{height:3px;background:var(--line);margin:0 20px 14px;display:none;}
 .progress.show{display:block;}
 .progress .bar{height:100%;width:0;background:var(--amber);}
@@ -172,23 +178,33 @@ input[type=range]{width:100%;accent-color:var(--amber);}
 
     <div class="section">
       <h2><span class="idx">05</span> Compression</h2>
-      <div class="rowlbl">Quality <b id="qualVal">82%</b></div>
-      <input type="range" id="qualSlider" min="30" max="95" value="82" step="1">
-      <div class="rowlbl" style="margin-top:12px;">Max Dimension <b id="dimVal">1600px</b></div>
+      <div class="presets">
+        <button class="prebtn" data-p="high">High</button>
+        <button class="prebtn active" data-p="med">Med</button>
+        <button class="prebtn" data-p="small">Small</button>
+        <button class="prebtn" data-p="tiny">Tiny</button>
+      </div>
+      <div class="rowlbl">Quality <b id="qualVal">60%</b></div>
+      <input type="range" id="qualSlider" min="10" max="95" value="60" step="1">
+      <div class="rowlbl" style="margin-top:12px;">Max Dimension <b id="dimVal">1200px</b></div>
       <select id="dimSelect">
         <option value="0">None — full resolution</option>
         <option value="2400">2400px long edge</option>
-        <option value="1600" selected>1600px long edge (recommended)</option>
-        <option value="1200">1200px long edge</option>
-        <option value="900">900px long edge — smallest / fastest</option>
+        <option value="1600">1600px long edge</option>
+        <option value="1200" selected>1200px long edge</option>
+        <option value="900">900px long edge</option>
+        <option value="700">700px long edge</option>
+        <option value="500">500px long edge — tiniest</option>
       </select>
-      <div class="qualitynote">Runs locally. Lower quality/dimension = smaller PDF, less RAM, faster on slow devices.</div>
+      <label class="chk"><input type="checkbox" id="grayChk"> Grayscale (much smaller for scans / docs)</label>
+      <div class="qualitynote">Runs locally. Lower quality/dimension = smaller PDF. Tiny = 40% / 700px / gray.</div>
     </div>
 
     <button class="gen" id="genBtn" disabled>Generate PDF →</button>
     <div class="progress" id="progress"><div class="bar" id="progressBar"></div></div>
     <div class="status" id="status"></div>
-    <button class="gen save" id="saveBtn" style="display:none">Save PDF… (choose location)</button>
+    <button class="gen save" id="dlBtn" style="display:none">⬇ Download PDF</button>
+    <button class="gen alt" id="saveBtn" style="display:none">Save As… (pick folder)</button>
   </div>
 
   <div class="preview">
@@ -218,13 +234,13 @@ input[type=range]{width:100%;accent-color:var(--amber);}
   };
   const EMPTY = `<div class="empty-state">${ICON.img}<div class="e1">No Pages Yet</div><div class="e2">Load images to see live layout</div></div>`;
 
-  const state = { files:[], orient:'portrait', pageSize:'a4', margin:0, activeIdx:0, quality:.82, maxDim:1600 };
+  const state = { files:[], orient:'portrait', pageSize:'a4', margin:0, activeIdx:0, quality:.60, maxDim:1200, gray:false };
   const PAGE_SIZES = { a4:[210,297], letter:[215.9,279.4], legal:[215.9,355.6], a3:[297,420], a5:[148,210] };
 
   const drop=$('drop'), fileInput=$('fileInput'), thumblist=$('thumblist'), fcount=$('fcount'),
         genBtn=$('genBtn'), progress=$('progress'), progressBar=$('progressBar'), statusEl=$('status'),
         previewBody=$('previewBody'), strip=$('strip'), pageinfo=$('pageinfo'),
-        prevBtn=$('prevBtn'), nextBtn=$('nextBtn'), saveBtn=$('saveBtn');
+        prevBtn=$('prevBtn'), nextBtn=$('nextBtn'), saveBtn=$('saveBtn'), dlBtn=$('dlBtn');
   let outBlob = null, outName = 'batch-output.pdf';
   // serial number so the file name is new every time (no "already exists / replace?" popup)
   function serialPeek(){ try{ return (+localStorage.getItem('i2p_serial')||0)+1; }catch(e){ return Date.now()%100000; } }
@@ -264,7 +280,7 @@ input[type=range]{width:100%;accent-color:var(--amber);}
   const work = document.createElement('canvas');
   function releaseCanvas(){ work.width = work.height = 0; }
 
-  function scaledJpeg(img, maxEdge, quality){
+  function scaledJpeg(img, maxEdge, quality, gray){
     let w = img.naturalWidth, h = img.naturalHeight;
     if(maxEdge > 0){
       const s = Math.min(1, maxEdge / Math.max(w,h));
@@ -274,6 +290,11 @@ input[type=range]{width:100%;accent-color:var(--amber);}
     const ctx = work.getContext('2d');
     ctx.fillStyle = '#fff'; ctx.fillRect(0,0,w,h);
     ctx.drawImage(img, 0, 0, w, h);
+    if(gray){
+      const id = ctx.getImageData(0,0,w,h), d = id.data;
+      for(let i=0;i<d.length;i+=4){ const g=(d[i]*77+d[i+1]*150+d[i+2]*29)>>8; d[i]=d[i+1]=d[i+2]=g; }
+      ctx.putImageData(id,0,0);
+    }
     return work; // caller reads from canvas
   }
 
@@ -373,14 +394,24 @@ input[type=range]{width:100%;accent-color:var(--amber);}
   const margSlider=$('margSlider'), margVal=$('margVal');
   function setMargin(v){
     state.margin=v; margSlider.value=v; margVal.textContent=v+'mm';
-    document.querySelectorAll('.margbtn').forEach(b=>b.classList.toggle('active',+b.dataset.m===v));
+    document.querySelectorAll('.marggrp .margbtn').forEach(b=>b.classList.toggle('active',+b.dataset.m===v));
     schedule(0,0,1);
   }
   margSlider.addEventListener('input', e=>setMargin(+e.target.value));
-  document.querySelectorAll('.margbtn').forEach(b=>b.addEventListener('click',()=>setMargin(+b.dataset.m)));
+  document.querySelectorAll('.marggrp .margbtn').forEach(b=>b.addEventListener('click',()=>setMargin(+b.dataset.m)));
 
-  $('qualSlider').addEventListener('input', e=>{ state.quality=+e.target.value/100; $('qualVal').textContent=e.target.value+'%'; });
-  $('dimSelect').addEventListener('change', e=>{ state.maxDim=+e.target.value; $('dimVal').textContent = state.maxDim? state.maxDim+'px':'off'; });
+  function markPreset(p){ document.querySelectorAll('.presets .prebtn').forEach(b=>b.classList.toggle('active',b.dataset.p===p)); }
+  $('qualSlider').addEventListener('input', e=>{ state.quality=+e.target.value/100; $('qualVal').textContent=e.target.value+'%'; markPreset(''); });
+  $('dimSelect').addEventListener('change', e=>{ state.maxDim=+e.target.value; $('dimVal').textContent = state.maxDim? state.maxDim+'px':'off'; markPreset(''); });
+  $('grayChk').addEventListener('change', e=>{ state.gray=e.target.checked; markPreset(''); });
+  const PRESETS = { high:[85,1600,false], med:[60,1200,false], small:[45,900,false], tiny:[40,700,true] };
+  document.querySelectorAll('.presets .prebtn').forEach(b=>b.addEventListener('click',()=>{
+    const [q,d,g]=PRESETS[b.dataset.p];
+    state.quality=q/100; state.maxDim=d; state.gray=g;
+    $('qualSlider').value=q; $('qualVal').textContent=q+'%';
+    $('dimSelect').value=String(d); $('dimVal').textContent=d+'px';
+    $('grayChk').checked=g; markPreset(b.dataset.p);
+  }));
 
   /* ---------- nav ---------- */
   function setActive(i){
@@ -509,26 +540,13 @@ input[type=range]{width:100%;accent-color:var(--amber);}
   /* ---------- PDF build ---------- */
   genBtn.addEventListener('click', async ()=>{
     if(!state.files.length) return;
-    // Ask for save location FIRST, right inside the click (browsers only allow the
-    // dialog during a fresh tap; a long build would expire it). File is written when done.
-    let handle = null;
+    // Build only. Saving is manual (buttons below) so no 0 KB placeholder file is ever created.
     const serial = serialPeek();
     outName = makeName(serial);
-    if(window.showSaveFilePicker){
-      try{
-        handle = await window.showSaveFilePicker({
-          suggestedName: outName,
-          types:[{description:'PDF document', accept:{'application/pdf':['.pdf']}}]
-        });
-      } catch(e){
-        if(e && e.name==='AbortError'){ statusEl.className='status'; statusEl.textContent='Cancelled — pick a location to continue.'; return; }
-        handle = null; // picker blocked → fall back to normal download
-      }
-    }
     genBtn.disabled = true;
     progress.classList.add('show');
     statusEl.className='status'; statusEl.textContent='Preparing…';
-    saveBtn.style.display='none'; outBlob=null;
+    saveBtn.style.display='none'; dlBtn.style.display='none'; outBlob=null;
     try{
       await loadPdfLib();
       const { jsPDF } = window.jspdf;
@@ -549,7 +567,7 @@ input[type=range]{width:100%;accent-color:var(--amber);}
 
         statusEl.textContent = `Compressing ${i+1} / ${total}…`;
         const {img, url} = await loadImg(f.file);
-        const c = scaledJpeg(img, state.maxDim, state.quality);
+        const c = scaledJpeg(img, state.maxDim, state.quality, state.gray);
         const data = c.toDataURL('image/jpeg', state.quality);
         img.src=''; URL.revokeObjectURL(url); releaseCanvas();
         doc.addImage(data,'JPEG', m+(aw-dw)/2, m+(ah-dh)/2, dw, dh, undefined, 'FAST');
@@ -559,18 +577,11 @@ input[type=range]{width:100%;accent-color:var(--amber);}
       }
       const blob = doc.output('blob');
       outBlob = blob;
-      let saved = false;
-      if(handle){
-        try{
-          const w = await handle.createWritable();
-          await w.write(blob); await w.close();
-          saved = true;
-        } catch(e){ console.error(e); }
-      } else { fallbackDownload(); saved = true; }
-      if(saved) serialBump(serial);
-      if(!saved) saveBtn.style.display = 'flex'; // write failed → manual save button
+      if(!blob || blob.size<100) throw new Error('PDF came out empty — try smaller dimension / fewer images');
+      dlBtn.style.display='flex';
+      if(window.showSaveFilePicker) saveBtn.style.display='flex';
       const kb = blob.size/1024;
-      statusEl.textContent = `${saved ? '✓ Saved' : '✓ PDF ready — tap Save'} — ${total} page${total===1?'':'s'}, ${kb<1024?Math.round(kb)+' KB':(kb/1024).toFixed(1)+' MB'}`;
+      statusEl.textContent = `✓ PDF ready — ${total} page${total===1?'':'s'}, ${kb<1024?Math.round(kb)+' KB':(kb/1024).toFixed(1)+' MB'}. Tap Download.`;
       statusEl.className='status ok';
     } catch(err){
       console.error(err);
@@ -582,34 +593,36 @@ input[type=range]{width:100%;accent-color:var(--amber);}
     }
   });
 
+  dlBtn.addEventListener('click', ()=>{ if(outBlob) fallbackDownload(); });
   saveBtn.addEventListener('click', async ()=>{
     if(!outBlob) return;
-    // Save dialog (Chrome/Edge/Opera, Android Chrome). Needs a fresh tap, so it is a button.
-    if(window.showSaveFilePicker){
-      try{
-        const h = await window.showSaveFilePicker({
-          suggestedName: outName,
-          types:[{description:'PDF document', accept:{'application/pdf':['.pdf']}}]
-        });
-        const w = await h.createWritable();
-        await w.write(outBlob); await w.close();
-        serialBump(+(outName.match(/\d+/)||[0])[0]);
-        statusEl.textContent='✓ Saved: '+h.name; statusEl.className='status ok';
-      } catch(e){
-        if(e && e.name==='AbortError') return; // user cancelled dialog
-        fallbackDownload();
-      }
-    } else fallbackDownload();
+    try{
+      const h = await window.showSaveFilePicker({
+        suggestedName: outName,
+        types:[{description:'PDF document', accept:{'application/pdf':['.pdf']}}]
+      });
+      const w = await h.createWritable();
+      await w.write(outBlob); await w.close();
+      serialBump(+(outName.match(/\d+/)||[0])[0]);
+      statusEl.textContent='✓ Saved: '+h.name; statusEl.className='status ok';
+    } catch(e){
+      if(e && e.name==='AbortError') return;
+      // picker refuses drive roots / system folders → normal download instead
+      statusEl.textContent='Folder blocked by browser (drive root / system folder). Using Download instead…';
+      statusEl.className='status err';
+      fallbackDownload();
+    }
   });
   function fallbackDownload(){
-    // Firefox/Safari: no path picker in the web platform. Browser decides
-    // (enable "Ask where to save files" in browser settings to get a dialog).
+    // Normal browser download. To choose ANY folder incl. drive root (C:\, D:\):
+    // browser Settings → Downloads → turn on "Ask where to save each file".
     const url = URL.createObjectURL(outBlob);
     const a = document.createElement('a');
     a.href=url; a.download=outName;
     document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url), 30000);
-    statusEl.textContent='✓ Downloaded (browser default location)'; statusEl.className='status ok';
+    serialBump(+(outName.match(/\d+/)||[0])[0]);
+    setTimeout(()=>URL.revokeObjectURL(url), 60000);
+    statusEl.textContent='✓ Download started — '+outName+' (check Downloads)'; statusEl.className='status ok';
   }
 
   renderPreview();
